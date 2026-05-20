@@ -1,222 +1,213 @@
+
+Inches coach v3 · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INCHES — Athlete App Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>INCHES — Coach App</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
   body{background:#eae9e6;font-family:'DM Sans',sans-serif}
-  #root{min-height:100vh}
-  #loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;background:#eae9e6}
-  .spin{width:40px;height:40px;border:3px solid #dddada;border-top-color:#c72333;border-radius:50%;animation:spin .8s linear infinite}
+  #root{height:100%}
+  .app-shell{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;height:100dvh;gap:7px;padding:8px 0 6px}
+  .brand{text-align:center;flex-shrink:0}
+  .brand-name{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#030000;letter-spacing:5px;line-height:1}
+  .brand-sub{font-size:8px;font-weight:700;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+  .phone{background:#fff;border-radius:36px;border:1.5px solid #bbb;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.18),0 3px 10px rgba(0,0,0,.07);position:relative;width:375px;max-width:calc(100vw - 12px);height:calc(100dvh - 76px);max-height:780px}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#030000;border-radius:0 0 13px 13px;z-index:20}
+  .sbar{height:34px;padding:8px 20px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#fff;position:relative;z-index:5}
+  .scr{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .scr::-webkit-scrollbar{display:none}
+  .bnav{height:56px;background:#fff;border-top:1.5px solid #dddada;display:flex;align-items:flex-start;padding-top:7px;flex-shrink:0}
   @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes scanLine{0%{top:20%}50%{top:75%}100%{top:20%}}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-  .fade-in{animation:fadeIn .25s ease}
-  .scan-line{position:absolute;left:10%;width:80%;height:2px;background:linear-gradient(90deg,transparent,#c72333,transparent);animation:scanLine 2s ease-in-out infinite}
-  .qr-corner{position:absolute;width:22px;height:22px;border-color:#c72333;border-style:solid}
-  .pulse-dot{animation:pulse 1.5s ease-in-out infinite}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .fade-in{animation:fadeIn .18s ease}
+  .slide-up{animation:slideUp .24s cubic-bezier(.32,.72,0,1)}
+  #loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;background:#eae9e6}
+  .spin{width:32px;height:32px;border:3px solid #dddada;border-top-color:#c72333;border-radius:50%;animation:spin .8s linear infinite}
+  textarea,input,select{outline:none}
+  input::placeholder,textarea::placeholder{color:#bbb}
 </style>
 </head>
 <body>
 <div id="loading">
   <div class="spin"></div>
-  <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#030000;letter-spacing:4px">INCHES</div>
-  <div style="font-size:12px;color:#888;font-family:'DM Sans',sans-serif">Loading prototype...</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#030000;letter-spacing:4px">INCHES</div>
+  <div style="font-size:11px;color:#888;font-family:'DM Sans',sans-serif">Loading Coach App…</div>
 </div>
-<div id="root" style="display:none"></div>
-
+<div id="root" style="display:none;height:100%"></div>
+ 
 <script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
-
-// ── TOKENS ────────────────────────────────────────────────────────────────────
+const { useState, useEffect, useRef } = React;
+ 
+/* ── TOKENS ──────────────────────────────────────────────────── */
 const R='#c72333',K='#030000',W='#ffffff',C='#242420',G='#dddada',GL='#f5f5f5';
 const RB='rgba(199,35,51,.07)',RBR='rgba(199,35,51,.22)';
-const GR='#1a7f4b',GRB='rgba(26,127,75,.1)',AM='#b45309',AMB='rgba(180,83,9,.1)';
+const GR='#1a7f4b',GRB='rgba(26,127,75,.1)';
+const AM='#b45309',AMB='rgba(180,83,9,.1)';
 const BL='#1471d4',BLB='rgba(20,113,212,.1)';
 const FD="'Barlow Condensed',sans-serif",FB="'DM Sans',sans-serif";
-
-// ── ICON HELPER ───────────────────────────────────────────────────────────────
-const Ic=({p,c=K,s=22})=>(
+ 
+/* ── ICON ─────────────────────────────────────────────────────── */
+const Ic=({p,c=K,s=19})=>(
   <span style={{display:'inline-flex',lineHeight:1,flexShrink:0}}
-    dangerouslySetInnerHTML={{__html:`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`}}/>
+    dangerouslySetInnerHTML={{__html:`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`}}/>
 );
 const I={
-  home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
-  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  clk:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
-  usr:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  usrs:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-  bel:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
-  chR:'<polyline points="9 18 15 12 9 6"/>',
-  chL:'<polyline points="15 18 9 12 15 6"/>',
-  map:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
-  cam:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
-  chk:'<polyline points="20 6 9 17 4 12"/>',
-  X:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
-  inf:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
-  flm:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
-  act:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
-  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
-  qr:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/><path d="M17 17h4"/><path d="M17 21v-4"/><path d="M21 14v3"/>',
-  award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
-  tgt:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
-  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  cal:  '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  usrs: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  clip: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',
+  usr:  '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  chR:  '<polyline points="9 18 15 12 9 6"/>',
+  chL:  '<polyline points="15 18 9 12 15 6"/>',
+  X:    '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  chk:  '<polyline points="20 6 9 17 4 12"/>',
+  inf:  '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  map:  '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  srch: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  tgt:  '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  coin: '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
 };
-
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const BRANCHES=[
-  {id:1,name:'New Cairo',addr:'Fifth Settlement, Cairo',coaches:4,color:BL,bg:BLB},
-  {id:2,name:'Maadi',addr:'Maadi, Cairo',coaches:3,color:GR,bg:GRB},
-  {id:3,name:'Sheikh Zayed',addr:'6th October, Giza',coaches:2,color:AM,bg:AMB},
-];
-
-const COACHES=[
-  {id:1,name:'Karim Adel',initials:'KA',specialty:'Strength & Power',rating:4.9,sessions:312,exp:'6 yrs',branches:[1,3],
-   bio:'Former national powerlifting champion. Specializes in strength programming, Olympic lifting, and athlete performance. Known for high-intensity, results-driven sessions.',
-   tags:['Strength','Olympic Lifting','HIIT','Powerlifting'],
-   reviews:[{n:'Omar H.',r:5,t:'Karim pushed me beyond what I thought was possible. Best coach I\'ve had.'},
-            {n:'Sara M.',r:5,t:'Amazing programming. Lost 8kg in 3 months and PR\'d my deadlift.'}],
-   slots:[{time:'7:00 AM',dur:'60 min',pts:15,day:'Mon/Wed/Thu'},{time:'9:00 AM',dur:'60 min',pts:15,day:'Tue/Thu'},{time:'5:00 PM',dur:'60 min',pts:18,day:'Mon/Wed/Fri'}]},
-  {id:2,name:'Sarah Mahmoud',initials:'SM',specialty:'Conditioning & Fat Loss',rating:4.8,sessions:245,exp:'4 yrs',branches:[1,2],
-   bio:'Certified personal trainer and nutrition coach. Expert in body recomposition, conditioning circuits, and mobility work. Creates customized plans for every athlete.',
-   tags:['Conditioning','Fat Loss','Mobility','Nutrition'],
-   reviews:[{n:'Hania A.',r:5,t:'Sarah\'s programming changed my body completely. So motivating!'},{n:'Lana K.',r:4,t:'Great attention to form and really knows how to scale workouts.'}],
-   slots:[{time:'8:00 AM',dur:'60 min',pts:14,day:'Mon/Tue/Wed'},{time:'11:00 AM',dur:'45 min',pts:12,day:'Daily'},{time:'4:00 PM',dur:'60 min',pts:14,day:'Sun/Tue/Thu'}]},
-  {id:3,name:'Lina Ramzy',initials:'LR',specialty:'Mobility & Recovery',rating:5.0,sessions:178,exp:'5 yrs',branches:[2,3],
-   bio:'Physical therapist and movement specialist. Focuses on mobility, injury prevention, corrective exercise, and performance recovery. Ideal for athletes with existing injuries.',
-   tags:['Mobility','Recovery','Injury Rehab','Flexibility'],
-   reviews:[{n:'Youssef A.',r:5,t:'Lina fixed a shoulder issue I\'ve had for 2 years in 6 sessions.'},{n:'Rami K.',r:5,t:'Best mobility coach in Cairo. Completely transformed how I move.'}],
-   slots:[{time:'9:00 AM',dur:'45 min',pts:12,day:'Mon/Wed/Fri'},{time:'1:00 PM',dur:'60 min',pts:14,day:'Tue/Thu'},{time:'6:00 PM',dur:'45 min',pts:12,day:'Sun/Tue'}]},
-  {id:4,name:'Omar Tarek',initials:'OT',specialty:'CrossFit & Endurance',rating:4.7,sessions:198,exp:'3 yrs',branches:[1],
-   bio:'CrossFit Level 2 coach and marathon runner. Specializes in endurance training, MetCon programming, and sport-specific conditioning for competitive athletes.',
-   tags:['CrossFit','Endurance','MetCon','Running'],
-   reviews:[{n:'Dina F.',r:5,t:'Omar\'s CrossFit programming is next level. Finished my first half marathon!'},{n:'Ahmed R.',r:4,t:'High energy sessions, really pushes you to your limits.'}],
-   slots:[{time:'6:00 AM',dur:'60 min',pts:13,day:'Mon-Sat'},{time:'7:00 PM',dur:'60 min',pts:13,day:'Mon/Wed/Fri'}]},
-];
-
-const COACH_WEEK_SLOTS={
-  1:{0:[],1:[{t:'7:00 AM',pts:15,booked:false},{t:'9:00 AM',pts:15,booked:true},{t:'5:00 PM',pts:18,booked:false}],2:[{t:'7:00 AM',pts:15,booked:false},{t:'5:00 PM',pts:18,booked:true}],3:[{t:'7:00 AM',pts:15,booked:false},{t:'9:00 AM',pts:15,booked:false},{t:'5:00 PM',pts:18,booked:false}],4:[{t:'9:00 AM',pts:15,booked:true}],5:[{t:'5:00 PM',pts:18,booked:false}],6:[]},
-  2:{0:[{t:'11:00 AM',pts:12,booked:false},{t:'4:00 PM',pts:14,booked:false}],1:[{t:'8:00 AM',pts:14,booked:false},{t:'11:00 AM',pts:12,booked:true}],2:[{t:'8:00 AM',pts:14,booked:false},{t:'11:00 AM',pts:12,booked:false}],3:[{t:'11:00 AM',pts:12,booked:false},{t:'4:00 PM',pts:14,booked:true}],4:[{t:'8:00 AM',pts:14,booked:false}],5:[{t:'4:00 PM',pts:14,booked:false}],6:[]},
-  3:{0:[{t:'9:00 AM',pts:12,booked:false}],1:[{t:'9:00 AM',pts:12,booked:true},{t:'1:00 PM',pts:14,booked:false}],2:[{t:'9:00 AM',pts:12,booked:false}],3:[{t:'1:00 PM',pts:14,booked:false}],4:[{t:'9:00 AM',pts:12,booked:false},{t:'6:00 PM',pts:12,booked:false}],5:[{t:'9:00 AM',pts:12,booked:false},{t:'6:00 PM',pts:12,booked:true}],6:[{t:'1:00 PM',pts:14,booked:false}]},
-  4:{0:[{t:'6:00 AM',pts:13,booked:false}],1:[{t:'6:00 AM',pts:13,booked:false},{t:'7:00 PM',pts:13,booked:true}],2:[{t:'6:00 AM',pts:13,booked:false}],3:[{t:'6:00 AM',pts:13,booked:false},{t:'7:00 PM',pts:13,booked:false}],4:[{t:'6:00 AM',pts:13,booked:true}],5:[{t:'6:00 AM',pts:13,booked:false},{t:'7:00 PM',pts:13,booked:false}],6:[{t:'6:00 AM',pts:13,booked:false}]},
-};
-
-const SESSION_POOL=[
-  {sid:'a',time:'7:00 AM',name:'MORNING CONDITIONING',coach:'Coach Sarah M.',dur:'60 min',spots:3,max:12,pts:8,brs:[1,2,3]},
-  {sid:'b',time:'9:00 AM',name:'STRENGTH & POWER',coach:'Coach Karim A.',dur:'60 min',spots:0,max:10,pts:10,brs:[1,3]},
-  {sid:'c',time:'12:00 PM',name:'MIDDAY MOBILITY',coach:'Coach Lina R.',dur:'45 min',spots:8,max:15,pts:6,brs:[2,3]},
-  {sid:'d',time:'6:00 PM',name:'EVENING HIIT',coach:'Coach Karim A.',dur:'45 min',spots:5,max:12,pts:8,brs:[1,2]},
-  {sid:'e',time:'5:00 PM',name:'CONDITIONING BLAST',coach:'Coach Omar T.',dur:'60 min',spots:6,max:12,pts:9,brs:[1]},
-  {sid:'f',time:'10:00 AM',name:'WEEKEND STRENGTH',coach:'Coach Sarah M.',dur:'90 min',spots:4,max:10,pts:12,brs:[2,3]},
-];
-const getSessionsForDay=(date,branchId)=>{
-  const dow=date.getDay(),wknd=dow===0||dow===6;
-  return SESSION_POOL.filter(s=>s.brs.includes(branchId)&&(wknd?['a','f'].includes(s.sid):s.sid!=='f'));
-};
-
-const BUY_PKGS=[
-  {id:1,name:'Starter Pack',pts:50,price:'1,500 EGP',ppt:'30 EGP / pt',feat:false,offer:null},
-  {id:2,name:'Performance Pack',pts:100,price:'2,800 EGP',ppt:'28 EGP / pt',feat:true,offer:null},
-  {id:3,name:'Elite Pack',pts:200,price:'5,200 EGP',ppt:'26 EGP / pt',feat:false,offer:{lbl:'+20 Bonus Pts',c:AM}},
-  {id:4,name:'Pro Pack',pts:500,price:'11,000 EGP',ppt:'22 EGP / pt',feat:false,offer:{lbl:'15% Off',c:GR}},
-];
-const ACT_PKGS=[
-  {name:'Starter Pack',rem:47,tot:100,ppt:'30 EGP / pt',exp:'Expires Jun 15',warn:true},
-  {name:'Performance Pack',rem:100,tot:100,ppt:'28 EGP / pt',exp:'Expires Jun 30',warn:false},
-];
-
-const OFF=n=>{const d=new Date();d.setDate(d.getDate()+n);return d;};
-const INIT_SESS=[
-  {id:1,date:new Date(),time:'6:00 PM',name:'STRENGTH & POWER',coach:'Coach Karim A.',type:'GROUP',pts:10,status:'upcoming',branch:'New Cairo',canCheckIn:true},
-  {id:2,date:OFF(2),time:'9:00 AM',name:'PRIVATE TRAINING',coach:'Coach Sarah M.',type:'PRIVATE',pts:15,status:'upcoming',branch:'Maadi',canCheckIn:false},
-  {id:3,date:OFF(5),time:'7:00 AM',name:'MORNING CONDITIONING',coach:'Coach Sarah M.',type:'GROUP',pts:8,status:'upcoming',branch:'New Cairo',canCheckIn:false},
-  {id:4,date:OFF(-2),time:'6:00 PM',name:'EVENING HIIT',coach:'Coach Karim A.',type:'GROUP',pts:8,status:'attended',branch:'New Cairo',rated:true,checkedIn:true},
-  {id:5,date:OFF(-4),time:'9:00 AM',name:'STRENGTH & POWER',coach:'Coach Karim A.',type:'GROUP',pts:10,status:'attended',branch:'New Cairo',rated:false,checkedIn:true},
-  {id:6,date:OFF(-7),time:'12:00 PM',name:'MIDDAY MOBILITY',coach:'Coach Lina R.',type:'GROUP',pts:6,status:'cancelled',branch:'Sheikh Zayed'},
-];
-
-const POLICY=[
-  {id:'free',title:'Free Cancellation',desc:'More than 24 hours before session',penalty:0,c:GR,bg:GRB},
-  {id:'half',title:'50% Points Deducted',desc:'Between 2–24 hours before session',penalty:.5,c:AM,bg:AMB},
-  {id:'none',title:'No Refund',desc:'Less than 2 hours before session',penalty:1,c:R,bg:RB},
-];
-
-const MO_LONG=['January','February','March','April','May','June','July','August','September','October','November','December'];
+ 
+/* ── HELPERS ──────────────────────────────────────────────────── */
+const MO_L=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MO_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DAY_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const DAY_L=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const fmtD=d=>`${DAY_S[d.getDay()]} ${d.getDate()} ${MO_S[d.getMonth()]}`;
 const sameDay=(a,b)=>a&&b&&a.getDate()===b.getDate()&&a.getMonth()===b.getMonth()&&a.getFullYear()===b.getFullYear();
-const isToday=d=>{const t=new Date();return sameDay(d,t);};
-const getPolicyTier=s=>{
-  const[tm,ap]=(s.time||'6:00 PM').split(' ');
+const isToday=d=>sameDay(d,new Date());
+const OFF=n=>{const d=new Date();d.setDate(d.getDate()+n);return d;};
+ 
+/* ── DATA ─────────────────────────────────────────────────────── */
+const CANCEL_POLICY=[
+  {id:'free',title:'Free Cancellation',      desc:'More than 24 hrs before',     c:GR,bg:GRB},
+  {id:'half',title:'50% Pts Returned',       desc:'Between 2 – 24 hrs before',   c:AM,bg:AMB},
+  {id:'full',title:'Full Refund to Athletes',desc:'Less than 2 hrs — full refund',c:BL,bg:BLB},
+];
+const BRANCHES=[
+  {id:1,name:'New Cairo',    addr:'Fifth Settlement'},
+  {id:2,name:'Maadi',        addr:'Maadi, Cairo'},
+  {id:3,name:'Sheikh Zayed', addr:'6th October'},
+];
+const SESSION_TYPES=[
+  {id:1,name:'Strength & Power',    pts:10},
+  {id:2,name:'Morning Conditioning',pts:8},
+  {id:3,name:'Evening HIIT',        pts:8},
+  {id:4,name:'Midday Mobility',     pts:6},
+  {id:5,name:'Private Training',    pts:15},
+  {id:6,name:'Conditioning Blast',  pts:9},
+];
+const ATHLETES=[
+  {id:1,name:'Hania Ahmed', init:'HA',goal:'Weight Loss & Endurance',  injury:'Left knee — mild strain',         att:91, sess:24,pts:147,branch:'New Cairo',   notes:'Prefers mornings. Avoid high-impact knee work.',           tags:['CrossFit','Endurance']},
+  {id:2,name:'Omar Hassan', init:'OH',goal:'Strength & Competition',   injury:'None',                            att:96, sess:48,pts:250,branch:'New Cairo',   notes:'Competitive. Training for powerlifting regionals.',        tags:['Powerlifting','Olympic']},
+  {id:3,name:'Lana Karim',  init:'LK',goal:'Body Composition',         injury:'Lower back — chronic (ongoing)',  att:83, sess:12,pts:40, branch:'Maadi',       notes:'Sensitive lower back. Focus on core stability first.',     tags:['Body Comp','Mobility']},
+  {id:4,name:'Youssef Ali', init:'YA',goal:'General Fitness',          injury:'None',                            att:75, sess:8, pts:80, branch:'New Cairo',   notes:'Beginner. Build confidence. Focus on form over weight.',   tags:['General','Beginner']},
+  {id:5,name:'Sara Mahmoud',init:'SM',goal:'Mobility & Recovery',      injury:'Shoulder impingement (recovering)',att:100,sess:31,pts:200,branch:'Sheikh Zayed',notes:'Excellent attendance. Modify upper body for shoulder.',    tags:['Mobility','Recovery']},
+  {id:6,name:'Rami Khaled', init:'RK',goal:'Muscle Gain',              injury:'None',                            att:88, sess:19,pts:120,branch:'Maadi',       notes:'Strong baseline. Goal: +5kg muscle by year end.',          tags:['Strength','Hypertrophy']},
+];
+const EARNINGS=[
+  {month:'June 2025',  sessions:4,  amount:480,  status:'current'},
+  {month:'May 2025',   sessions:22, amount:2640, status:'pending'},
+  {month:'April 2025', sessions:20, amount:2400, status:'paid'},
+  {month:'March 2025', sessions:18, amount:2160, status:'paid'},
+];
+const mkSess=()=>[
+  {id:1, date:new Date(),time:'8:00 AM', type:'GROUP',  name:'MORNING CONDITIONING',branch:'New Cairo',   maxA:12,pts:8, status:'upcoming',athletes:[1,2,4],  notes:'',att:{}},
+  {id:2, date:new Date(),time:'11:00 AM',type:'PRIVATE',name:'PRIVATE TRAINING',   branch:'New Cairo',   maxA:1, pts:15,status:'upcoming',athletes:[3],      notes:'',att:{}},
+  {id:3, date:new Date(),time:'2:00 PM', type:'GROUP',  name:'STRENGTH & POWER',   branch:'New Cairo',   maxA:10,pts:10,status:'upcoming',athletes:[1,2,5,6],notes:'',att:{}},
+  {id:4, date:new Date(),time:'5:00 PM', type:'PRIVATE',name:'PRIVATE TRAINING',   branch:'Sheikh Zayed',maxA:1, pts:15,status:'upcoming',athletes:[5],      notes:'',att:{}},
+  {id:5, date:OFF(1),   time:'7:00 AM', type:'GROUP',  name:'MORNING CONDITIONING',branch:'New Cairo',   maxA:12,pts:8, status:'upcoming',athletes:[1,4,6],  notes:'',att:{}},
+  {id:6, date:OFF(2),   time:'6:00 PM', type:'GROUP',  name:'EVENING HIIT',        branch:'Maadi',       maxA:12,pts:8, status:'upcoming',athletes:[3,6],    notes:'',att:{}},
+  {id:7, date:OFF(-1),  time:'8:00 AM', type:'GROUP',  name:'MORNING CONDITIONING',branch:'New Cairo',   maxA:12,pts:8, status:'done',    athletes:[1,2,4,6],notes:'Great energy. Everyone hit PRs.',att:{1:'p',2:'p',4:'a',6:'p'}},
+  {id:8, date:OFF(-3),  time:'2:00 PM', type:'GROUP',  name:'STRENGTH & POWER',    branch:'New Cairo',   maxA:10,pts:10,status:'done',    athletes:[1,2,5],  notes:'',att:{1:'p',2:'p',5:'l'}},
+  {id:9, date:OFF(-5),  time:'11:00 AM',type:'PRIVATE',name:'PRIVATE TRAINING',    branch:'Sheikh Zayed',maxA:1, pts:15,status:'done',    athletes:[3],      notes:'Core focus. Good progress.',att:{3:'p'}},
+];
+ 
+/* ── SHARED UI ────────────────────────────────────────────────── */
+/* Compact tag */
+const Tag=({label,c=R,bg=RB})=>(
+  <span style={{display:'inline-flex',background:bg,color:c,borderRadius:6,fontSize:9,fontWeight:700,padding:'2px 6px',fontFamily:FB,letterSpacing:'.2px',whiteSpace:'nowrap'}}>{label}</span>
+);
+/* Section heading */
+const SH=({label,cta,onCta})=>(
+  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7}}>
+    <span style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB}}>{label}</span>
+    {cta&&<span onClick={onCta} style={{fontSize:11,color:R,cursor:'pointer',fontWeight:600,fontFamily:FB}}>{cta}</span>}
+  </div>
+);
+/* Back button */
+const BackBtn=({onBack,light=false})=>(
+  <button onClick={onBack} style={{background:light?'rgba(255,255,255,.1)':'transparent',border:`1.5px solid ${light?'rgba(255,255,255,.2)':G}`,borderRadius:9,width:32,height:32,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+    <Ic p={I.chL} c={light?W:C} s={15}/>
+  </button>
+);
+/* Athlete avatar stack */
+const AvatarStack=({ids,max=4})=>{
+  const aths=ATHLETES.filter(a=>ids.includes(a.id));
+  return(
+    <div style={{display:'flex',alignItems:'center',gap:2}}>
+      {aths.slice(0,max).map((a,i)=>(
+        <div key={a.id} style={{width:20,height:20,borderRadius:'50%',background:K,border:`1.5px solid ${W}`,display:'flex',alignItems:'center',justifyContent:'center',marginLeft:i>0?-6:0,zIndex:max-i}}>
+          <span style={{fontSize:6,fontWeight:900,color:W,fontFamily:FB}}>{a.init}</span>
+        </div>
+      ))}
+      <span style={{fontSize:10,color:'#aaa',fontFamily:FB,marginLeft:7}}>{ids.length} athlete{ids.length!==1?'s':''}</span>
+    </div>
+  );
+};
+ 
+/* ── GET POLICY TIER ──────────────────────────────────────────── */
+const getPolicy=s=>{
+  const[tm,ap]=(s.time||'8:00 AM').split(' ');
   const[h,m]=tm.split(':').map(Number);
   const hr=h+(ap==='PM'&&h!==12?12:(ap==='AM'&&h===12?-12:0));
   const dt=new Date(s.date);dt.setHours(hr,m||0,0,0);
   const hrs=(dt-Date.now())/3600000;
-  return hrs>24?POLICY[0]:hrs>2?POLICY[1]:POLICY[2];
+  return hrs>24?CANCEL_POLICY[0]:hrs>2?CANCEL_POLICY[1]:CANCEL_POLICY[2];
 };
-
-// ── SHARED UI ─────────────────────────────────────────────────────────────────
-const BackBtn=({onBack})=>(
-  <button onClick={onBack} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:12,width:40,height:40,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-    <Ic p={I.chL} c={C} s={18}/>
-  </button>
-);
-const Tag=({label,c=R,bg=RB})=>(
-  <span style={{display:'inline-flex',background:bg,color:c,borderRadius:8,fontSize:10,fontWeight:700,padding:'3px 8px',fontFamily:FB,letterSpacing:'.2px'}}>{label}</span>
-);
-const StarRow=({rating,s=14})=>(
-  <span style={{display:'inline-flex',gap:1}}>
-    {[1,2,3,4,5].map(i=>(
-      <svg key={i} width={s} height={s} viewBox="0 0 24 24" fill={i<=Math.round(rating)?AM:'none'} stroke={AM} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-    ))}
-  </span>
-);
-
-// ── MINI CALENDAR ─────────────────────────────────────────────────────────────
-function MiniCal({month,year,selected,onSelect,onPrev,onNext,highlightDays=null}){
+ 
+/* ── MINI CALENDAR ────────────────────────────────────────────── */
+function MiniCal({month,year,selected,onSelect,onPrev,onNext,markedDates=[]}){
   const fd=new Date(year,month,1).getDay(),dim=new Date(year,month+1,0).getDate();
   const cells=[];
   for(let i=0;i<fd;i++)cells.push(null);
   for(let d=1;d<=dim;d++)cells.push(d);
   return(
-    <div style={{padding:'0 20px 16px'}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-        <button onClick={onPrev} style={{width:36,height:36,borderRadius:10,background:'transparent',border:`1.5px solid ${G}`,cursor:'pointer',fontSize:18,color:C,fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center'}}>‹</button>
-        <span style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K}}>{MO_LONG[month]} {year}</span>
-        <button onClick={onNext} style={{width:36,height:36,borderRadius:10,background:'transparent',border:`1.5px solid ${G}`,cursor:'pointer',fontSize:18,color:C,fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center'}}>›</button>
+    <div style={{padding:'0 14px 12px'}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+        <button onClick={onPrev} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${G}`,background:'transparent',cursor:'pointer',fontSize:15,display:'flex',alignItems:'center',justifyContent:'center',color:C}}>‹</button>
+        <span style={{fontFamily:FD,fontSize:16,fontWeight:800,color:K}}>{MO_L[month]} {year}</span>
+        <button onClick={onNext} style={{width:28,height:28,borderRadius:8,border:`1.5px solid ${G}`,background:'transparent',cursor:'pointer',fontSize:15,display:'flex',alignItems:'center',justifyContent:'center',color:C}}>›</button>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:3,marginBottom:6}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:3}}>
         {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>(
-          <div key={d} style={{textAlign:'center',fontSize:9.5,fontWeight:700,color:'#bbb',fontFamily:FB,padding:'3px 0'}}>{d}</div>
+          <div key={d} style={{textAlign:'center',fontSize:8.5,fontWeight:700,color:'#ccc',fontFamily:FB,padding:'2px 0'}}>{d}</div>
         ))}
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:3}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2}}>
         {cells.map((d,i)=>{
           const dt=d?new Date(year,month,d):null;
           const sel=dt&&sameDay(dt,selected),tod=dt&&isToday(dt);
-          const hasSlot=highlightDays&&dt&&highlightDays.includes(dt.getDay())&&(dt>=new Date(new Date().setHours(0,0,0,0)));
+          const dot=dt&&markedDates.some(md=>sameDay(md,dt));
           return(
             <div key={i} onClick={()=>dt&&onSelect(dt)}
-              style={{height:36,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:10,cursor:d?'pointer':'default',
+              style={{height:28,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:7,
+                cursor:d?'pointer':'default',position:'relative',
                 background:sel?K:tod?RB:'transparent',
                 border:tod&&!sel?`1.5px solid ${R}`:'1.5px solid transparent',
-                fontSize:13,fontWeight:sel||tod?700:400,
-                color:sel?W:tod?R:d?C:'transparent',fontFamily:FB,transition:'all .12s',
-                position:'relative'}}>
+                fontSize:11,fontWeight:sel||tod?700:400,
+                color:sel?W:tod?R:d?C:'transparent',fontFamily:FB,transition:'all .1s'}}>
               {d||''}
-              {hasSlot&&!sel&&<div style={{position:'absolute',bottom:3,left:'50%',transform:'translateX(-50%)',width:4,height:4,borderRadius:'50%',background:GR}}/>}
+              {dot&&!sel&&<div style={{position:'absolute',bottom:2,left:'50%',transform:'translateX(-50%)',width:3,height:3,borderRadius:'50%',background:R}}/>}
             </div>
           );
         })}
@@ -224,881 +215,545 @@ function MiniCal({month,year,selected,onSelect,onPrev,onNext,highlightDays=null}
     </div>
   );
 }
-
-// ── QR CHECK-IN SCREEN ────────────────────────────────────────────────────────
-function QRCheckIn({session,onSuccess,onClose}){
-  const[phase,setPhase]=useState('scan'); // scan | success | failed
-  const[scanning,setScanning]=useState(true);
-  // Simulate scan after 3 seconds
-  useEffect(()=>{
-    if(phase!=='scan')return;
-    const t=setTimeout(()=>{setPhase('success');setScanning(false);},3000);
-    return()=>clearTimeout(t);
-  },[phase]);
-
-  const QRPattern=()=>(
-    <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="10" y="10" width="50" height="50" rx="6" fill="none" stroke={K} strokeWidth="3"/>
-      <rect x="20" y="20" width="30" height="30" rx="3" fill={K}/>
-      <rect x="100" y="10" width="50" height="50" rx="6" fill="none" stroke={K} strokeWidth="3"/>
-      <rect x="110" y="20" width="30" height="30" rx="3" fill={K}/>
-      <rect x="10" y="100" width="50" height="50" rx="6" fill="none" stroke={K} strokeWidth="3"/>
-      <rect x="20" y="110" width="30" height="30" rx="3" fill={K}/>
-      <rect x="75" y="10" width="10" height="10" fill={K}/><rect x="90" y="10" width="10" height="10" fill={K}/>
-      <rect x="75" y="25" width="10" height="10" fill={K}/><rect x="90" y="25" width="10" height="10" fill={K}/>
-      <rect x="75" y="40" width="10" height="10" fill={K}/>
-      <rect x="100" y="75" width="10" height="10" fill={K}/><rect x="115" y="75" width="10" height="10" fill={K}/><rect x="130" y="75" width="10" height="10" fill={K}/>
-      <rect x="100" y="90" width="10" height="10" fill={K}/><rect x="130" y="90" width="10" height="10" fill={K}/>
-      <rect x="100" y="105" width="10" height="10" fill={K}/><rect x="115" y="105" width="10" height="10" fill={K}/><rect x="130" y="105" width="10" height="10" fill={K}/>
-      <rect x="100" y="120" width="10" height="10" fill={K}/><rect x="130" y="120" width="10" height="10" fill={K}/>
-      <rect x="100" y="135" width="10" height="10" fill={K}/><rect x="115" y="135" width="10" height="10" fill={K}/><rect x="130" y="135" width="10" height="10" fill={K}/>
-      <rect x="75" y="75" width="10" height="10" fill={K}/><rect x="75" y="90" width="10" height="10" fill={K}/><rect x="75" y="105" width="10" height="10" fill={K}/>
-      <rect x="10" y="75" width="10" height="10" fill={K}/><rect x="25" y="75" width="10" height="10" fill={K}/><rect x="40" y="75" width="10" height="10" fill={K}/><rect x="55" y="75" width="10" height="10" fill={K}/>
-      <rect x="10" y="90" width="10" height="10" fill={K}/><rect x="40" y="90" width="10" height="10" fill={K}/>
-      <rect x="10" y="105" width="10" height="10" fill={K}/><rect x="25" y="105" width="10" height="10" fill={K}/><rect x="40" y="105" width="10" height="10" fill={K}/><rect x="55" y="105" width="10" height="10" fill={K}/>
-    </svg>
-  );
-
-  if(phase==='success')return(
-    <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.75)',zIndex:200,display:'flex',flexDirection:'column',justifyContent:'flex-end'}}
-      onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div style={{background:W,borderRadius:'28px 28px 0 0',padding:'28px 24px 36px',textAlign:'center'}} className="fade-in">
-        <div style={{width:80,height:80,borderRadius:'50%',background:GRB,border:`3px solid ${GR}`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 18px'}}>
-          <Ic p={I.chk} c={GR} s={36}/>
-        </div>
-        <div style={{fontFamily:FD,fontSize:30,fontWeight:900,color:K,marginBottom:6}}>CHECKED IN!</div>
-        <div style={{fontSize:14,color:'#666',fontFamily:FB,lineHeight:1.6,marginBottom:20}}>Your attendance for <strong>{session.name}</strong> has been confirmed.</div>
-        <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:16,padding:'12px 16px',marginBottom:20,textAlign:'left'}}>
-          {[['📅',fmtD(session.date)],['⏰',session.time],['📍',session.branch]].map(([e,v])=>(
-            <div key={v} style={{display:'flex',alignItems:'center',gap:10,padding:'6px 0',borderBottom:`1px solid ${G}`}}>
-              <span style={{fontSize:16}}>{e}</span><span style={{fontSize:13,color:C,fontFamily:FB}}>{v}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{background:GRB,border:`1.5px solid ${GR}33`,borderRadius:12,padding:'10px 14px',marginBottom:20,display:'flex',alignItems:'center',gap:10}}>
-          <Ic p={I.award} c={GR} s={18}/>
-          <span style={{fontSize:13,color:GR,fontFamily:FB,fontWeight:600}}>Streak maintained! 🔥 Day 13</span>
-        </div>
-        <button onClick={()=>{onSuccess(session.id);onClose();}} style={{width:'100%',background:K,border:'none',borderRadius:14,padding:15,fontSize:15,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Done</button>
-      </div>
-    </div>
-  );
-
+ 
+/* ── SESSION CARD (compact) ───────────────────────────────────── */
+function SessCard({s,onCancel,onAtt}){
   return(
-    <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.9)',zIndex:200,display:'flex',flexDirection:'column'}}>
-      {/* header */}
-      <div style={{padding:'50px 20px 20px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <div>
-          <div style={{fontFamily:FD,fontSize:22,fontWeight:900,color:W}}>SCAN QR CODE</div>
-          <div style={{fontSize:12,color:'rgba(255,255,255,.5)',fontFamily:FB,marginTop:2}}>Hold camera steady over the code</div>
-        </div>
-        <button onClick={onClose} style={{background:'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.15)',borderRadius:12,width:40,height:40,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
-          <Ic p={I.X} c={W} s={18}/>
-        </button>
-      </div>
-
-      {/* session info strip */}
-      <div style={{margin:'0 20px 24px',background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.12)',borderRadius:14,padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <div>
-          <div style={{fontFamily:FD,fontSize:16,fontWeight:800,color:W,marginBottom:2}}>{session.name}</div>
-          <div style={{fontSize:11,color:'rgba(255,255,255,.5)',fontFamily:FB}}>{session.time} · {session.branch}</div>
-        </div>
-        <Tag label="LIVE" c={GR} bg={GRB}/>
-      </div>
-
-      {/* camera viewport */}
-      <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
-        {/* dark overlay with cutout */}
-        <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center'}}>
-          <div style={{width:230,height:230,position:'relative'}}>
-            {/* Corners */}
-            {[{top:0,left:0,borderTop:'3px solid',borderLeft:'3px solid',borderRadius:'6px 0 0 0'},
-              {top:0,right:0,borderTop:'3px solid',borderRight:'3px solid',borderRadius:'0 6px 0 0'},
-              {bottom:0,left:0,borderBottom:'3px solid',borderLeft:'3px solid',borderRadius:'0 0 0 6px'},
-              {bottom:0,right:0,borderBottom:'3px solid',borderRight:'3px solid',borderRadius:'0 0 6px 0'}]
-              .map((s,i)=><div key={i} className="qr-corner" style={{...s,width:30,height:30}}/>)}
-            {/* Scan line */}
-            {scanning&&<div className="scan-line"/>}
-            {/* QR display */}
-            <div style={{position:'absolute',inset:24,background:W,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',padding:12}}>
-              <QRPattern/>
-            </div>
+    <div style={{background:W,border:`1.5px solid ${s.status==='done'?GR+'33':s.status==='cancelled'?G:RBR}`,borderRadius:12,padding:'10px 12px',marginBottom:8,opacity:s.status==='cancelled'?.55:1}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:7}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:4,flexWrap:'wrap'}}>
+            <span style={{fontSize:10,fontWeight:700,color:R,fontFamily:FB}}>{fmtD(s.date)} · {s.time}</span>
+            <Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/>
+            <Tag label={s.branch} c={'#777'} bg={GL}/>
+            {s.status==='done'&&<Tag label="✓ Done" c={GR} bg={GRB}/>}
+            {s.status==='cancelled'&&<Tag label="Cancelled" c={'#999'} bg={GL}/>}
           </div>
+          <div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:5}}>{s.name}</div>
+          <AvatarStack ids={s.athletes}/>
         </div>
       </div>
-
-      {/* bottom */}
-      <div style={{padding:'20px 20px 40px',textAlign:'center'}}>
-        {scanning?(
-          <>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:14}}>
-              <div className="pulse-dot" style={{width:8,height:8,borderRadius:'50%',background:R}}/>
-              <span style={{fontSize:13,color:'rgba(255,255,255,.6)',fontFamily:FB}}>Scanning… auto-detects in 3 seconds</span>
-            </div>
-            <div style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:14,padding:'12px 16px',display:'flex',gap:10,alignItems:'center',marginBottom:16}}>
-              <Ic p={I.inf} c={'rgba(255,255,255,.4)'} s={16}/>
-              <span style={{fontSize:12,color:'rgba(255,255,255,.4)',fontFamily:FB,lineHeight:1.5}}>The coach will show you the QR code on their device or at the gym entrance.</span>
-            </div>
-            <button onClick={()=>setPhase('success')} style={{width:'100%',background:'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.15)',borderRadius:14,padding:14,fontSize:14,fontWeight:600,color:W,cursor:'pointer',fontFamily:FB}}>
-              Simulate Successful Scan ✓
-            </button>
-          </>
-        ):(
-          <div style={{fontSize:14,color:GR,fontFamily:FB,fontWeight:600}}>✓ QR Code detected</div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── CANCEL MODAL ──────────────────────────────────────────────────────────────
-function CancelModal({session,onConfirm,onClose}){
-  const tier=getPolicyTier(session);
-  const penalty=Math.round(session.pts*tier.penalty);
-  const refund=session.pts-penalty;
-  return(
-    <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)',zIndex:100,display:'flex',flexDirection:'column',justifyContent:'flex-end'}}
-      onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div style={{background:W,borderRadius:'24px 24px 0 0',padding:20,maxHeight:'88%',overflowY:'auto'}} className="fade-in">
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-          <span style={{fontFamily:FD,fontSize:22,fontWeight:800,color:K}}>CANCEL SESSION</span>
-          <button onClick={onClose} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,width:36,height:36,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic p={I.X} c={C} s={16}/></button>
-        </div>
-        <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:14,padding:'12px 14px',marginBottom:16}}>
-          <div style={{fontFamily:FD,fontSize:18,fontWeight:800,color:K,marginBottom:2}}>{session.name}</div>
-          <div style={{fontSize:12,color:'#666',fontFamily:FB}}>{fmtD(session.date)} · {session.time} · {session.branch}</div>
-        </div>
-        <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:10}}>CANCELLATION POLICY</div>
-        {POLICY.map(t=>(
-          <div key={t.id} style={{display:'flex',alignItems:'flex-start',gap:10,padding:'10px 0',borderBottom:`1px solid ${G}`}}>
-            <div style={{width:10,height:10,borderRadius:'50%',background:t.id===tier.id?t.c:G,marginTop:4,flexShrink:0}}/>
-            <div style={{flex:1}}>
-              <div style={{fontSize:13,fontWeight:t.id===tier.id?700:400,color:t.id===tier.id?K:'#888',fontFamily:FB}}>{t.title}</div>
-              <div style={{fontSize:11,color:'#aaa',fontFamily:FB}}>{t.desc}</div>
-            </div>
-            {t.id===tier.id&&<Tag label="Active" c={t.c} bg={t.bg}/>}
-          </div>
-        ))}
-        <div style={{background:tier.bg,border:`1.5px solid ${tier.c}44`,borderRadius:14,padding:'14px 16px',margin:'16px 0'}}>
-          {[['Session cost',`${session.pts} pts`,K],[`Penalty (${Math.round(tier.penalty*100)}%)`,`-${penalty} pts`,tier.c]].map(([l,v,vc])=>(
-            <div key={l} style={{display:'flex',justifyContent:'space-between',marginBottom:6}}>
-              <span style={{fontSize:13,color:C,fontFamily:FB}}>{l}</span>
-              <span style={{fontSize:13,fontWeight:700,color:vc,fontFamily:FB}}>{v}</span>
-            </div>
-          ))}
-          <div style={{height:1,background:`${tier.c}33`,margin:'8px 0'}}/>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:14,fontWeight:700,color:K,fontFamily:FB}}>Refund to wallet</span>
-            <span style={{fontFamily:FD,fontSize:22,fontWeight:800,color:tier.c}}>{refund} pts</span>
-          </div>
-        </div>
-        <div style={{display:'flex',gap:10}}>
-          <button onClick={onClose} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:12,padding:14,fontSize:14,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Keep Session</button>
-          <button onClick={()=>onConfirm(session,penalty)} style={{flex:1,background:R,border:'none',borderRadius:12,padding:14,fontSize:14,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Confirm Cancel</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── BOOK CONFIRM MODAL ────────────────────────────────────────────────────────
-function BookConfirmModal({session,branch,date,isPrivate,coachName,onConfirm,onClose}){
-  return(
-    <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)',zIndex:150,display:'flex',flexDirection:'column',justifyContent:'flex-end'}}
-      onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div style={{background:W,borderRadius:'24px 24px 0 0',padding:20}} className="fade-in">
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
-          <span style={{fontFamily:FD,fontSize:22,fontWeight:800,color:K}}>CONFIRM BOOKING</span>
-          <button onClick={onClose} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,width:36,height:36,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic p={I.X} c={C} s={16}/></button>
-        </div>
-        <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:16,padding:16,marginBottom:16}}>
-          <div style={{fontFamily:FD,fontSize:22,fontWeight:900,color:K,marginBottom:10}}>{isPrivate?`PRIVATE TRAINING`:(session.name||'SESSION')}</div>
-          {[['📅',fmtD(date)],['⏰',`${session.time||session.t} · ${session.dur||'60 min'}`],['👤',coachName||session.coach],['📍',`${branch.name} Branch`],['🏷',isPrivate?'Private Session':'Group Session']].map(([e,v])=>(
-            <div key={v} style={{display:'flex',alignItems:'center',gap:10,padding:'7px 0',borderTop:`1px solid ${G}`}}>
-              <span style={{fontSize:16}}>{e}</span><span style={{fontSize:13,color:C,fontFamily:FB}}>{v}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'14px 16px',background:RB,border:`1.5px solid ${RBR}`,borderRadius:14,marginBottom:16}}>
-          <span style={{fontSize:14,color:C,fontFamily:FB}}>Points deducted</span>
-          <div><span style={{fontFamily:FD,fontSize:28,fontWeight:900,color:R}}>{session.pts}</span><span style={{fontSize:12,fontWeight:600,color:'#888',fontFamily:FB}}> pts</span></div>
-        </div>
-        <button onClick={onConfirm} style={{width:'100%',background:K,border:'none',borderRadius:14,padding:15,fontSize:15,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>
-          Confirm — Deduct {session.pts} pts
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ── COACH PROFILE ─────────────────────────────────────────────────────────────
-function CoachProfile({coach,branch,onBook,onBack}){
-  const[view,setView]=useState('profile'); // profile | schedule
-  const[selDate,setSelDate]=useState(new Date());
-  const[calMo,setCalMo]=useState(new Date());
-  const[confirm,setConfirm]=useState(null);
-  const[done,setDone]=useState(false);
-  const yr=calMo.getFullYear(),mo=calMo.getMonth();
-  const daySlots=COACH_WEEK_SLOTS[coach.id]?.[selDate.getDay()]||[];
-  // Days that have slots (for dot indicators)
-  const activeDays=[0,1,2,3,4,5,6].filter(d=>(COACH_WEEK_SLOTS[coach.id]?.[d]||[]).length>0);
-
-  if(done)return(
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'40px 24px',textAlign:'center'}} className="fade-in">
-      <div style={{width:72,height:72,borderRadius:'50%',background:GRB,border:`2px solid ${GR}`,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}><Ic p={I.chk} c={GR} s={30}/></div>
-      <div style={{fontFamily:FD,fontSize:28,fontWeight:900,color:K,marginBottom:8}}>SESSION BOOKED!</div>
-      <div style={{fontSize:14,color:'#666',fontFamily:FB,lineHeight:1.6,marginBottom:6}}>Private session with <strong>{coach.name}</strong></div>
-      <div style={{fontSize:14,color:'#888',fontFamily:FB,marginBottom:24}}>{fmtD(selDate)} · {confirm?.t}</div>
-      <button onClick={onBack} style={{background:K,border:'none',borderRadius:14,padding:'14px 32px',fontSize:14,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Back to Coaches</button>
-    </div>
-  );
-
-  return(
-    <div style={{paddingBottom:24,position:'relative'}}>
-      {confirm&&<BookConfirmModal session={{...confirm,pts:confirm.pts,time:confirm.t,dur:'60 min'}} branch={branch} date={selDate} isPrivate coachName={coach.name} onConfirm={()=>{onBook(confirm,coach,branch,selDate);setDone(true);setConfirm(null);}} onClose={()=>setConfirm(null)}/>}
-
-      {/* Hero */}
-      <div style={{background:K,padding:'20px 20px 22px',position:'relative',overflow:'hidden'}}>
-        <div style={{position:'absolute',right:-30,top:-30,width:160,height:160,borderRadius:'50%',border:'1px solid rgba(199,35,51,.2)',opacity:.5}}/>
-        <button onClick={onBack} style={{background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)',borderRadius:12,width:38,height:38,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}>
-          <Ic p={I.chL} c={W} s={18}/>
-        </button>
-        <div style={{display:'flex',gap:16,alignItems:'flex-start'}}>
-          <div style={{width:70,height:70,borderRadius:22,background:R,border:'3px solid rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-            <span style={{fontFamily:FD,fontSize:28,fontWeight:900,color:W}}>{coach.initials}</span>
-          </div>
-          <div style={{flex:1}}>
-            <div style={{fontFamily:FD,fontSize:26,fontWeight:900,color:W,lineHeight:1,marginBottom:4}}>{coach.name.toUpperCase()}</div>
-            <div style={{fontSize:12,color:'rgba(255,255,255,.5)',fontFamily:FB,marginBottom:10}}>{coach.specialty}</div>
-            <div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}>
-              <StarRow rating={coach.rating} s={13}/>
-              <span style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.7)',fontFamily:FB}}>{coach.rating}</span>
-              <span style={{fontSize:11,color:'rgba(255,255,255,.35)',fontFamily:FB}}>· {coach.sessions} sessions · {coach.exp}</span>
-            </div>
-          </div>
-        </div>
-        <div style={{display:'flex',gap:6,marginTop:14,flexWrap:'wrap'}}>
-          {coach.tags.map(t=><Tag key={t} label={t} c={'rgba(255,255,255,.7)'} bg={'rgba(255,255,255,.1)'}/>)}
-        </div>
-      </div>
-
-      {/* Tab toggle */}
-      <div style={{display:'flex',background:GL,borderRadius:12,padding:4,margin:'14px 20px',border:`1.5px solid ${G}`}}>
-        {[['profile','About'],['schedule','Book Session']].map(([v,l])=>(
-          <div key={v} onClick={()=>setView(v)} style={{flex:1,textAlign:'center',padding:'9px 0',borderRadius:9,fontSize:13,fontWeight:600,cursor:'pointer',background:view===v?W:'transparent',color:view===v?K:'#aaa',boxShadow:view===v?'0 1px 4px rgba(0,0,0,.12)':'none',fontFamily:FB,transition:'all .15s'}}>{l}</div>
-        ))}
-      </div>
-
-      {view==='profile'&&(
-        <div style={{padding:'0 20px'}} className="fade-in">
-          {/* Bio */}
-          <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:8}}>ABOUT</div>
-          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:16,marginBottom:14}}>
-            <p style={{fontSize:13,color:C,fontFamily:FB,lineHeight:1.7}}>{coach.bio}</p>
-          </div>
-          {/* Stats */}
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:14}}>
-            {[[coach.sessions+'','Sessions'],[coach.rating+'','Rating'],[coach.exp,'Experience']].map(([v,l])=>(
-              <div key={l} style={{background:W,border:`1.5px solid ${G}`,borderRadius:16,padding:'12px 8px',textAlign:'center'}}>
-                <div style={{fontFamily:FD,fontSize:22,fontWeight:900,color:l==='Rating'?AM:R,lineHeight:1}}>{l==='Rating'?'★ ':''}{v}</div>
-                <div style={{fontSize:10,fontWeight:700,color:'#888',textTransform:'uppercase',letterSpacing:'.5px',marginTop:4,fontFamily:FB}}>{l}</div>
-              </div>
-            ))}
-          </div>
-          {/* Session types offered */}
-          <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:8}}>AVAILABLE SLOTS</div>
-          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:'4px 0',marginBottom:14}}>
-            {coach.slots.map((s,i)=>(
-              <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px',borderBottom:i<coach.slots.length-1?`1px solid ${G}`:'none'}}>
-                <div>
-                  <div style={{fontSize:13,fontWeight:600,color:K,fontFamily:FB}}>{s.time} · {s.dur}</div>
-                  <div style={{fontSize:11,color:'#888',fontFamily:FB,marginTop:2}}>{s.day}</div>
-                </div>
-                <div style={{display:'flex',alignItems:'center',gap:10}}>
-                  <div style={{textAlign:'right'}}><span style={{fontFamily:FD,fontSize:20,fontWeight:900,color:R}}>{s.pts}</span><span style={{fontSize:10,color:'#aaa',fontFamily:FB}}> pts</span></div>
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Reviews */}
-          <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:8}}>ATHLETE REVIEWS</div>
-          {coach.reviews.map((rv,i)=>(
-            <div key={i} style={{background:W,border:`1.5px solid ${G}`,borderRadius:16,padding:14,marginBottom:8}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
-                  <div style={{width:32,height:32,borderRadius:10,background:K,display:'flex',alignItems:'center',justifyContent:'center'}}><span style={{fontSize:11,fontWeight:900,color:W,fontFamily:FB}}>{rv.n.split(' ').map(w=>w[0]).join('')}</span></div>
-                  <span style={{fontSize:13,fontWeight:600,color:K,fontFamily:FB}}>{rv.n}</span>
-                </div>
-                <StarRow rating={rv.r} s={12}/>
-              </div>
-              <p style={{fontSize:12,color:'#666',fontFamily:FB,lineHeight:1.6,fontStyle:'italic'}}>"{rv.t}"</p>
-            </div>
-          ))}
-          <button onClick={()=>setView('schedule')} style={{width:'100%',marginTop:6,background:K,border:'none',borderRadius:14,padding:15,fontSize:15,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>
-            Book a Private Session →
+      {s.notes&&<div style={{background:GL,borderRadius:7,padding:'5px 9px',marginBottom:7,fontSize:10,color:'#777',fontFamily:FB,lineHeight:1.4}}>📝 {s.notes}</div>}
+      {s.status!=='cancelled'&&(
+        <div style={{display:'flex',gap:6}}>
+          {s.status!=='done'&&(
+            <button onClick={()=>onCancel(s)} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:8,padding:'7px 0',fontSize:11,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>
+          )}
+          <button onClick={()=>onAtt(s)} style={{flex:2,background:s.status==='done'?GRB:K,border:s.status==='done'?`1.5px solid ${GR}33`:'none',borderRadius:8,padding:'7px 0',fontSize:11,fontWeight:700,color:s.status==='done'?GR:W,cursor:'pointer',fontFamily:FB}}>
+            {s.status==='done'?'Edit Attendance':'Mark Attendance'}
           </button>
         </div>
       )}
-
-      {view==='schedule'&&(
-        <div className="fade-in">
-          <div style={{padding:'0 20px 8px'}}>
-            <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}>SELECT DATE</div>
-            <div style={{fontSize:11,color:'#aaa',fontFamily:FB}}>
-              <span style={{display:'inline-flex',alignItems:'center',gap:4}}><span style={{width:6,height:6,borderRadius:'50%',background:GR,display:'inline-block'}}></span> = slots available</span>
-            </div>
-          </div>
-          <MiniCal month={mo} year={yr} selected={selDate} highlightDays={activeDays}
-            onSelect={setSelDate}
-            onPrev={()=>setCalMo(new Date(yr,mo-1,1))}
-            onNext={()=>setCalMo(new Date(yr,mo+1,1))}
-          />
-          <div style={{padding:'0 20px'}}>
-            <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:12}}>
-              SLOTS — {fmtD(selDate).toUpperCase()}{isToday(selDate)?' · TODAY':''}
-            </div>
-            {daySlots.length===0?(
-              <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:18,padding:24,textAlign:'center'}}>
-                <div style={{fontSize:22,marginBottom:8}}>😔</div>
-                <div style={{fontSize:13,fontWeight:600,color:K,fontFamily:FB,marginBottom:4}}>No slots on this day</div>
-                <div style={{fontSize:12,color:'#888',fontFamily:FB}}>Try a different date. Green dots show available days.</div>
-              </div>
-            ):daySlots.map((sl,i)=>(
-              <div key={i} style={{background:W,border:`1.5px solid ${sl.booked?G:RBR}`,borderRadius:18,padding:'14px 16px',marginBottom:10,opacity:sl.booked?.6:1}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:sl.booked?0:12}}>
-                  <div>
-                    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
-                      <span style={{fontSize:13,fontWeight:700,color:R,fontFamily:FB}}>{sl.t}</span>
-                      <Tag label={sl.booked?'BOOKED':'AVAILABLE'} c={sl.booked?'#aaa':GR} bg={sl.booked?GL:GRB}/>
-                    </div>
-                    <div style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K}}>PRIVATE SESSION</div>
-                    <div style={{fontSize:12,color:'#666',fontFamily:FB,marginTop:2}}>With {coach.name} · 60 min</div>
-                  </div>
-                  <div style={{textAlign:'right'}}>
-                    <div style={{fontFamily:FD,fontSize:26,fontWeight:900,color:R,lineHeight:1}}>{sl.pts}</div>
-                    <div style={{fontSize:10,fontWeight:700,color:'#aaa',fontFamily:FB}}>PTS</div>
-                  </div>
-                </div>
-                {!sl.booked&&(
-                  <button onClick={()=>setConfirm(sl)} style={{width:'100%',background:K,border:'none',borderRadius:12,padding:12,fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>
-                    Book This Slot
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
-
-// ── RECEIPT UPLOAD ────────────────────────────────────────────────────────────
-function ReceiptUpload({pkg,onBack,onSubmit}){
-  const[file,setFile]=useState(null);
-  const[preview,setPreview]=useState(null);
-  const[notes,setNotes]=useState('');
-  const[done,setDone]=useState(false);
-  const ref=useRef();
-  const handleFile=e=>{
-    const f=e.target.files[0];if(!f)return;
-    setFile(f);const r=new FileReader();r.onload=()=>setPreview(r.result);r.readAsDataURL(f);
-  };
-  if(done)return(
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'40px 24px',textAlign:'center'}} className="fade-in">
-      <div style={{width:72,height:72,borderRadius:'50%',background:GRB,border:`2px solid ${GR}`,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}><Ic p={I.chk} c={GR} s={30}/></div>
-      <div style={{fontFamily:FD,fontSize:28,fontWeight:900,color:K,marginBottom:8}}>RECEIPT SUBMITTED</div>
-      <div style={{fontSize:14,color:'#666',fontFamily:FB,lineHeight:1.6,marginBottom:24}}>Your {pkg.name} is pending admin review.</div>
-      <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:16,padding:'14px 16px',width:'100%',marginBottom:24}}>
-        {[['Package',pkg.name],['Amount',pkg.price],['Points',`${pkg.pts} pts`],['Status','Pending Review']].map(([l,v])=>(
-          <div key={l} style={{display:'flex',justifyContent:'space-between',padding:'7px 0',borderBottom:`1px solid ${G}`}}>
-            <span style={{fontSize:13,color:'#666',fontFamily:FB}}>{l}</span>
-            <span style={{fontSize:13,fontWeight:700,color:l==='Status'?AM:K,background:l==='Status'?AMB:'transparent',padding:l==='Status'?'2px 8px':'0',borderRadius:l==='Status'?7:0,fontFamily:FB}}>{v}</span>
-          </div>
-        ))}
-      </div>
-      <button onClick={onSubmit} style={{width:'100%',background:K,border:'none',borderRadius:14,padding:15,fontSize:15,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Back to Wallet</button>
-    </div>
-  );
+ 
+/* ── CANCEL MODAL ─────────────────────────────────────────────── */
+function CancelModal({session:s,onConfirm,onClose}){
+  const policy=getPolicy(s);
   return(
-    <div style={{paddingBottom:24}}>
-      <div style={{display:'flex',alignItems:'center',gap:14,padding:'14px 20px 16px'}}>
-        <BackBtn onBack={onBack}/>
-        <div>
-          <div style={{fontFamily:FD,fontSize:22,fontWeight:900,color:K}}>UPLOAD RECEIPT</div>
-          <div style={{fontSize:12,color:'#888',fontFamily:FB}}>Submit proof of payment</div>
+    <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)',zIndex:200,display:'flex',flexDirection:'column',justifyContent:'flex-end'}}
+      onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="slide-up" style={{background:W,borderRadius:'18px 18px 0 0',padding:16,maxHeight:'86%',overflowY:'auto'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+          <span style={{fontFamily:FD,fontSize:19,fontWeight:800,color:K}}>CANCEL SESSION</span>
+          <button onClick={onClose} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:8,width:30,height:30,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic p={I.X} c={C} s={13}/></button>
         </div>
-      </div>
-      <div style={{margin:'0 20px 20px',background:K,borderRadius:18,padding:'16px 18px'}}>
-        <div style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.4)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}>SELECTED PACKAGE</div>
-        <div style={{fontFamily:FD,fontSize:22,fontWeight:900,color:W,marginBottom:8}}>{pkg.name}</div>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <div><span style={{fontFamily:FD,fontSize:32,fontWeight:900,color:R}}>{pkg.pts}</span><span style={{fontSize:14,color:'rgba(255,255,255,.4)',fontFamily:FB,marginLeft:4}}>pts</span></div>
-          <div style={{textAlign:'right'}}><div style={{fontFamily:FD,fontSize:22,fontWeight:800,color:W}}>{pkg.price}</div><div style={{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:FB}}>{pkg.ppt}</div></div>
+        <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:'9px 11px',marginBottom:12}}>
+          <div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:2}}>{s.name}</div>
+          <div style={{fontSize:11,color:'#777',fontFamily:FB}}>{fmtD(s.date)} · {s.time} · {s.branch} · {s.athletes.length} athlete{s.athletes.length!==1?'s':''}</div>
         </div>
-      </div>
-      <div style={{padding:'0 20px'}}>
-        <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:12}}>PAYMENT RECEIPT</div>
-        <input ref={ref} type="file" accept="image/*,.pdf" onChange={handleFile} style={{display:'none'}}/>
-        {preview?(
-          <div style={{position:'relative',marginBottom:16}}>
-            <img src={preview} alt="receipt" style={{width:'100%',borderRadius:16,border:`1.5px solid ${G}`,objectFit:'cover',maxHeight:200}}/>
-            <button onClick={()=>{setFile(null);setPreview(null);}} style={{position:'absolute',top:10,right:10,background:K,border:'none',borderRadius:10,width:32,height:32,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic p={I.X} c={W} s={14}/></button>
+        <div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB,marginBottom:7}}>CANCELLATION POLICY</div>
+        {CANCEL_POLICY.map(p=>(
+          <div key={p.id} style={{display:'flex',gap:8,padding:'8px 0',borderBottom:`1px solid ${G}`}}>
+            <div style={{width:8,height:8,borderRadius:'50%',background:p.id===policy.id?p.c:'#ddd',marginTop:4,flexShrink:0}}/>
+            <div style={{flex:1}}>
+              <div style={{fontSize:12,fontWeight:p.id===policy.id?700:400,color:p.id===policy.id?K:'#aaa',fontFamily:FB}}>{p.title}</div>
+              <div style={{fontSize:10,color:'#ccc',fontFamily:FB,marginTop:1}}>{p.desc}</div>
+            </div>
+            {p.id===policy.id&&<Tag label="Active" c={p.c} bg={p.bg}/>}
           </div>
-        ):(
-          <div onClick={()=>ref.current.click()} style={{border:`2px dashed ${G}`,borderRadius:18,padding:'32px 20px',textAlign:'center',cursor:'pointer',marginBottom:16}}>
-            <div style={{width:52,height:52,borderRadius:16,background:RB,border:`1px solid ${RBR}`,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px'}}><Ic p={I.cam} c={R} s={24}/></div>
-            <div style={{fontFamily:FD,fontSize:18,fontWeight:800,color:K,marginBottom:4}}>TAP TO UPLOAD</div>
-            <div style={{fontSize:12,color:'#888',fontFamily:FB}}>JPG, PNG or PDF · Max 10MB</div>
+        ))}
+        <div style={{background:BLB,border:`1.5px solid ${BL}33`,borderRadius:10,padding:'10px 12px',margin:'12px 0'}}>
+          <div style={{display:'flex',gap:7,alignItems:'flex-start'}}>
+            <Ic p={I.inf} c={BL} s={13}/>
+            <div>
+              <div style={{fontSize:12,fontWeight:700,color:BL,fontFamily:FB,marginBottom:3}}>Coach cancellations always give full refund</div>
+              <div style={{fontSize:11,color:C,fontFamily:FB,lineHeight:1.5}}>All {s.athletes.length} athlete{s.athletes.length!==1?'s':''} receive 100% points back. Mandatory policy.</div>
+            </div>
           </div>
-        )}
-        <textarea value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Transfer reference or notes..." rows={3}
-          style={{width:'100%',background:GL,border:`1.5px solid ${G}`,borderRadius:14,padding:'12px 14px',fontSize:13,fontFamily:FB,color:K,resize:'none',outline:'none',marginBottom:20}}/>
-        <button onClick={()=>{if(file)setDone(true);}}
-          style={{width:'100%',background:file?K:G,border:'none',borderRadius:14,padding:15,fontSize:15,fontWeight:700,color:file?W:'#aaa',cursor:file?'pointer':'not-allowed',fontFamily:FB,transition:'all .2s'}}>
-          {file?'Submit for Review':'Upload Receipt First'}
-        </button>
-        <div style={{marginTop:14,background:AMB,border:`1px solid ${AM}33`,borderRadius:12,padding:'10px 14px',display:'flex',gap:10,alignItems:'flex-start'}}>
-          <Ic p={I.inf} c={AM} s={16}/>
-          <div style={{fontSize:12,color:AM,fontFamily:FB,lineHeight:1.5}}>Points are added after admin approves your receipt.</div>
+        </div>
+        <div style={{display:'flex',gap:8}}>
+          <button onClick={onClose} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'10px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Keep Session</button>
+          <button onClick={()=>onConfirm(s.id)} style={{flex:1,background:R,border:'none',borderRadius:10,padding:'10px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Cancel Session</button>
         </div>
       </div>
     </div>
   );
 }
-
-// ── HOME SCREEN ───────────────────────────────────────────────────────────────
-function HomeScreen({sessions,onNav,onCheckIn}){
-  const next=sessions.filter(s=>s.status==='upcoming').sort((a,b)=>a.date-b.date)[0];
-  const todaySess=sessions.filter(s=>s.status==='upcoming'&&isToday(s.date));
-  return(
-    <div style={{paddingBottom:24}}>
-      <div style={{background:K,padding:'22px 20px 26px',position:'relative',overflow:'hidden'}}>
-        <div style={{position:'absolute',right:-40,top:-40,width:180,height:180,borderRadius:'50%',border:'1px solid rgba(199,35,51,.2)',opacity:.5}}/>
-        <div style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.4)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:3}}>GOOD EVENING</div>
-        <div style={{fontFamily:FD,fontSize:32,fontWeight:900,color:W,marginBottom:18}}>HANIA AHMED</div>
-        <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between'}}>
-          <div>
-            <div style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.4)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:2}}>Points Balance</div>
-            <div style={{display:'flex',alignItems:'flex-end',gap:6}}>
-              <span style={{fontFamily:FD,fontSize:52,fontWeight:900,color:R,lineHeight:1}}>147</span>
-              <span style={{fontFamily:FD,fontSize:18,fontWeight:700,color:'rgba(199,35,51,.5)',marginBottom:7}}>PTS</span>
-            </div>
-            <div style={{fontSize:11,color:'rgba(255,255,255,.35)',fontFamily:FB}}>Across 2 active packages · FIFO</div>
-          </div>
-          <div style={{position:'relative',cursor:'pointer'}}>
-            <div style={{background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.1)',borderRadius:14,padding:10,display:'inline-flex'}}><Ic p={I.bel} c={W} s={20}/></div>
-            <div style={{position:'absolute',top:-3,right:-3,width:9,height:9,borderRadius:'50%',background:R,border:`2px solid ${K}`}}/>
-          </div>
-        </div>
-      </div>
-      <div style={{padding:'16px 20px 0'}}>
-        {ACT_PKGS.map((p,i)=>(
-          <div key={i} style={{background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:'14px 16px',marginBottom:10}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-              <div><div style={{fontSize:13,fontWeight:600,color:K,fontFamily:FB}}>{p.name}</div><div style={{fontSize:11,color:'#888',fontFamily:FB,marginTop:1}}>{p.ppt} · {p.exp}</div></div>
-              <div style={{textAlign:'right'}}><span style={{fontFamily:FD,fontSize:24,fontWeight:900,color:p.warn?AM:R}}>{p.rem}</span><span style={{fontSize:10,fontWeight:600,color:'#aaa',fontFamily:FB}}> /{p.tot} pts</span></div>
-            </div>
-            <div style={{height:5,borderRadius:3,background:G}}><div style={{height:'100%',width:`${p.rem/p.tot*100}%`,borderRadius:3,background:p.warn?AM:R}}/></div>
-          </div>
-        ))}
-
-        {/* Today's sessions with check-in */}
-        {todaySess.length>0&&(
-          <>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-              <span style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB}}>TODAY'S SESSIONS</span>
-            </div>
-            {todaySess.map(s=>(
-              <div key={s.id} style={{background:W,border:`1.5px solid ${RBR}`,borderRadius:18,padding:'14px 16px',marginBottom:10,display:'flex',gap:14}}>
-                <div style={{width:52,background:K,borderRadius:14,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'10px 0',flexShrink:0}}>
-                  <span style={{fontSize:8,fontWeight:700,color:'rgba(255,255,255,.4)',textTransform:'uppercase',fontFamily:FB}}>TODAY</span>
-                  <span style={{fontFamily:FD,fontSize:18,fontWeight:900,color:R,lineHeight:1.2,textAlign:'center',padding:'0 3px'}}>{s.time.replace(':00','')}</span>
-                </div>
-                <div style={{flex:1}}>
-                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4,flexWrap:'wrap'}}>
-                    <span style={{fontFamily:FD,fontSize:17,fontWeight:800,color:K}}>{s.name}</span>
-                    <Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/>
-                  </div>
-                  <div style={{fontSize:12,color:'#666',fontFamily:FB,marginBottom:10}}>{s.coach} · {s.branch}</div>
-                  <div style={{display:'flex',gap:8}}>
-                    <button onClick={()=>onNav('schedule',{openCancel:s})} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'8px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>
-                    <button onClick={()=>onCheckIn(s)} style={{flex:1,background:R,border:'none',borderRadius:10,padding:'8px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:5}}>
-                      <Ic p={I.qr} c={W} s={14}/>Check In
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </>
-        )}
-
-        {!todaySess.length&&next&&(
-          <>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-              <span style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB}}>NEXT SESSION</span>
-              <span onClick={()=>onNav('schedule')} style={{fontSize:12,color:R,cursor:'pointer',fontWeight:600,fontFamily:FB}}>See all →</span>
-            </div>
-            <div style={{background:W,border:`1.5px solid ${RBR}`,borderRadius:18,padding:'14px 16px',marginBottom:16,display:'flex',gap:14}}>
-              <div style={{width:52,background:K,borderRadius:14,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'10px 0',flexShrink:0}}>
-                <span style={{fontSize:8,fontWeight:700,color:'rgba(255,255,255,.4)',textTransform:'uppercase',fontFamily:FB}}>{DAY_S[next.date.getDay()]}</span>
-                <span style={{fontFamily:FD,fontSize:18,fontWeight:900,color:R,lineHeight:1.2,textAlign:'center',padding:'0 2px'}}>{next.time.replace(':00','')}</span>
-              </div>
-              <div style={{flex:1}}>
-                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4,flexWrap:'wrap'}}>
-                  <span style={{fontFamily:FD,fontSize:17,fontWeight:800,color:K}}>{next.name}</span>
-                  <Tag label={next.type} c={next.type==='PRIVATE'?AM:BL} bg={next.type==='PRIVATE'?AMB:BLB}/>
-                </div>
-                <div style={{fontSize:12,color:'#666',fontFamily:FB,marginBottom:10}}>{next.coach} · {next.branch}</div>
-                <button onClick={()=>onNav('schedule',{openCancel:next})} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'8px 16px',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel Session</button>
-              </div>
-            </div>
-          </>
-        )}
-
-        <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:10}}>QUICK ACTIONS</div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
-          {[['Book Group','Sessions','book',I.usrs],['Book Private','Session','book',I.usr],['Buy Points','Packages','points',I.zap],['My Schedule','View all','schedule',I.cal]].map(([l,sub,t,ic])=>(
-            <div key={l} onClick={()=>onNav(t)} style={{background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:16,cursor:'pointer'}}>
-              <div style={{width:40,height:40,borderRadius:12,background:RB,border:`1px solid ${RBR}`,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:10}}><Ic p={ic} c={R} s={20}/></div>
-              <div style={{fontFamily:FD,fontSize:18,fontWeight:800,color:K,marginBottom:2}}>{l}</div>
-              <div style={{fontSize:11,color:'#888',fontFamily:FB}}>{sub}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{display:'flex',gap:10,marginBottom:16}}>
-          <div style={{flex:1,background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:14}}>
-            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:6}}><Ic p={I.flm} c={AM} s={16}/><span style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.2px',textTransform:'uppercase',fontFamily:FB}}>Streak</span></div>
-            <div style={{fontFamily:FD,fontSize:42,fontWeight:900,color:AM,lineHeight:1}}>12</div>
-            <div style={{fontSize:11,color:'#888',marginTop:4,fontFamily:FB}}>days in a row</div>
-          </div>
-          <div style={{flex:1,background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:14}}>
-            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:6}}><Ic p={I.act} c={R} s={16}/><span style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.2px',textTransform:'uppercase',fontFamily:FB}}>This Month</span></div>
-            <div style={{fontFamily:FD,fontSize:42,fontWeight:900,color:R,lineHeight:1}}>8</div>
-            <div style={{fontSize:11,color:'#888',marginTop:4,fontFamily:FB}}>sessions done</div>
-          </div>
-        </div>
-        <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:10}}>ANNOUNCEMENTS</div>
-        {[['🏋','Strongman Challenge — June 15','Earn 2× bonus points this week.',true],['⏳','Package A expires in 15 days','47 pts remaining — book before Jun 15.',false]].map(([e,t,b,hi])=>(
-          <div key={t} style={{background:W,border:`1.5px solid ${hi?RBR:G}`,borderRadius:16,padding:14,marginBottom:8,display:'flex',gap:12}}>
-            <span style={{fontSize:20}}>{e}</span>
-            <div><div style={{fontSize:13,fontWeight:600,color:K,marginBottom:3,fontFamily:FB}}>{t}</div><div style={{fontSize:11,color:'#777',lineHeight:1.5,fontFamily:FB}}>{b}</div></div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── BOOK SCREEN ───────────────────────────────────────────────────────────────
-function BookScreen({onBook,onPrivateBook}){
-  const[step,setStep]=useState('branch');
-  const[branch,setBranch]=useState(null);
-  const[type,setType]=useState('group');
-  const[date,setDate]=useState(new Date());
+ 
+/* ── CREATE SESSION MODAL ─────────────────────────────────────── */
+function CreateModal({onSave,onClose}){
+  const[form,setForm]=useState({type:'GROUP',name:'',branch:1,date:new Date(),time:'08:00',max:12,pts:8,notes:''});
+  const[calOpen,setCalOpen]=useState(false);
   const[calMo,setCalMo]=useState(new Date());
-  const[confirm,setConfirm]=useState(null);
-  const[done,setDone]=useState(null);
-  const[coachView,setCoachView]=useState(null); // selected coach for profile
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
   const yr=calMo.getFullYear(),mo=calMo.getMonth();
-  const sessions=branch?getSessionsForDay(date,branch.id):[];
-  const branchCoaches=branch?COACHES.filter(c=>c.branches.includes(branch.id)):[];
-  const handleConfirm=()=>{onBook(confirm,branch,date);setDone(confirm.name);setConfirm(null);};
-
-  if(coachView)return(
-    <CoachProfile coach={coachView} branch={branch}
-      onBook={(slot,coach,br,dt)=>{onPrivateBook(slot,coach,br,dt);setCoachView(null);setStep('branch');setBranch(null);setDone('Private session with '+coach.name);}}
-      onBack={()=>setCoachView(null)}
-    />
-  );
-
-  if(done)return(
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'40px 24px',textAlign:'center'}} className="fade-in">
-      <div style={{width:72,height:72,borderRadius:'50%',background:GRB,border:`2px solid ${GR}`,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}><Ic p={I.chk} c={GR} s={30}/></div>
-      <div style={{fontFamily:FD,fontSize:28,fontWeight:900,color:K,marginBottom:8}}>SESSION BOOKED!</div>
-      <div style={{fontSize:14,color:'#666',fontFamily:FB,lineHeight:1.6,marginBottom:24}}>{done} confirmed.</div>
-      <button onClick={()=>{setDone(null);setStep('branch');setBranch(null);}} style={{background:K,border:'none',borderRadius:14,padding:'14px 32px',fontSize:14,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Book Another</button>
-    </div>
-  );
-
+  const valid=form.name.trim().length>0&&form.pts>0;
+  const iStyle={width:'100%',background:GL,border:`1.5px solid ${G}`,borderRadius:9,padding:'9px 11px',fontSize:12,fontFamily:FB,color:K};
+  const lbl=txt=><div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:5}}>{txt}</div>;
   return(
-    <div style={{paddingBottom:24,position:'relative'}}>
-      {confirm&&<BookConfirmModal session={confirm} branch={branch} date={date} onConfirm={handleConfirm} onClose={()=>setConfirm(null)}/>}
-      <div style={{padding:'14px 20px 0',display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-        <div style={{fontFamily:FD,fontSize:30,fontWeight:900,color:K}}>BOOK SESSION</div>
-        {branch&&<button onClick={()=>{setStep('branch');setBranch(null);}} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'6px 12px',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Change Branch</button>}
-      </div>
-
-      {step==='branch'&&(
-        <div style={{padding:'0 20px'}}>
-          <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:12}}>SELECT YOUR BRANCH</div>
-          {BRANCHES.map(br=>(
-            <div key={br.id} onClick={()=>{setBranch(br);setStep('sessions');}}
-              style={{background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:16,marginBottom:12,cursor:'pointer',display:'flex',alignItems:'center',gap:14}}>
-              <div style={{width:52,height:52,borderRadius:16,background:br.bg,border:`1.5px solid ${br.color}33`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Ic p={I.map} c={br.color} s={22}/></div>
-              <div style={{flex:1}}>
-                <div style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K,marginBottom:2}}>{br.name} Branch</div>
-                <div style={{fontSize:11,color:'#888',fontFamily:FB,marginBottom:6}}>{br.addr}</div>
-                <Tag label={`${br.coaches} coaches`} c={br.color} bg={br.bg}/>
-              </div>
-              <Ic p={I.chR} c={'#ccc'} s={18}/>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {step==='sessions'&&branch&&(
-        <>
-          <div style={{margin:'0 20px 14px',background:branch.bg,border:`1.5px solid ${branch.color}33`,borderRadius:14,padding:'10px 14px',display:'flex',alignItems:'center',gap:10}}>
-            <Ic p={I.map} c={branch.color} s={18}/>
-            <span style={{fontSize:13,fontWeight:600,color:branch.color,fontFamily:FB}}>{branch.name} Branch · {branch.addr}</span>
+    <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.65)',zIndex:200,display:'flex',flexDirection:'column',justifyContent:'flex-end'}}
+      onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="slide-up" style={{background:W,borderRadius:'18px 18px 0 0',maxHeight:'92%',overflowY:'auto'}}>
+        <div style={{padding:'14px 14px 0'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:13}}>
+            <span style={{fontFamily:FD,fontSize:19,fontWeight:900,color:K}}>NEW SESSION</span>
+            <button onClick={onClose} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:8,width:30,height:30,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic p={I.X} c={C} s={13}/></button>
           </div>
-          {/* type toggle */}
-          <div style={{display:'flex',background:GL,borderRadius:12,padding:4,margin:'0 20px 14px',border:`1.5px solid ${G}`}}>
-            {[['group','Group'],['private','Private']].map(([t,l])=>(
-              <div key={t} onClick={()=>setType(t)} style={{flex:1,textAlign:'center',padding:'9px 0',borderRadius:9,fontSize:13,fontWeight:600,cursor:'pointer',background:type===t?W:'transparent',color:type===t?K:'#aaa',boxShadow:type===t?'0 1px 4px rgba(0,0,0,.12)':'none',fontFamily:FB,transition:'all .15s'}}>{l} Sessions</div>
-            ))}
-          </div>
-
-          {type==='group'&&(
-            <>
-              <MiniCal month={mo} year={yr} selected={date} onSelect={setDate} onPrev={()=>setCalMo(new Date(yr,mo-1,1))} onNext={()=>setCalMo(new Date(yr,mo+1,1))}/>
-              <div style={{padding:'0 20px 10px'}}><div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB}}>SESSIONS — {fmtD(date).toUpperCase()}</div></div>
-              <div style={{padding:'0 20px'}}>
-                {sessions.length===0?(
-                  <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:18,padding:24,textAlign:'center'}}><div style={{fontSize:13,color:'#888',fontFamily:FB}}>No sessions on this date for this branch.</div></div>
-                ):sessions.map(s=>{
-                  const full=s.spots===0,alm=s.spots>0&&s.spots<=3,dc=full?R:alm?AM:GR,dbg=full?RB:alm?AMB:GRB;
-                  return(
-                    <div key={s.sid} style={{background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:'14px 16px',marginBottom:10,opacity:full?.75:1}}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
-                        <div>
-                          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
-                            <span style={{fontSize:11,fontWeight:700,color:R,fontFamily:FB}}>{s.time}</span>
-                            <span style={{fontSize:11,color:'#aaa',fontFamily:FB}}>· {s.dur}</span>
-                          </div>
-                          <div style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K,marginBottom:2}}>{s.name}</div>
-                          <div style={{fontSize:12,color:'#666',fontFamily:FB}}>{s.coach}</div>
-                        </div>
-                        <div style={{textAlign:'right'}}><div style={{fontFamily:FD,fontSize:26,fontWeight:900,color:R,lineHeight:1}}>{s.pts}</div><div style={{fontSize:10,fontWeight:700,color:'#aaa',fontFamily:FB}}>PTS</div></div>
-                      </div>
-                      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
-                        <div style={{flex:1,height:4,borderRadius:2,background:G,overflow:'hidden'}}><div style={{height:'100%',width:`${((s.max-s.spots)/s.max)*100}%`,borderRadius:2,background:dc+'99'}}/></div>
-                        <div style={{display:'flex',alignItems:'center',gap:4,background:dbg,padding:'3px 8px',borderRadius:7}}>
-                          <div style={{width:6,height:6,borderRadius:'50%',background:dc}}/>
-                          <span style={{fontSize:10,fontWeight:700,color:dc,fontFamily:FB}}>{full?'FULL':alm?`${s.spots} left`:`${s.spots} spots`}</span>
-                        </div>
-                      </div>
-                      <button onClick={()=>!full&&setConfirm(s)} style={{width:'100%',background:full?GL:K,border:full?`1.5px solid ${G}`:'none',borderRadius:12,padding:12,fontSize:13,fontWeight:700,color:full?'#aaa':W,cursor:full?'default':'pointer',fontFamily:FB}}>
-                        {full?'Join Waitlist':'Reserve Spot'}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          {type==='private'&&(
-            <div style={{padding:'0 20px'}} className="fade-in">
-              <div style={{background:K,borderRadius:18,padding:'14px 16px',marginBottom:16,display:'flex',gap:12,alignItems:'flex-start'}}>
-                <Ic p={I.lock} c={R} s={20}/>
-                <div>
-                  <div style={{fontSize:13,fontWeight:700,color:W,fontFamily:FB,marginBottom:3}}>Private Sessions</div>
-                  <div style={{fontSize:12,color:'rgba(255,255,255,.5)',fontFamily:FB,lineHeight:1.5}}>Browse coaches below, view their profile & availability, then book a 1-on-1 slot.</div>
-                </div>
-              </div>
-              <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:12}}>
-                AVAILABLE COACHES — {branch.name}
-              </div>
-              {branchCoaches.length===0?(
-                <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:18,padding:24,textAlign:'center'}}><div style={{fontSize:13,color:'#888',fontFamily:FB}}>No coaches at this branch.</div></div>
-              ):branchCoaches.map(coach=>(
-                <div key={coach.id} style={{background:W,border:`1.5px solid ${G}`,borderRadius:20,padding:16,marginBottom:12}}>
-                  {/* Coach summary row */}
-                  <div style={{display:'flex',alignItems:'center',gap:14,marginBottom:12}}>
-                    <div style={{width:56,height:56,borderRadius:18,background:K,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:`2px solid ${R}22`}}>
-                      <span style={{fontFamily:FD,fontSize:20,fontWeight:900,color:W}}>{coach.initials}</span>
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K,marginBottom:2}}>{coach.name}</div>
-                      <div style={{fontSize:12,color:'#666',fontFamily:FB,marginBottom:5}}>{coach.specialty}</div>
-                      <div style={{display:'flex',alignItems:'center',gap:8}}>
-                        <StarRow rating={coach.rating} s={11}/>
-                        <span style={{fontSize:11,fontWeight:700,color:AM,fontFamily:FB}}>{coach.rating}</span>
-                        <span style={{fontSize:11,color:'#aaa',fontFamily:FB}}>· {coach.sessions} sessions</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Tags */}
-                  <div style={{display:'flex',gap:5,flexWrap:'wrap',marginBottom:12}}>
-                    {coach.tags.slice(0,3).map(t=><Tag key={t} label={t} c={R} bg={RB}/>)}
-                  </div>
-                  {/* Quick slot preview */}
-                  <div style={{background:GL,borderRadius:12,padding:'10px 12px',marginBottom:12}}>
-                    <div style={{fontSize:10,fontWeight:700,color:'#888',letterSpacing:'1px',textTransform:'uppercase',fontFamily:FB,marginBottom:8}}>SAMPLE SLOTS</div>
-                    <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
-                      {coach.slots.slice(0,3).map((s,i)=>(
-                        <div key={i} style={{background:W,border:`1px solid ${G}`,borderRadius:9,padding:'5px 10px',fontSize:11,fontWeight:600,color:K,fontFamily:FB}}>
-                          {s.time} · <span style={{color:R}}>{s.pts}pts</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* Actions */}
-                  <div style={{display:'flex',gap:8}}>
-                    <button onClick={()=>setCoachView(coach)} style={{flex:1,background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:'10px 0',fontSize:13,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>View Profile</button>
-                    <button onClick={()=>setCoachView(coach)} style={{flex:1,background:K,border:'none',borderRadius:12,padding:'10px 0',fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Book Session →</button>
-                  </div>
-                </div>
+          {/* Type */}
+          <div style={{marginBottom:11}}>
+            {lbl('SESSION TYPE')}
+            <div style={{display:'flex',background:GL,borderRadius:9,padding:3,border:`1.5px solid ${G}`}}>
+              {[['GROUP','Group'],['PRIVATE','Private']].map(([v,l])=>(
+                <div key={v} onClick={()=>set('type',v)} style={{flex:1,textAlign:'center',padding:'7px 0',borderRadius:6,fontSize:12,fontWeight:600,cursor:'pointer',background:form.type===v?K:'transparent',color:form.type===v?W:'#bbb',fontFamily:FB,transition:'all .12s'}}>{l}</div>
               ))}
             </div>
-          )}
-        </>
-      )}
+          </div>
+          {/* Name */}
+          <div style={{marginBottom:11}}>
+            {lbl('SESSION NAME')}
+            <select value={form.name} onChange={e=>{const st=SESSION_TYPES.find(s=>s.name===e.target.value);set('name',e.target.value);if(st)set('pts',st.pts);}} style={{...iStyle,appearance:'none',cursor:'pointer'}}>
+              <option value="">Select session type…</option>
+              {SESSION_TYPES.filter(s=>form.type==='PRIVATE'?s.name.includes('Private'):!s.name.includes('Private')).map(s=><option key={s.id} value={s.name}>{s.name} — {s.pts} pts</option>)}
+            </select>
+          </div>
+          {/* Branch */}
+          <div style={{marginBottom:11}}>
+            {lbl('BRANCH')}
+            <select value={form.branch} onChange={e=>set('branch',parseInt(e.target.value))} style={{...iStyle,appearance:'none',cursor:'pointer'}}>
+              {BRANCHES.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </div>
+          {/* Date */}
+          <div style={{marginBottom:11}}>
+            {lbl('DATE')}
+            <button onClick={()=>setCalOpen(!calOpen)} style={{...iStyle,cursor:'pointer',textAlign:'left',display:'flex',justifyContent:'space-between',alignItems:'center',border:`1.5px solid ${calOpen?K:G}`}}>
+              <span>{fmtD(form.date)}</span><Ic p={I.cal} c={R} s={14}/>
+            </button>
+            {calOpen&&(
+              <div style={{marginTop:5,border:`1.5px solid ${G}`,borderRadius:11,overflow:'hidden',background:W}}>
+                <MiniCal month={mo} year={yr} selected={form.date} onSelect={d=>{set('date',d);setCalOpen(false);}} onPrev={()=>setCalMo(new Date(yr,mo-1,1))} onNext={()=>setCalMo(new Date(yr,mo+1,1))}/>
+              </div>
+            )}
+          </div>
+          {/* Time / Max / Pts */}
+          <div style={{display:'grid',gridTemplateColumns:form.type==='GROUP'?'1fr 1fr 1fr':'1fr 1fr',gap:8,marginBottom:11}}>
+            <div>{lbl('TIME')}<input type="time" value={form.time} onChange={e=>set('time',e.target.value)} style={iStyle}/></div>
+            {form.type==='GROUP'&&<div>{lbl('MAX ATHLETES')}<input type="number" value={form.max} min={2} max={30} onChange={e=>set('max',parseInt(e.target.value)||12)} style={iStyle}/></div>}
+            <div>{lbl('POINTS')}<input type="number" value={form.pts} min={1} onChange={e=>set('pts',parseInt(e.target.value)||0)} style={iStyle}/></div>
+          </div>
+          {/* Notes */}
+          <div style={{marginBottom:11}}>
+            {lbl('NOTES (OPTIONAL)')}
+            <textarea value={form.notes} onChange={e=>set('notes',e.target.value)} rows={2} placeholder="Session notes…" style={{...iStyle,resize:'none'}}/>
+          </div>
+        </div>
+        {/* Preview */}
+        {form.name&&(
+          <div style={{margin:'0 14px 12px',background:K,borderRadius:11,padding:'11px 13px'}}>
+            <div style={{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.35)',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:6}}>PREVIEW</div>
+            <div style={{fontFamily:FD,fontSize:16,fontWeight:800,color:W,marginBottom:6}}>{form.name}</div>
+            <div style={{display:'flex',gap:5,flexWrap:'wrap'}}>
+              <Tag label={form.type} c={form.type==='PRIVATE'?AM:BL} bg={form.type==='PRIVATE'?'rgba(180,83,9,.3)':'rgba(20,113,212,.3)'}/>
+              <Tag label={fmtD(form.date)} c={'rgba(255,255,255,.6)'} bg={'rgba(255,255,255,.1)'}/>
+              <Tag label={form.time} c={'rgba(255,255,255,.6)'} bg={'rgba(255,255,255,.1)'}/>
+              <Tag label={form.pts+' pts'} c={R} bg={'rgba(199,35,51,.25)'}/>
+              <Tag label={BRANCHES.find(b=>b.id===form.branch)?.name||''} c={'rgba(255,255,255,.5)'} bg={'rgba(255,255,255,.09)'}/>
+            </div>
+          </div>
+        )}
+        <div style={{padding:'0 14px 20px'}}>
+          <button onClick={()=>{if(valid){onSave(form);onClose();}}}
+            style={{width:'100%',background:valid?K:G,border:'none',borderRadius:11,padding:'11px 0',fontSize:13,fontWeight:700,color:valid?W:'#aaa',cursor:valid?'pointer':'not-allowed',fontFamily:FB,transition:'all .18s'}}>
+            {valid?'Create Session':'Fill required fields'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
-
-// ── POINTS SCREEN ─────────────────────────────────────────────────────────────
-function PointsScreen({pending,onPurchase}){
-  const[pTab,setPTab]=useState('packages');
-  const[buyPkg,setBuyPkg]=useState(null);
-  const txns=[{tp:'out',l:'Strength & Power — Group',s:'Today · Starter Pack',pts:-10},{tp:'out',l:'Morning Conditioning',s:'May 1 · Starter Pack',pts:-8},{tp:'in',l:'Coach cancellation refund',s:'Apr 30',pts:8},{tp:'in',l:'Purchased Starter Pack',s:'Apr 20',pts:50}];
-  if(buyPkg)return<ReceiptUpload pkg={buyPkg} onBack={()=>setBuyPkg(null)} onSubmit={()=>{onPurchase(buyPkg);setBuyPkg(null);setPTab('pending');}}/>;
-  const tabs=[{id:'packages',l:'My Packages'},{id:'buy',l:'Buy Points'},{id:'pending',l:`Pending${pending.length?` (${pending.length})`:''}`},{id:'history',l:'History'}];
+ 
+/* ── ATTENDANCE MODAL ─────────────────────────────────────────── */
+function AttModal({session:s,onSave,onClose}){
+  const aths=ATHLETES.filter(a=>s.athletes.includes(a.id));
+  const[att,setAtt]=useState({...s.att});
+  const[notes,setNotes]=useState(s.notes||'');
   return(
-    <div style={{paddingBottom:24}}>
-      <div style={{background:K,padding:'22px 20px 24px'}}>
-        <div style={{fontSize:10,fontWeight:700,color:'rgba(255,255,255,.4)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:3}}>Total Balance</div>
-        <div style={{display:'flex',alignItems:'flex-end',gap:6,marginBottom:4}}>
-          <span style={{fontFamily:FD,fontSize:58,fontWeight:900,color:R,lineHeight:1}}>147</span>
-          <span style={{fontFamily:FD,fontSize:18,fontWeight:700,color:'rgba(199,35,51,.5)',marginBottom:9}}>PTS</span>
+    <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.6)',zIndex:200,display:'flex',flexDirection:'column',justifyContent:'flex-end'}}
+      onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="slide-up" style={{background:W,borderRadius:'18px 18px 0 0',maxHeight:'88%',overflowY:'auto'}}>
+        <div style={{padding:'14px 14px 0'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:3}}>
+            <span style={{fontFamily:FD,fontSize:19,fontWeight:800,color:K}}>MARK ATTENDANCE</span>
+            <button onClick={onClose} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:8,width:30,height:30,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic p={I.X} c={C} s={13}/></button>
+          </div>
+          <div style={{fontSize:11,color:'#aaa',fontFamily:FB,marginBottom:10}}>{s.name} · {fmtD(s.date)} · {s.time}</div>
+          <div style={{display:'flex',gap:6,marginBottom:10}}>
+            {[['✓','Present',GR,GRB,'rgba(26,127,75,.3)'],['✕','Absent',R,RB,RBR],['~','Late',AM,AMB,'rgba(180,83,9,.3)']].map(([ic,l,c,bg,bc])=>(
+              <div key={l} style={{display:'flex',alignItems:'center',gap:3,background:bg,border:`1px solid ${bc}`,borderRadius:7,padding:'3px 8px'}}>
+                <span style={{fontSize:11,fontWeight:700,color:c}}>{ic}</span>
+                <span style={{fontSize:10,color:c,fontFamily:FB}}>{l}</span>
+              </div>
+            ))}
+          </div>
         </div>
-        <div style={{fontSize:11,color:'rgba(255,255,255,.35)',fontFamily:FB}}>Across 2 active packages · Deducted FIFO</div>
+        <div style={{padding:'0 14px'}}>
+          {aths.map(a=>{
+            const v=att[a.id];
+            return(
+              <div key={a.id} style={{display:'flex',alignItems:'center',gap:9,padding:'9px 0',borderBottom:`1.5px solid ${G}`}}>
+                <div style={{width:36,height:36,borderRadius:10,background:K,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <span style={{fontFamily:FD,fontSize:12,fontWeight:900,color:W}}>{a.init}</span>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:12,fontWeight:600,color:K,fontFamily:FB}}>{a.name}</div>
+                  <div style={{fontSize:10,color:'#bbb',fontFamily:FB,marginTop:1}}>{a.goal}</div>
+                </div>
+                <div style={{display:'flex',gap:4}}>
+                  {[['p','✓',GR,'rgba(26,127,75,.15)','rgba(26,127,75,.35)'],['a','✕',R,RB,RBR],['l','~',AM,AMB,'rgba(180,83,9,.35)']].map(([key,ic,c,bg,bc])=>(
+                    <button key={key} onClick={()=>setAtt(prev=>({...prev,[a.id]:key}))}
+                      style={{width:30,height:30,borderRadius:8,border:`1.5px solid ${v===key?bc:G}`,background:v===key?bg:'transparent',color:v===key?c:'#ccc',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:FB,transition:'all .1s'}}>
+                      {ic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{padding:'12px 14px'}}>
+          <div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:6}}>SESSION NOTES</div>
+          <textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={2} placeholder="Add notes…"
+            style={{width:'100%',background:GL,border:`1.5px solid ${G}`,borderRadius:9,padding:'9px 11px',fontSize:12,fontFamily:FB,color:K,resize:'none',marginBottom:10}}/>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+            <span style={{fontSize:11,color:'#aaa',fontFamily:FB}}>{Object.keys(att).length}/{aths.length} marked</span>
+            <button onClick={()=>{const a={};aths.forEach(x=>a[x.id]='p');setAtt(a);}}
+              style={{background:GRB,border:`1px solid ${GR}33`,borderRadius:7,padding:'5px 10px',fontSize:11,fontWeight:600,color:GR,cursor:'pointer',fontFamily:FB}}>
+              Mark All Present
+            </button>
+          </div>
+          <button onClick={()=>onSave(s.id,att,notes)}
+            style={{width:'100%',background:K,border:'none',borderRadius:10,padding:'11px 0',fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>
+            Save Attendance
+          </button>
+        </div>
       </div>
-      <div style={{display:'flex',background:GL,padding:4,margin:'14px 20px',borderRadius:12,border:`1.5px solid ${G}`,overflowX:'auto',scrollbarWidth:'none',gap:2}}>
-        {tabs.map(t=>(
-          <div key={t.id} onClick={()=>setPTab(t.id)} style={{flexShrink:0,textAlign:'center',padding:'8px 12px',borderRadius:9,fontSize:12,fontWeight:600,cursor:'pointer',background:pTab===t.id?W:'transparent',color:pTab===t.id?K:'#aaa',boxShadow:pTab===t.id?'0 1px 4px rgba(0,0,0,.12)':'none',fontFamily:FB,whiteSpace:'nowrap',transition:'all .15s'}}>{t.l}</div>
+    </div>
+  );
+}
+ 
+/* ── HOME SCREEN ──────────────────────────────────────────────── */
+function HomeScreen({sessions,onNav,onCancel,onAtt,onNew}){
+  const today   =sessions.filter(s=>isToday(s.date)&&s.status!=='cancelled').sort((a,b)=>a.time.localeCompare(b.time));
+  const upcoming=sessions.filter(s=>!isToday(s.date)&&s.status==='upcoming').sort((a,b)=>a.date-b.date).slice(0,2);
+  const done    =sessions.filter(s=>s.status==='done');
+  const prs =done.reduce((a,s)=>a+Object.values(s.att).filter(v=>v==='p').length,0);
+  const enr =done.reduce((a,s)=>a+s.athletes.length,0);
+  const avgAtt=enr>0?Math.round(prs/enr*100):0;
+  return(
+    <div style={{paddingBottom:16}}>
+      {/* Hero — compact */}
+      <div style={{background:K,padding:'14px 14px 16px',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',right:-30,top:-30,width:140,height:140,borderRadius:'50%',border:'1px solid rgba(199,35,51,.12)',opacity:.4,pointerEvents:'none'}}/>
+        <div style={{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.35)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:1}}>WEDNESDAY, JUN 4</div>
+        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:W,marginBottom:12}}>COACH KARIM</div>
+        {/* Stats row */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginBottom:12}}>
+          {[[today.length+'','Today'],[done.length+'','Done'],[avgAtt+'%','Att.'],['480 EGP','Week']].map(([v,l])=>(
+            <div key={l} style={{background:'rgba(255,255,255,.07)',borderRadius:9,padding:'7px 4px',textAlign:'center',border:'1px solid rgba(255,255,255,.07)'}}>
+              <div style={{fontFamily:FD,fontSize:l==='Week'?12:15,fontWeight:900,color:l==='Att.'?R:W,lineHeight:1}}>{v}</div>
+              <div style={{fontSize:7.5,fontWeight:700,color:'rgba(255,255,255,.3)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:2,fontFamily:FB}}>{l}</div>
+            </div>
+          ))}
+        </div>
+        {/* Actions */}
+        <div style={{display:'flex',gap:7}}>
+          <button onClick={onNew} style={{flex:1,background:R,border:'none',borderRadius:9,padding:'8px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
+            <Ic p={I.plus} c={W} s={13}/>New Session
+          </button>
+          <button onClick={()=>onNav('athletes')} style={{flex:1,background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)',borderRadius:9,padding:'8px 0',fontSize:12,fontWeight:600,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
+            <Ic p={I.usrs} c={W} s={13}/>Athletes
+          </button>
+        </div>
+      </div>
+ 
+      <div style={{padding:'12px 14px 0'}}>
+        {/* Today's sessions */}
+        <SH label={'Today\'s Sessions ('+today.length+')'} cta="Schedule →" onCta={()=>onNav('schedule')}/>
+        {today.length===0?(
+          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:16,textAlign:'center',marginBottom:12}}>
+            <div style={{fontSize:12,color:'#aaa',fontFamily:FB}}>No sessions today</div>
+          </div>
+        ):today.map(s=>(
+          <div key={s.id} style={{background:W,border:`1.5px solid ${s.status==='done'?GR+'33':G}`,borderRadius:12,padding:'10px 12px',marginBottom:8}}>
+            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:5,flexWrap:'wrap'}}>
+              <span style={{fontSize:11,fontWeight:700,color:R,fontFamily:FB}}>{s.time}</span>
+              <Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/>
+              <Tag label={s.branch} c={'#777'} bg={GL}/>
+              {s.status==='done'&&<Tag label="✓ Done" c={GR} bg={GRB}/>}
+            </div>
+            <div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:5}}>{s.name}</div>
+            <div style={{marginBottom:8}}><AvatarStack ids={s.athletes}/></div>
+            <div style={{display:'flex',gap:6}}>
+              {s.status!=='done'&&(
+                <button onClick={()=>onCancel(s)} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:7,padding:'6px 0',fontSize:11,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>
+              )}
+              <button onClick={()=>onAtt(s)} style={{flex:2,background:s.status==='done'?GRB:K,border:s.status==='done'?`1.5px solid ${GR}33`:'none',borderRadius:7,padding:'6px 0',fontSize:11,fontWeight:700,color:s.status==='done'?GR:W,cursor:'pointer',fontFamily:FB}}>
+                {s.status==='done'?'Edit Attendance':'Mark Attendance'}
+              </button>
+            </div>
+          </div>
+        ))}
+ 
+        {/* Upcoming */}
+        <SH label="Upcoming" cta="See all →" onCta={()=>onNav('schedule')}/>
+        {upcoming.length===0?(
+          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:11,padding:12,textAlign:'center'}}><div style={{fontSize:12,color:'#bbb',fontFamily:FB}}>No upcoming sessions</div></div>
+        ):upcoming.map(s=>(
+          <div key={s.id} style={{display:'flex',alignItems:'center',gap:9,padding:'8px 0',borderBottom:`1.5px solid ${G}`}}>
+            <div style={{width:46,background:GL,border:`1.5px solid ${G}`,borderRadius:9,padding:'4px 2px',textAlign:'center',flexShrink:0}}>
+              <div style={{fontFamily:FD,fontSize:11,fontWeight:800,color:R,lineHeight:1}}>{s.time.split(' ')[0]}</div>
+              <div style={{fontSize:7.5,fontWeight:700,color:'#aaa',fontFamily:FB}}>{s.time.split(' ')[1]}</div>
+              <div style={{fontSize:7.5,fontWeight:700,color:'#bbb',fontFamily:FB,marginTop:1}}>{fmtD(s.date).split(' ').slice(0,2).join(' ')}</div>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontFamily:FD,fontSize:13,fontWeight:800,color:K,marginBottom:3}}>{s.name}</div>
+              <div style={{display:'flex',gap:5,alignItems:'center'}}>
+                <Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/>
+                <span style={{fontSize:10,color:'#bbb',fontFamily:FB}}>{s.athletes.length} enrolled</span>
+              </div>
+            </div>
+            <Ic p={I.chR} c={'#ddd'} s={13}/>
+          </div>
         ))}
       </div>
-      {pTab==='packages'&&(<div style={{padding:'0 20px'}}>{ACT_PKGS.map((p,i)=>(
-        <div key={i} style={{background:W,border:`1.5px solid ${p.warn?AM+'44':RBR}`,borderRadius:20,padding:18,marginBottom:12}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:12}}>
-            <div><div style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K,marginBottom:2}}>{p.name}</div><div style={{fontSize:11,color:'#888',fontFamily:FB}}>{p.ppt}</div></div>
-            <div style={{textAlign:'right'}}><span style={{fontFamily:FD,fontSize:30,fontWeight:900,color:p.warn?AM:R}}>{p.rem}</span><span style={{fontSize:10,fontWeight:700,color:'#aaa',fontFamily:FB}}> /{p.tot} pts</span></div>
-          </div>
-          <div style={{height:5,borderRadius:3,background:G,marginBottom:8}}><div style={{height:'100%',width:`${p.rem/p.tot*100}%`,borderRadius:3,background:p.warn?AM:R}}/></div>
-          <div style={{fontSize:11,color:p.warn?R:'#888',fontFamily:FB,fontWeight:p.warn?600:400}}>{p.exp}</div>
-        </div>
-      ))}</div>)}
-      {pTab==='buy'&&(<div style={{padding:'0 20px'}}>{BUY_PKGS.map(p=>(
-        <div key={p.id} style={{background:W,border:`1.5px solid ${p.feat?K:G}`,borderRadius:20,padding:'16px 18px',marginBottom:12,position:'relative',overflow:'hidden'}}>
-          {p.feat&&<div style={{position:'absolute',top:14,right:0,background:K,color:W,fontSize:9,fontWeight:800,letterSpacing:'1px',padding:'4px 10px',borderRadius:'5px 0 0 5px',fontFamily:FB}}>BEST VALUE</div>}
-          {p.offer&&<div style={{display:'inline-flex',alignItems:'center',background:`${p.offer.c}15`,borderRadius:8,padding:'3px 8px',fontSize:11,fontWeight:700,color:p.offer.c,fontFamily:FB,marginBottom:10}}>🎁 {p.offer.lbl}</div>}
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:12}}>
-            <div><div style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K,marginBottom:2}}>{p.name}</div><div style={{fontSize:11,color:'#888',fontFamily:FB}}>{p.ppt}</div></div>
-            <div style={{textAlign:'right'}}><div style={{fontFamily:FD,fontSize:30,fontWeight:900,color:p.feat?R:K}}>{p.pts}<span style={{fontSize:14}}> pts</span></div><div style={{fontSize:15,fontWeight:700,color:K,fontFamily:FB}}>{p.price}</div></div>
-          </div>
-          <button onClick={()=>setBuyPkg(p)} style={{width:'100%',background:p.feat?K:GL,border:p.feat?'none':`1.5px solid ${G}`,borderRadius:12,padding:12,fontSize:13,fontWeight:700,color:p.feat?W:C,cursor:'pointer',fontFamily:FB}}>Purchase · Upload Receipt</button>
-        </div>
-      ))}</div>)}
-      {pTab==='pending'&&(<div style={{padding:'0 20px'}}>{pending.length===0?(
-        <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:18,padding:28,textAlign:'center'}}>
-          <div style={{fontSize:13,color:'#888',fontFamily:FB,marginBottom:12}}>No pending purchases.</div>
-          <button onClick={()=>setPTab('buy')} style={{background:K,border:'none',borderRadius:12,padding:'10px 20px',fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Buy a Package</button>
-        </div>
-      ):pending.map((p,i)=>(
-        <div key={i} style={{background:W,border:`1.5px solid ${G}`,borderRadius:18,padding:'14px 16px',marginBottom:12}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-            <div><div style={{fontFamily:FD,fontSize:18,fontWeight:800,color:K,marginBottom:2}}>{p.name}</div><div style={{fontSize:11,color:'#888',fontFamily:FB}}>{p.pts} pts · {p.price}</div></div>
-            <Tag label="Pending Review" c={AM} bg={AMB}/>
-          </div>
-          <div style={{fontSize:11,color:'#aaa',fontFamily:FB}}>Submitted {new Date().toLocaleDateString('en-GB')}</div>
-        </div>
-      ))}</div>)}
-      {pTab==='history'&&(<div style={{padding:'0 20px'}}>{txns.map((t,i)=>(
-        <div key={i} style={{display:'flex',alignItems:'center',gap:14,padding:'14px 0',borderBottom:`1.5px solid ${G}`}}>
-          <div style={{width:40,height:40,borderRadius:12,background:t.tp==='in'?GRB:RB,border:`1px solid ${t.tp==='in'?GR+'33':RBR}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-            <span style={{fontFamily:FD,fontSize:18,fontWeight:700,color:t.tp==='in'?GR:R}}>{t.tp==='in'?'↑':'↓'}</span>
-          </div>
-          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:500,color:K,fontFamily:FB,marginBottom:2}}>{t.l}</div><div style={{fontSize:11,color:'#888',fontFamily:FB}}>{t.s}</div></div>
-          <span style={{fontFamily:FD,fontSize:20,fontWeight:800,color:t.tp==='in'?GR:R}}>{t.pts>0?'+':''}{t.pts}</span>
-        </div>
-      ))}</div>)}
     </div>
   );
 }
-
-// ── SCHEDULE SCREEN ───────────────────────────────────────────────────────────
-function ScheduleScreen({sessions,onCancel,onCheckIn,initialCancel}){
-  const[sTab,setSTab]=useState('upcoming');
-  const[selDate,setSelDate]=useState(null);
+ 
+/* ── SCHEDULE SCREEN ──────────────────────────────────────────── */
+function ScheduleScreen({sessions,onCancel,onAtt,onNew}){
+  const[selDate,setSelDate]=useState(new Date());
   const[calMo,setCalMo]=useState(new Date());
-  const[showCal,setShowCal]=useState(false);
-  const[cancelSess,setCancelSess]=useState(null);
-  useEffect(()=>{if(initialCancel){setCancelSess(initialCancel);}},[initialCancel]);
-  const up=sessions.filter(s=>s.status==='upcoming').sort((a,b)=>a.date-b.date);
-  const past=sessions.filter(s=>s.status!=='upcoming').sort((a,b)=>b.date-a.date);
-  const list=(sTab==='upcoming'?up:past).filter(s=>!selDate||sameDay(s.date,selDate));
+  const[view,setView]=useState('day');
   const yr=calMo.getFullYear(),mo=calMo.getMonth();
-  const stMap={upcoming:[GRB,GR,'● Confirmed'],attended:[RB,R,'✓ Attended'],cancelled:['rgba(0,0,0,.05)','#888','✕ Cancelled'],waitlist:[AMB,AM,'● Waitlist']};
+  const marked=sessions.filter(s=>s.status!=='cancelled').map(s=>s.date);
+  const daySess=sessions.filter(s=>sameDay(s.date,selDate)&&s.status!=='cancelled').sort((a,b)=>a.time.localeCompare(b.time));
+  const upcomingSess=sessions.filter(s=>s.status==='upcoming').sort((a,b)=>a.date-b.date);
   return(
-    <div style={{paddingBottom:24,position:'relative'}}>
-      {cancelSess&&<CancelModal session={cancelSess} onConfirm={(s)=>{onCancel(s.id);setCancelSess(null);}} onClose={()=>setCancelSess(null)}/>}
-      <div style={{padding:'14px 20px 14px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <div style={{fontFamily:FD,fontSize:30,fontWeight:900,color:K}}>MY SCHEDULE</div>
-        <button onClick={()=>setShowCal(!showCal)} style={{display:'flex',alignItems:'center',gap:6,background:showCal?K:W,border:`1.5px solid ${showCal?K:G}`,borderRadius:12,padding:'8px 12px',cursor:'pointer',fontFamily:FB,fontSize:12,fontWeight:600,color:showCal?W:C,transition:'all .15s'}}>
-          <Ic p={I.cal} c={showCal?W:R} s={16}/>
-          {selDate?fmtD(selDate):'Filter date'}
+    <div style={{paddingBottom:16}}>
+      <div style={{padding:'10px 14px 10px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:K}}>SCHEDULE</div>
+        <button onClick={onNew} style={{display:'flex',alignItems:'center',gap:4,background:K,border:'none',borderRadius:9,padding:'7px 11px',cursor:'pointer',fontFamily:FB,fontSize:12,fontWeight:700,color:W}}>
+          <Ic p={I.plus} c={W} s={13}/>New
         </button>
       </div>
-      {showCal&&(
-        <div style={{marginBottom:14}}>
-          <MiniCal month={mo} year={yr} selected={selDate} onSelect={d=>{setSelDate(d);setShowCal(false);}} onPrev={()=>setCalMo(new Date(yr,mo-1,1))} onNext={()=>setCalMo(new Date(yr,mo+1,1))}/>
-          {selDate&&<div style={{padding:'0 20px'}}><button onClick={()=>setSelDate(null)} style={{width:'100%',background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:10,fontSize:13,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Clear Filter</button></div>}
-        </div>
-      )}
-      <div style={{display:'flex',background:GL,borderRadius:12,padding:4,margin:'0 20px 14px',border:`1.5px solid ${G}`}}>
-        {[['upcoming','Upcoming'],['past','Past']].map(([t,l])=>(
-          <div key={t} onClick={()=>setSTab(t)} style={{flex:1,textAlign:'center',padding:'9px 0',borderRadius:9,fontSize:13,fontWeight:600,cursor:'pointer',background:sTab===t?W:'transparent',color:sTab===t?K:'#aaa',boxShadow:sTab===t?'0 1px 4px rgba(0,0,0,.12)':'none',fontFamily:FB,transition:'all .15s'}}>{l}</div>
+      <MiniCal month={mo} year={yr} selected={selDate} markedDates={marked} onSelect={setSelDate} onPrev={()=>setCalMo(new Date(yr,mo-1,1))} onNext={()=>setCalMo(new Date(yr,mo+1,1))}/>
+      <div style={{display:'flex',background:GL,borderRadius:9,padding:3,margin:'0 14px 11px',border:`1.5px solid ${G}`}}>
+        {[['day','Selected Day'],['upcoming','All Upcoming']].map(([v,l])=>(
+          <div key={v} onClick={()=>setView(v)} style={{flex:1,textAlign:'center',padding:'7px 0',borderRadius:6,fontSize:11,fontWeight:600,cursor:'pointer',background:view===v?W:'transparent',color:view===v?K:'#bbb',boxShadow:view===v?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,transition:'all .12s'}}>{l}</div>
         ))}
       </div>
-      <div style={{padding:'0 20px'}}>
-        {list.length===0?(
-          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:18,padding:28,textAlign:'center'}}><div style={{fontSize:13,color:'#888',fontFamily:FB}}>{sTab==='upcoming'?'No upcoming sessions.':'No past sessions.'}</div></div>
-        ):list.map(s=>{
-          const[sbg,sc,sl]=stMap[s.status]||[RB,R,'● Booked'];
-          const canQR=sTab==='upcoming'&&s.status==='upcoming'&&isToday(s.date);
-          return(
-            <div key={s.id} style={{background:W,border:`1.5px solid ${canQR?RBR:G}`,borderRadius:18,padding:'14px 16px',marginBottom:12}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
-                <div>
-                  <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4,flexWrap:'wrap'}}>
-                    <span style={{fontSize:11,fontWeight:600,color:'#666',fontFamily:FB}}>{fmtD(s.date)} · {s.time}</span>
-                    <Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/>
-                  </div>
-                  <div style={{fontFamily:FD,fontSize:20,fontWeight:800,color:K,marginBottom:2}}>{s.name}</div>
-                  <div style={{fontSize:12,color:'#666',fontFamily:FB}}>{s.coach} · {s.branch}</div>
-                </div>
-                <div style={{textAlign:'right'}}><div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:R,lineHeight:1}}>{s.pts}</div><div style={{fontSize:10,fontWeight:700,color:'#aaa',fontFamily:FB}}>PTS</div></div>
+      <div style={{padding:'0 14px'}}>
+        {view==='day'&&(
+          <>
+            <SH label={fmtD(selDate)+(isToday(selDate)?' · Today':'')+' — '+daySess.length+' session'+(daySess.length!==1?'s':'')}/>
+            {daySess.length===0?(
+              <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:20,textAlign:'center'}}>
+                <div style={{fontSize:12,color:'#aaa',fontFamily:FB,marginBottom:9}}>No sessions on this day</div>
+                <button onClick={onNew} style={{background:K,border:'none',borderRadius:9,padding:'7px 16px',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>+ Add Session</button>
               </div>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8,flexWrap:'wrap'}}>
-                <span style={{display:'inline-flex',alignItems:'center',gap:5,fontSize:11,fontWeight:700,color:sc,background:sbg,padding:'4px 10px',borderRadius:8,fontFamily:FB}}>{sl}</span>
-                <div style={{display:'flex',gap:8}}>
-                  {sTab==='upcoming'&&s.status==='upcoming'&&!canQR&&<button onClick={()=>setCancelSess(s)} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'6px 14px',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>}
-                  {canQR&&(
-                    <div style={{display:'flex',gap:8}}>
-                      <button onClick={()=>setCancelSess(s)} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'6px 12px',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>
-                      <button onClick={()=>onCheckIn(s)} style={{background:R,border:'none',borderRadius:10,padding:'6px 12px',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',gap:5}}>
-                        <Ic p={I.qr} c={W} s={13}/>Scan QR
-                      </button>
-                    </div>
-                  )}
-                  {sTab==='past'&&s.status==='attended'&&!s.rated&&<button style={{background:'transparent',border:`1.5px solid ${R}`,borderRadius:10,padding:'6px 14px',fontSize:12,fontWeight:700,color:R,cursor:'pointer',fontFamily:FB}}>Rate Session</button>}
-                  {sTab==='past'&&s.rated&&<span style={{fontSize:13,color:AM,fontWeight:700,fontFamily:FB}}>★★★★★</span>}
-                  {sTab==='past'&&s.checkedIn&&<Tag label="✓ Checked In" c={GR} bg={GRB}/>}
+            ):daySess.map(s=><SessCard key={s.id} s={s} onCancel={onCancel} onAtt={onAtt}/>)}
+          </>
+        )}
+        {view==='upcoming'&&(
+          <>
+            <SH label={upcomingSess.length+' upcoming'}/>
+            {upcomingSess.length===0?(
+              <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:18,textAlign:'center'}}><div style={{fontSize:12,color:'#aaa',fontFamily:FB}}>No upcoming sessions</div></div>
+            ):upcomingSess.map(s=><SessCard key={s.id} s={s} onCancel={onCancel} onAtt={onAtt}/>)}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+ 
+/* ── ATHLETE PROFILE ──────────────────────────────────────────── */
+function AthProfile({a,sessions,onBack}){
+  const[tab,setTab]=useState('overview');
+  const mySess=sessions.filter(s=>s.athletes.includes(a.id));
+  const doneSess=mySess.filter(s=>s.status==='done');
+  const present=doneSess.filter(s=>s.att[a.id]==='p').length;
+  const attRate=doneSess.length>0?Math.round(present/doneSess.length*100):a.att;
+  return(
+    <div style={{paddingBottom:16}}>
+      <div style={{background:K,padding:'13px 14px 16px',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',right:-25,top:-25,width:110,height:110,borderRadius:'50%',border:'1px solid rgba(199,35,51,.15)',opacity:.4,pointerEvents:'none'}}/>
+        <BackBtn onBack={onBack} light/>
+        <div style={{display:'flex',gap:11,alignItems:'flex-start',marginTop:11}}>
+          <div style={{width:52,height:52,borderRadius:16,background:R,border:'2px solid rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <span style={{fontFamily:FD,fontSize:19,fontWeight:900,color:W}}>{a.init}</span>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:FD,fontSize:21,fontWeight:900,color:W,lineHeight:1,marginBottom:3}}>{a.name.toUpperCase()}</div>
+            <div style={{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:FB,marginBottom:7}}>{a.goal}</div>
+            <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
+              <Tag label={a.branch} c={'rgba(255,255,255,.5)'} bg={'rgba(255,255,255,.09)'}/>
+              {a.tags.map(t=><Tag key={t} label={t} c={R} bg={'rgba(199,35,51,.25)'}/>)}
+            </div>
+          </div>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6,marginTop:12}}>
+          {[[a.sess+'','Sessions'],[attRate+'%','Attendance'],[a.pts+'pts','Balance']].map(([v,l])=>(
+            <div key={l} style={{background:'rgba(255,255,255,.07)',borderRadius:9,padding:'7px 4px',textAlign:'center',border:'1px solid rgba(255,255,255,.06)'}}>
+              <div style={{fontFamily:FD,fontSize:15,fontWeight:900,color:W,lineHeight:1}}>{v}</div>
+              <div style={{fontSize:7.5,fontWeight:700,color:'rgba(255,255,255,.28)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:2,fontFamily:FB}}>{l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{display:'flex',background:GL,borderRadius:9,padding:3,margin:'11px 14px',border:`1.5px solid ${G}`}}>
+        {[['overview','Overview'],['sessions','Sessions'],['notes','Notes']].map(([v,l])=>(
+          <div key={v} onClick={()=>setTab(v)} style={{flex:1,textAlign:'center',padding:'7px 0',borderRadius:6,fontSize:11,fontWeight:600,cursor:'pointer',background:tab===v?W:'transparent',color:tab===v?K:'#bbb',boxShadow:tab===v?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,transition:'all .12s'}}>{l}</div>
+        ))}
+      </div>
+      {tab==='overview'&&(
+        <div style={{padding:'0 14px'}} className="fade-in">
+          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:11,padding:11,marginBottom:9}}>
+            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              <div style={{width:30,height:30,borderRadius:8,background:RB,border:`1px solid ${RBR}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Ic p={I.tgt} c={R} s={14}/></div>
+              <div><div style={{fontSize:9,fontWeight:700,color:'#bbb',textTransform:'uppercase',letterSpacing:'1px',fontFamily:FB,marginBottom:2}}>TRAINING GOAL</div><div style={{fontSize:12,color:K,fontFamily:FB}}>{a.goal}</div></div>
+            </div>
+          </div>
+          <div style={{background:a.injury==='None'?GL:AMB,border:`1.5px solid ${a.injury==='None'?G:AM+'44'}`,borderRadius:11,padding:11,marginBottom:9}}>
+            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              <span style={{fontSize:16,flexShrink:0}}>🩹</span>
+              <div><div style={{fontSize:9,fontWeight:700,color:a.injury==='None'?'#bbb':AM,textTransform:'uppercase',letterSpacing:'1px',fontFamily:FB,marginBottom:2}}>INJURY STATUS</div><div style={{fontSize:12,color:a.injury==='None'?'#aaa':C,fontFamily:FB}}>{a.injury}</div></div>
+            </div>
+          </div>
+          <SH label="Performance"/>
+          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:11,padding:11}}>
+            {[['Attendance Rate',attRate,100,attRate>=90?GR:attRate>=75?AM:R,'%'],['Pts Remaining',a.pts,200,BL,''],['Sessions',a.sess,50,R,'']].map(([l,v,mx,c,suf])=>(
+              <div key={l} style={{marginBottom:9}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:3}}>
+                  <span style={{fontSize:11,color:C,fontFamily:FB}}>{l}</span>
+                  <span style={{fontSize:11,fontWeight:700,color:c,fontFamily:FB}}>{v}{suf}</span>
                 </div>
+                <div style={{height:4,borderRadius:2,background:G}}><div style={{height:'100%',width:`${Math.min(100,v/mx*100)}%`,borderRadius:2,background:c}}/></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {tab==='sessions'&&(
+        <div style={{padding:'0 14px'}} className="fade-in">
+          {mySess.length===0?(
+            <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:11,padding:18,textAlign:'center'}}><div style={{fontSize:12,color:'#bbb',fontFamily:FB}}>No shared sessions</div></div>
+          ):mySess.sort((x,y)=>y.date-x.date).map(s=>(
+            <div key={s.id} style={{background:W,border:`1.5px solid ${G}`,borderRadius:11,padding:'10px 12px',marginBottom:8}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div>
+                  <div style={{fontSize:10,fontWeight:600,color:'#bbb',fontFamily:FB,marginBottom:2}}>{fmtD(s.date)} · {s.time}</div>
+                  <div style={{fontFamily:FD,fontSize:14,fontWeight:800,color:K,marginBottom:4}}>{s.name}</div>
+                  <Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/>
+                </div>
+                {s.status==='done'&&s.att[a.id]&&(
+                  <div style={{textAlign:'center'}}>
+                    <div style={{width:30,height:30,borderRadius:8,background:s.att[a.id]==='p'?GRB:s.att[a.id]==='a'?RB:AMB,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      <span style={{fontSize:14,fontWeight:700,color:s.att[a.id]==='p'?GR:s.att[a.id]==='a'?R:AM}}>{s.att[a.id]==='p'?'✓':s.att[a.id]==='a'?'✕':'~'}</span>
+                    </div>
+                    <div style={{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',marginTop:2,fontFamily:FB}}>{s.att[a.id]==='p'?'Present':s.att[a.id]==='a'?'Absent':'Late'}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {tab==='notes'&&(
+        <div style={{padding:'0 14px'}} className="fade-in">
+          <div style={{background:AMB,border:`1.5px solid ${AM}33`,borderRadius:11,padding:11,marginBottom:11}}>
+            <div style={{display:'flex',gap:7,alignItems:'flex-start'}}><Ic p={I.inf} c={AM} s={13}/><div style={{fontSize:11,color:AM,fontFamily:FB,lineHeight:1.5}}>{a.notes}</div></div>
+          </div>
+          <div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB,marginBottom:6}}>ADD NOTE</div>
+          <textarea rows={3} placeholder="Add coaching notes…"
+            style={{width:'100%',background:W,border:`1.5px solid ${G}`,borderRadius:10,padding:'9px 11px',fontSize:12,fontFamily:FB,color:K,resize:'none',marginBottom:9}}/>
+          <button style={{width:'100%',background:K,border:'none',borderRadius:9,padding:'10px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Save Note</button>
+        </div>
+      )}
+    </div>
+  );
+}
+ 
+/* ── ATHLETES SCREEN ──────────────────────────────────────────── */
+function AthletesScreen({sessions}){
+  const[q,setQ]=useState('');
+  const[sel,setSel]=useState(null);
+  const filtered=ATHLETES.filter(a=>a.name.toLowerCase().includes(q.toLowerCase())||a.goal.toLowerCase().includes(q.toLowerCase()));
+  if(sel) return <AthProfile a={sel} sessions={sessions} onBack={()=>setSel(null)}/>;
+  return(
+    <div style={{paddingBottom:16}}>
+      <div style={{padding:'10px 14px 11px'}}>
+        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:11}}>MY ATHLETES</div>
+        <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:'0 11px',display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+          <Ic p={I.srch} c={'#ccc'} s={15}/>
+          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by name or goal…"
+            style={{flex:1,background:'transparent',border:'none',padding:'10px 0',fontSize:12,fontFamily:FB,color:K}}/>
+          {q&&<button onClick={()=>setQ('')} style={{background:'transparent',border:'none',cursor:'pointer',display:'flex',padding:2}}><Ic p={I.X} c={'#ccc'} s={13}/></button>}
+        </div>
+        <div style={{display:'flex',gap:6,overflowX:'auto',scrollbarWidth:'none'}}>
+          {[['All',ATHLETES.length],['New Cairo',3],['Maadi',2],['Sheikh Zayed',1]].map(([l,n])=>(
+            <div key={l} style={{flexShrink:0,background:GL,border:`1.5px solid ${G}`,borderRadius:7,padding:'4px 9px',fontSize:10,fontWeight:600,fontFamily:FB,color:C,whiteSpace:'nowrap'}}>
+              {l} <span style={{color:R,fontWeight:700}}>{n}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{padding:'0 14px'}}>
+        {filtered.length===0?(
+          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:18,textAlign:'center'}}><div style={{fontSize:12,color:'#bbb',fontFamily:FB}}>No athletes found</div></div>
+        ):filtered.map(a=>{
+          const ac=a.att>=95?GR:a.att>=80?AM:R;
+          return(
+            <div key={a.id} onClick={()=>setSel(a)} style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'10px 12px',marginBottom:8,cursor:'pointer'}}>
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
+                <div style={{width:42,height:42,borderRadius:13,background:K,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <span style={{fontFamily:FD,fontSize:15,fontWeight:900,color:W}}>{a.init}</span>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:600,color:K,fontFamily:FB,marginBottom:3}}>{a.name}</div>
+                  <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
+                    <Tag label={a.branch} c={'#777'} bg={GL}/>
+                    {a.tags.slice(0,2).map(t=><Tag key={t} label={t} c={R} bg={RB}/>)}
+                  </div>
+                </div>
+                <Ic p={I.chR} c={'#ddd'} s={13}/>
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:a.injury!=='None'?'1fr 1fr 1fr 1fr':'1fr 1fr 1fr',gap:6}}>
+                {[[a.sess,'Sessions','#777'],[a.att+'%','Attendance',ac],[a.pts+'pts','Balance',R]].map(([v,l,c])=>(
+                  <div key={l} style={{background:GL,borderRadius:7,padding:'6px 4px',textAlign:'center'}}>
+                    <div style={{fontFamily:FD,fontSize:14,fontWeight:800,color:c,lineHeight:1}}>{v}</div>
+                    <div style={{fontSize:7.5,fontWeight:700,color:'#ccc',textTransform:'uppercase',letterSpacing:'.4px',marginTop:2,fontFamily:FB}}>{l}</div>
+                  </div>
+                ))}
+                {a.injury!=='None'&&(
+                  <div style={{background:AMB,borderRadius:7,padding:'6px 4px',textAlign:'center',border:`1px solid ${AM}22`}}>
+                    <div style={{fontSize:14,lineHeight:1}}>🩹</div>
+                    <div style={{fontSize:7.5,fontWeight:700,color:AM,textTransform:'uppercase',letterSpacing:'.4px',marginTop:2,fontFamily:FB}}>Injury</div>
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -1107,107 +762,221 @@ function ScheduleScreen({sessions,onCancel,onCheckIn,initialCancel}){
     </div>
   );
 }
-
-// ── PROFILE SCREEN ────────────────────────────────────────────────────────────
-function ProfileScreen(){
+ 
+/* ── SESSIONS SCREEN ──────────────────────────────────────────── */
+function SessionsScreen({sessions,onCancel,onAtt,onNew}){
+  const[tab,setTab]=useState('upcoming');
+  const up  =sessions.filter(s=>s.status==='upcoming').sort((a,b)=>a.date-b.date);
+  const done=sessions.filter(s=>s.status==='done').sort((a,b)=>b.date-a.date);
+  const canc=sessions.filter(s=>s.status==='cancelled');
+  const list=tab==='upcoming'?up:tab==='done'?done:canc;
   return(
-    <div style={{paddingBottom:24}}>
-      <div style={{background:K,padding:'22px 20px 24px'}}>
-        <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:18}}>
-          <div style={{width:70,height:70,borderRadius:22,border:`2px solid ${R}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,background:'rgba(255,255,255,.07)'}}><span style={{fontFamily:FD,fontSize:26,fontWeight:900,color:W}}>HA</span></div>
-          <div>
-            <div style={{fontFamily:FD,fontSize:26,fontWeight:900,color:W,lineHeight:1,marginBottom:4}}>HANIA AHMED</div>
-            <div style={{fontSize:12,color:'rgba(255,255,255,.4)',fontFamily:FB,marginBottom:8}}>Member since Jan 2024</div>
-            <div style={{display:'flex',gap:6}}><Tag label="CROSSFIT" c={R} bg={'rgba(199,35,51,.25)'}/><Tag label="NEW CAIRO" c={'rgba(255,255,255,.5)'} bg={'rgba(255,255,255,.1)'}/></div>
-          </div>
-        </div>
-        <div style={{display:'flex',gap:8}}>
-          {[['12','Day Streak'],['8','Sessions/mo'],['147','Points']].map(([v,l])=>(
-            <div key={l} style={{flex:1,background:'rgba(255,255,255,.07)',borderRadius:14,padding:10,textAlign:'center',border:'1px solid rgba(255,255,255,.08)'}}>
-              <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:W,lineHeight:1}}>{v}</div>
-              <div style={{fontSize:9.5,fontWeight:700,color:'rgba(255,255,255,.35)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:3,fontFamily:FB}}>{l}</div>
-            </div>
-          ))}
-        </div>
+    <div style={{paddingBottom:16}}>
+      <div style={{padding:'10px 14px 0',display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:K}}>SESSIONS</div>
+        <button onClick={onNew} style={{display:'flex',alignItems:'center',gap:4,background:K,border:'none',borderRadius:9,padding:'7px 11px',cursor:'pointer',fontFamily:FB,fontSize:12,fontWeight:700,color:W}}>
+          <Ic p={I.plus} c={W} s={13}/>New
+        </button>
       </div>
-      <div style={{padding:'8px 20px 0'}}>
-        {[['👤','Personal Info','Edit your details'],['🎯','Training Goals','2 active goals'],['🩹','Injury Notes','1 record on file'],['🔔','Notifications','Manage alerts'],['💳','Payment History','3 purchases'],['🔒','Privacy','Social visibility']].map(([e,l,s])=>(
-          <div key={l} style={{display:'flex',alignItems:'center',gap:14,padding:'15px 0',borderBottom:`1.5px solid ${G}`,cursor:'pointer'}}>
-            <div style={{width:42,height:42,borderRadius:13,background:GL,border:`1px solid ${G}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>{e}</div>
-            <div style={{flex:1}}><div style={{fontSize:14,fontWeight:500,color:K,fontFamily:FB,marginBottom:2}}>{l}</div><div style={{fontSize:11,color:'#888',fontFamily:FB}}>{s}</div></div>
-            <Ic p={I.chR} c={'#ccc'} s={16}/>
+      <div style={{display:'flex',gap:7,padding:'0 14px',marginBottom:10,overflowX:'auto',scrollbarWidth:'none'}}>
+        {[[up.length,'Upcoming',R],[done.length,'Done',GR],[canc.length,'Cancelled','#bbb']].map(([n,l,c])=>(
+          <div key={l} style={{flexShrink:0,background:GL,border:`1.5px solid ${G}`,borderRadius:8,padding:'5px 11px',display:'flex',gap:5,alignItems:'center'}}>
+            <span style={{fontFamily:FD,fontSize:15,fontWeight:900,color:c,lineHeight:1}}>{n}</span>
+            <span style={{fontSize:10,fontWeight:600,color:'#aaa',fontFamily:FB}}>{l}</span>
           </div>
         ))}
-        <button style={{width:'100%',marginTop:20,background:'transparent',border:`1.5px solid ${R}33`,borderRadius:14,padding:14,fontSize:14,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}>Sign Out</button>
+      </div>
+      <div style={{display:'flex',background:GL,borderRadius:9,padding:3,margin:'0 14px 11px',border:`1.5px solid ${G}`}}>
+        {[['upcoming','Upcoming'],['done','Done'],['cancelled','Cancelled']].map(([v,l])=>(
+          <div key={v} onClick={()=>setTab(v)} style={{flex:1,textAlign:'center',padding:'7px 0',borderRadius:6,fontSize:11,fontWeight:600,cursor:'pointer',background:tab===v?W:'transparent',color:tab===v?K:'#bbb',boxShadow:tab===v?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,transition:'all .12s'}}>{l}</div>
+        ))}
+      </div>
+      <div style={{padding:'0 14px'}}>
+        {list.length===0?(
+          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:22,textAlign:'center'}}>
+            <div style={{fontSize:12,color:'#bbb',fontFamily:FB,marginBottom:tab==='upcoming'?9:0}}>No {tab} sessions</div>
+            {tab==='upcoming'&&<button onClick={onNew} style={{background:K,border:'none',borderRadius:9,padding:'7px 16px',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>+ Create Session</button>}
+          </div>
+        ):list.map(s=><SessCard key={s.id} s={s} onCancel={onCancel} onAtt={onAtt}/>)}
       </div>
     </div>
   );
 }
-
-// ── MAIN APP ──────────────────────────────────────────────────────────────────
-function InchesAthlete(){
-  const[tab,setTab]=useState('home');
-  const[sessions,setSessions]=useState(INIT_SESS);
-  const[pending,setPending]=useState([]);
-  const[initCancel,setInitCancel]=useState(null);
-  const[qrSession,setQrSession]=useState(null);
-
-  const handleBook=(s,br,dt)=>setSessions(p=>[...p,{id:Date.now(),date:dt,time:s.time,name:s.name,coach:s.coach,type:'GROUP',pts:s.pts,status:'upcoming',branch:br.name,canCheckIn:isToday(dt)}]);
-  const handlePrivateBook=(sl,coach,br,dt)=>setSessions(p=>[...p,{id:Date.now(),date:dt,time:sl.t,name:'PRIVATE TRAINING',coach:`Coach ${coach.name}`,type:'PRIVATE',pts:sl.pts,status:'upcoming',branch:br.name,canCheckIn:isToday(dt)}]);
-  const handleCancel=id=>setSessions(p=>p.map(s=>s.id===id?{...s,status:'cancelled'}:s));
-  const handleCheckInSuccess=id=>setSessions(p=>p.map(s=>s.id===id?{...s,checkedIn:true,status:'attended'}:s));
-  const handlePurchase=pkg=>setPending(p=>[...p,{...pkg}]);
-  const handleNav=(t,extra={})=>{
-    if(extra.openCancel)setInitCancel(extra.openCancel);
-    else setInitCancel(null);
-    setTab(t);
-  };
-  const navItems=[{id:'home',l:'Home',ic:I.home},{id:'book',l:'Book',ic:I.cal},{id:'points',l:'Points',ic:I.zap},{id:'schedule',l:'Schedule',ic:I.clk},{id:'profile',l:'Profile',ic:I.usr}];
-
+ 
+/* ── PROFILE SCREEN ───────────────────────────────────────────── */
+function ProfileScreen({sessions}){
+  const[tab,setTab]=useState('profile');
+  const done=sessions.filter(s=>s.status==='done');
+  const total=sessions.length;
+  const uqA=[...new Set(sessions.flatMap(s=>s.athletes))].length;
+  const prs=done.reduce((a,s)=>a+Object.values(s.att).filter(v=>v==='p').length,0);
+  const enr=done.reduce((a,s)=>a+s.athletes.length,0);
+  const avgAtt=enr>0?Math.round(prs/enr*100):95;
   return(
-    <div style={{background:'#eae9e6',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',padding:'20px 12px 40px',gap:16,fontFamily:FB}}>
-      <div style={{textAlign:'center'}}>
-        <div style={{fontFamily:FD,fontSize:40,fontWeight:900,color:K,letterSpacing:'6px'}}>INCHES</div>
-        <div style={{fontSize:10,fontWeight:700,color:'#999',letterSpacing:'2.5px',textTransform:'uppercase',marginTop:2,fontFamily:FB}}>Performance Training · Athlete App</div>
-      </div>
-      <div style={{width:375,height:812,background:W,borderRadius:50,border:'1.5px solid #bbb',overflow:'hidden',display:'flex',flexDirection:'column',position:'relative',boxShadow:'0 28px 72px rgba(0,0,0,.22),0 4px 16px rgba(0,0,0,.1)'}}>
-        <div style={{position:'absolute',top:0,left:'50%',transform:'translateX(-50%)',width:110,height:30,background:K,borderRadius:'0 0 18px 18px',zIndex:10}}/>
-        <div style={{height:44,padding:'12px 24px 0',display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0,background:W,position:'relative',zIndex:5}}>
-          <span style={{fontSize:15,fontWeight:600,color:K,fontFamily:FB}}>9:41</span>
-          <div style={{display:'flex',alignItems:'center',gap:5}}>
-            <svg width="16" height="11" viewBox="0 0 16 11" fill={K}><rect x="0" y="3" width="3" height="8" rx="1"/><rect x="4.5" y="2" width="3" height="9" rx="1"/><rect x="9" y="0" width="3" height="11" rx="1"/><rect x="13.5" y="1" width="2.5" height="10" rx=".5" opacity=".3"/></svg>
-            <svg width="14" height="11" viewBox="0 0 15 11" fill="none"><path d="M7.5 2.5C9.5 2.5 11.3 3.3 12.6 4.6L14 3.2C12.3 1.5 10 .5 7.5.5 5 .5 2.7 1.5 1 3.2L2.4 4.6C3.7 3.3 5.5 2.5 7.5 2.5Z" fill={K}/><path d="M7.5 5.5C8.7 5.5 9.8 6 10.6 6.8L12 5.4C10.8 4.2 9.2 3.5 7.5 3.5 5.8 3.5 4.2 4.2 3 5.4L4.4 6.8C5.2 6 6.3 5.5 7.5 5.5Z" fill={K}/><circle cx="7.5" cy="9.5" r="1.5" fill={K}/></svg>
-            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke={K} strokeOpacity=".35"/><rect x="1.5" y="1.5" width="18" height="9" rx="2.5" fill={K}/><path d="M23 4.5V7.5c.8-.3 1.5-1.1 1.5-1.5S23.8 4.8 23 4.5Z" fill={K} fillOpacity=".4"/></svg>
+    <div style={{paddingBottom:16}}>
+      <div style={{background:K,padding:'14px 14px 16px',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',right:-30,top:-30,width:130,height:130,borderRadius:'50%',border:'1px solid rgba(199,35,51,.1)',opacity:.4,pointerEvents:'none'}}/>
+        <div style={{display:'flex',gap:12,alignItems:'flex-start',marginBottom:12}}>
+          <div style={{width:58,height:58,borderRadius:17,background:R,border:'2px solid rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <span style={{fontFamily:FD,fontSize:22,fontWeight:900,color:W}}>KA</span>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:FD,fontSize:21,fontWeight:900,color:W,lineHeight:1,marginBottom:3}}>KARIM ADEL</div>
+            <div style={{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:FB,marginBottom:7}}>Head Coach · 6 yrs</div>
+            <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
+              {['Strength','Power','HIIT'].map(t=><Tag key={t} label={t} c={R} bg={'rgba(199,35,51,.25)'}/>)}
+            </div>
           </div>
         </div>
-        <div style={{flex:1,overflowY:'auto',overflowX:'hidden',scrollbarWidth:'none',WebkitOverflowScrolling:'touch',position:'relative'}}>
-          {qrSession&&<QRCheckIn session={qrSession} onSuccess={handleCheckInSuccess} onClose={()=>setQrSession(null)}/>}
-          {tab==='home'    &&<HomeScreen     sessions={sessions} onNav={handleNav} onCheckIn={setQrSession}/>}
-          {tab==='book'    &&<BookScreen     onBook={handleBook} onPrivateBook={handlePrivateBook}/>}
-          {tab==='points'  &&<PointsScreen   pending={pending} onPurchase={handlePurchase}/>}
-          {tab==='schedule'&&<ScheduleScreen sessions={sessions} onCancel={handleCancel} onCheckIn={setQrSession} initialCancel={initCancel}/>}
-          {tab==='profile' &&<ProfileScreen/>}
-        </div>
-        <div style={{height:76,background:W,borderTop:`1.5px solid ${G}`,display:'flex',alignItems:'flex-start',paddingTop:10,flexShrink:0}}>
-          {navItems.map(item=>(
-            <div key={item.id} onClick={()=>{if(item.id!=='schedule')setInitCancel(null);setTab(item.id);}} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,cursor:'pointer',padding:'3px 0'}}>
-              <Ic p={item.ic} c={tab===item.id?R:C} s={22}/>
-              <span style={{fontSize:9.5,fontWeight:700,letterSpacing:'.3px',textTransform:'uppercase',fontFamily:FB,color:tab===item.id?R:'#bbb'}}>{item.l}</span>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6}}>
+          {[[total+'','Sessions'],[uqA+'','Athletes'],[avgAtt+'%','Att.'],['4.9★','Rating']].map(([v,l])=>(
+            <div key={l} style={{background:'rgba(255,255,255,.07)',borderRadius:9,padding:'7px 4px',textAlign:'center',border:'1px solid rgba(255,255,255,.06)'}}>
+              <div style={{fontFamily:FD,fontSize:l==='Rating'?12:14,fontWeight:900,color:l==='Att.'?R:l==='Rating'?AM:W,lineHeight:1}}>{v}</div>
+              <div style={{fontSize:7.5,fontWeight:700,color:'rgba(255,255,255,.27)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:2,fontFamily:FB}}>{l}</div>
             </div>
           ))}
         </div>
       </div>
-      <div style={{fontSize:11,color:'#999',textAlign:'center',fontFamily:FB,maxWidth:375}}>
-        INCHES Athlete App · v3 · Fully Reactive<br/>
-        <span style={{color:'#bbb'}}>Private booking with coach profiles · QR Check-in · Full calendar</span>
+      <div style={{display:'flex',background:GL,borderRadius:9,padding:3,margin:'11px 14px',border:`1.5px solid ${G}`}}>
+        {[['profile','Profile'],['earnings','Earnings'],['branches','Branches']].map(([v,l])=>(
+          <div key={v} onClick={()=>setTab(v)} style={{flex:1,textAlign:'center',padding:'7px 0',borderRadius:6,fontSize:11,fontWeight:600,cursor:'pointer',background:tab===v?W:'transparent',color:tab===v?K:'#bbb',boxShadow:tab===v?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,transition:'all .12s'}}>{l}</div>
+        ))}
+      </div>
+      {tab==='profile'&&(
+        <div style={{padding:'0 14px'}} className="fade-in">
+          <SH label="Specialties"/>
+          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:11,padding:'2px 0',marginBottom:11}}>
+            {[['🏋','Strength & Powerlifting','Olympic lifting, competition prep'],['⚡','High Intensity Training','MetCon, HIIT, conditioning'],['🎯','Athletic Performance','Speed, agility, sport-specific']].map(([e,t,d])=>(
+              <div key={t} style={{display:'flex',gap:9,padding:'9px 11px',borderBottom:`1px solid ${G}`}}>
+                <span style={{fontSize:17,flexShrink:0}}>{e}</span>
+                <div><div style={{fontSize:12,fontWeight:600,color:K,fontFamily:FB,marginBottom:1}}>{t}</div><div style={{fontSize:10,color:'#aaa',fontFamily:FB}}>{d}</div></div>
+              </div>
+            ))}
+          </div>
+          {[['👤','Personal Info','Edit profile'],['🔔','Notifications','Session alerts'],['🔒','Availability','Set schedule'],['⚙️','Settings','App preferences']].map(([e,l,s])=>(
+            <div key={l} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:`1.5px solid ${G}`,cursor:'pointer'}}>
+              <div style={{width:35,height:35,borderRadius:10,background:GL,border:`1px solid ${G}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:15,flexShrink:0}}>{e}</div>
+              <div style={{flex:1}}><div style={{fontSize:12,fontWeight:500,color:K,fontFamily:FB,marginBottom:1}}>{l}</div><div style={{fontSize:10,color:'#bbb',fontFamily:FB}}>{s}</div></div>
+              <Ic p={I.chR} c={'#ddd'} s={13}/>
+            </div>
+          ))}
+          <button style={{width:'100%',marginTop:14,background:'transparent',border:`1.5px solid ${R}33`,borderRadius:11,padding:'10px 0',fontSize:12,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}>Sign Out</button>
+        </div>
+      )}
+      {tab==='earnings'&&(
+        <div style={{padding:'0 14px'}} className="fade-in">
+          <SH label="Earnings History"/>
+          {EARNINGS.map((e,i)=>(
+            <div key={i} style={{background:W,border:`1.5px solid ${e.status==='pending'?AM+'44':e.status==='current'?RBR:G}`,borderRadius:12,padding:'10px 12px',marginBottom:8}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:7}}>
+                <div>
+                  <div style={{fontFamily:FD,fontSize:16,fontWeight:800,color:K,marginBottom:1}}>{e.month}</div>
+                  <div style={{fontSize:10,color:'#aaa',fontFamily:FB}}>{e.sessions} sessions</div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontFamily:FD,fontSize:20,fontWeight:900,color:e.status==='current'?R:K,lineHeight:1}}>{e.amount.toLocaleString()}</div>
+                  <div style={{fontSize:9,fontWeight:700,color:'#bbb',fontFamily:FB}}>EGP</div>
+                </div>
+              </div>
+              <Tag label={e.status==='paid'?'✓ Paid':e.status==='pending'?'Pending Approval':'Current'} c={e.status==='paid'?GR:e.status==='pending'?AM:R} bg={e.status==='paid'?GRB:e.status==='pending'?AMB:RB}/>
+            </div>
+          ))}
+          <div style={{background:K,borderRadius:12,padding:'12px 14px',marginTop:4}}>
+            <div style={{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.35)',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB,marginBottom:3}}>TOTAL PAID OUT</div>
+            <div style={{fontFamily:FD,fontSize:28,fontWeight:900,color:R,lineHeight:1}}>4,560 <span style={{fontSize:13,color:'rgba(199,35,51,.45)'}}>EGP</span></div>
+            <div style={{fontSize:10,color:'rgba(255,255,255,.3)',fontFamily:FB,marginTop:3}}>Across 38 sessions paid</div>
+          </div>
+        </div>
+      )}
+      {tab==='branches'&&(
+        <div style={{padding:'0 14px'}} className="fade-in">
+          <SH label="Assigned Branches"/>
+          {BRANCHES.map(b=>(
+            <div key={b.id} style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'10px 12px',marginBottom:8,display:'flex',gap:10,alignItems:'center'}}>
+              <div style={{width:38,height:38,borderRadius:11,background:RB,border:`1.5px solid ${RBR}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Ic p={I.map} c={R} s={17}/></div>
+              <div style={{flex:1}}>
+                <div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:1}}>{b.name}</div>
+                <div style={{fontSize:10,color:'#aaa',fontFamily:FB,marginBottom:4}}>{b.addr}</div>
+                <Tag label="Active" c={GR} bg={GRB}/>
+              </div>
+              <Ic p={I.chR} c={'#ddd'} s={13}/>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+ 
+/* ── APP ROOT ─────────────────────────────────────────────────── */
+function App(){
+  const[tab,setTab]=useState('home');
+  const[sessions,setSessions]=useState(mkSess);
+  const[cancelM,setCancelM]=useState(null);
+  const[attM,setAttM]=useState(null);
+  const[createM,setCreateM]=useState(false);
+ 
+  const handleCancel=id=>{setSessions(p=>p.map(s=>s.id===id?{...s,status:'cancelled'}:s));setCancelM(null);};
+  const handleAtt=(id,att,notes)=>{setSessions(p=>p.map(s=>s.id===id?{...s,att,notes,status:'done'}:s));setAttM(null);};
+  const handleCreate=form=>{
+    const br=BRANCHES.find(b=>b.id===form.branch)?.name||'';
+    const[hh,mm]=form.time.split(':');const h=parseInt(hh);const ap=h>=12?'PM':'AM';const h12=h>12?h-12:h===0?12:h;
+    setSessions(p=>[...p,{id:Date.now(),date:form.date,time:`${h12}:${mm} ${ap}`,type:form.type,name:form.name,branch:br,maxA:form.type==='PRIVATE'?1:form.max,pts:form.pts,status:'upcoming',athletes:[],notes:form.notes,att:{}}]);
+  };
+ 
+  const navItems=[
+    {id:'home',     l:'Home',     ic:I.home},
+    {id:'schedule', l:'Schedule', ic:I.cal},
+    {id:'athletes', l:'Athletes', ic:I.usrs},
+    {id:'sessions', l:'Sessions', ic:I.clip},
+    {id:'profile',  l:'Profile',  ic:I.usr},
+  ];
+ 
+  return(
+    <div className="app-shell">
+      <div className="brand">
+        <div className="brand-name">INCHES</div>
+        <div className="brand-sub">Coach App</div>
+      </div>
+      <div className="phone">
+        <div className="notch"/>
+        {/* Status bar */}
+        <div className="sbar">
+          <span style={{fontSize:12,fontWeight:600,color:K,fontFamily:FB}}>9:41</span>
+          <div style={{display:'flex',alignItems:'center',gap:4}}>
+            <svg width="13" height="9" viewBox="0 0 16 11" fill={K}><rect x="0" y="3" width="3" height="8" rx="1"/><rect x="4.5" y="2" width="3" height="9" rx="1"/><rect x="9" y="0" width="3" height="11" rx="1"/><rect x="13.5" y="1" width="2.5" height="10" rx=".5" opacity=".3"/></svg>
+            <svg width="12" height="9" viewBox="0 0 15 11" fill="none"><path d="M7.5 2.5C9.5 2.5 11.3 3.3 12.6 4.6L14 3.2C12.3 1.5 10 .5 7.5.5 5 .5 2.7 1.5 1 3.2L2.4 4.6C3.7 3.3 5.5 2.5 7.5 2.5Z" fill={K}/><path d="M7.5 5.5C8.7 5.5 9.8 6 10.6 6.8L12 5.4C10.8 4.2 9.2 3.5 7.5 3.5 5.8 3.5 4.2 4.2 3 5.4L4.4 6.8C5.2 6 6.3 5.5 7.5 5.5Z" fill={K}/><circle cx="7.5" cy="9.5" r="1.5" fill={K}/></svg>
+            <svg width="20" height="10" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke={K} strokeOpacity=".35"/><rect x="1.5" y="1.5" width="18" height="9" rx="2.5" fill={K}/><path d="M23 4.5V7.5c.8-.3 1.5-1.1 1.5-1.5S23.8 4.8 23 4.5Z" fill={K} fillOpacity=".4"/></svg>
+          </div>
+        </div>
+        {/* Main screen */}
+        <div className="scr" style={{position:'relative'}}>
+          {cancelM&&<CancelModal session={cancelM} onConfirm={handleCancel} onClose={()=>setCancelM(null)}/>}
+          {attM&&<AttModal session={attM} onSave={handleAtt} onClose={()=>setAttM(null)}/>}
+          {createM&&<CreateModal onSave={handleCreate} onClose={()=>setCreateM(false)}/>}
+          {tab==='home'     &&<HomeScreen     sessions={sessions} onNav={setTab} onCancel={setCancelM} onAtt={setAttM} onNew={()=>setCreateM(true)}/>}
+          {tab==='schedule' &&<ScheduleScreen sessions={sessions} onCancel={setCancelM} onAtt={setAttM} onNew={()=>setCreateM(true)}/>}
+          {tab==='athletes' &&<AthletesScreen sessions={sessions}/>}
+          {tab==='sessions' &&<SessionsScreen sessions={sessions} onCancel={setCancelM} onAtt={setAttM} onNew={()=>setCreateM(true)}/>}
+          {tab==='profile'  &&<ProfileScreen  sessions={sessions}/>}
+        </div>
+        {/* Bottom nav */}
+        <div className="bnav">
+          {navItems.map(item=>(
+            <div key={item.id} onClick={()=>setTab(item.id)} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,cursor:'pointer',padding:'2px 0'}}>
+              <Ic p={item.ic} c={tab===item.id?R:C} s={19}/>
+              <span style={{fontSize:8.5,fontWeight:700,letterSpacing:'.3px',textTransform:'uppercase',fontFamily:FB,color:tab===item.id?R:'#bbb'}}>{item.l}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
+ 
 document.getElementById('loading').style.display='none';
 document.getElementById('root').style.display='block';
-ReactDOM.createRoot(document.getElementById('root')).render(<InchesAthlete/>);
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
