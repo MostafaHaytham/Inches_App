@@ -3,70 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>INCHES — Admin App</title>
+<title>INCHES — Admin</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%;overflow:hidden}
-  body{background:#eae9e6;font-family:'DM Sans',sans-serif}
-  #root{height:100%}
-  .shell{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;height:100dvh;gap:7px;padding:8px 0 6px}
-  .brand{text-align:center;flex-shrink:0}
-  .brand-name{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#030000;letter-spacing:5px;line-height:1}
-  .brand-sub{font-size:8px;font-weight:700;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-top:1px}
-  /* phone — position:relative is critical so absolute children (modals) clip to it */
-  .phone{background:#fff;border-radius:36px;border:1.5px solid #bbb;overflow:hidden;
-    display:flex;flex-direction:column;position:relative;
-    box-shadow:0 20px 50px rgba(0,0,0,.18),0 3px 10px rgba(0,0,0,.07);
-    width:375px;max-width:calc(100vw - 12px);height:calc(100dvh - 76px);max-height:780px}
-  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#030000;border-radius:0 0 13px 13px;z-index:20}
-  .sbar{height:34px;padding:8px 20px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#fff;z-index:4;position:relative}
-  .scr{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;z-index:1}
-  .scr::-webkit-scrollbar{display:none}
-  .bnav{height:56px;background:#fff;border-top:1.5px solid #dddada;display:flex;align-items:flex-start;padding-top:7px;flex-shrink:0;z-index:4;position:relative}
-  /* MODAL OVERLAY — absolutely positioned inside .phone, covers everything including nav */
-  .moverlay{position:absolute;inset:0;background:rgba(0,0,0,.72);z-index:200;display:flex;flex-direction:column;justify-content:flex-end}
-  .msheet{background:#fff;border-radius:18px 18px 0 0;max-height:90%;overflow-y:auto;scrollbar-width:none}
-  .msheet::-webkit-scrollbar{display:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .fi{animation:fadeIn .18s ease}
-  .su{animation:slideUp .24s cubic-bezier(.32,.72,0,1)}
-  #loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;background:#eae9e6}
-  .spin{width:32px;height:32px;border:3px solid #dddada;border-top-color:#c72333;border-radius:50%;animation:spin .8s linear infinite}
-  textarea,input,select{outline:none}
-  input::placeholder,textarea::placeholder{color:#bbb}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:#eae9e6;font-family:'DM Sans',sans-serif}
+#root{height:100%}
+.shell{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;height:100dvh;gap:7px;padding:8px 0 6px}
+.brand-name{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#030000;letter-spacing:5px;line-height:1;text-align:center}
+.brand-sub{font-size:8px;font-weight:700;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-top:1px;text-align:center}
+.phone{background:#fff;border-radius:36px;border:1.5px solid #bbb;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 20px 50px rgba(0,0,0,.18);width:375px;max-width:calc(100vw - 12px);height:calc(100dvh - 76px);max-height:780px}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:22px;background:#030000;border-radius:0 0 13px 13px;z-index:20}
+.sbar{height:34px;padding:8px 20px 0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:#fff;z-index:4}
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;z-index:1}
+.scr::-webkit-scrollbar{display:none}
+.bnav{height:56px;background:#fff;border-top:1.5px solid #dddada;display:flex;align-items:flex-start;padding-top:7px;flex-shrink:0;z-index:4}
+/* Modals sit INSIDE .phone (position:relative+overflow:hidden) via position:absolute */
+.ov{position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;flex-direction:column;justify-content:flex-end}
+.sh{background:#fff;border-radius:18px 18px 0 0;max-height:90%;overflow-y:auto;scrollbar-width:none}
+.sh::-webkit-scrollbar{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.su{animation:su .24s cubic-bezier(.32,.72,0,1)}
+.fi{animation:fi .18s ease}
+#loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:12px;background:#eae9e6}
+.spin{width:32px;height:32px;border:3px solid #dddada;border-top-color:#c72333;border-radius:50%;animation:spin .8s linear infinite}
+input,select,textarea{outline:none}
+input::placeholder,textarea::placeholder{color:#bbb}
 </style>
 </head>
 <body>
 <div id="loading">
   <div class="spin"></div>
   <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#030000;letter-spacing:4px">INCHES</div>
-  <div style="font-size:11px;color:#888;font-family:'DM Sans',sans-serif">Loading Admin Panel…</div>
+  <div style="font-size:11px;color:#888;font-family:'DM Sans',sans-serif">Loading Admin Panel...</div>
 </div>
 <div id="root" style="display:none;height:100%"></div>
-<script type="text/babel">
-const { useState, useMemo } = React;
 
-/* ── TOKENS ──────────────────────────────────────────── */
-const R='#c72333',K='#030000',W='#ffffff',C='#242420',G='#dddada',GL='#f5f5f5';
-const RB='rgba(199,35,51,.07)',RBR='rgba(199,35,51,.22)';
-const GR='#1a7f4b',GRB='rgba(26,127,75,.1)';
-const AM='#b45309',AMB='rgba(180,83,9,.1)';
-const BL='#1471d4',BLB='rgba(20,113,212,.1)';
-const PU='#7c3aed',PUB='rgba(124,58,237,.1)';
-const FD="'Barlow Condensed',sans-serif",FB="'DM Sans',sans-serif";
+<script type="text/javascript">
+var _useState = React.useState;
 
-/* ── ICON ─────────────────────────────────────────────── */
-const Ic=({p,c=K,s=19})=>(
-  <span style={{display:'inline-flex',lineHeight:1,flexShrink:0}}
-    dangerouslySetInnerHTML={{__html:`<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`}}/>
-);
-const I={
+/* ── TOKENS ── */
+var R='#c72333', K='#030000', W='#ffffff', C='#242420', G='#dddada', GL='#f5f5f5';
+var RB='rgba(199,35,51,.07)', RBR='rgba(199,35,51,.22)';
+var GR='#1a7f4b', GRB='rgba(26,127,75,.1)';
+var AM='#b45309', AMB='rgba(180,83,9,.1)';
+var BL='#1471d4', BLB='rgba(20,113,212,.1)';
+var PU='#7c3aed', PUB='rgba(124,58,237,.1)';
+var FD="'Barlow Condensed',sans-serif", FB="'DM Sans',sans-serif";
+
+/* ── ICON ── */
+function Ic(props) {
+  var p = props.p, c = props.c || K, s = props.s || 19;
+  return React.createElement('span', {
+    style: {display:'inline-flex', lineHeight:1, flexShrink:0},
+    dangerouslySetInnerHTML: {__html: '<svg xmlns="http://www.w3.org/2000/svg" width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'}
+  });
+}
+var I = {
   dash:  '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
   usrs:  '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   cal:   '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
@@ -81,1194 +79,1107 @@ const I={
   edit:  '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
   inf:   '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
   srch:  '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
-  star:  '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
-  map:   '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
   warn:  '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
   trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>',
-  clip:  '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',
-  bell:  '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  star:  '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  map:   '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
 };
 
-/* ── HELPERS ──────────────────────────────────────────── */
-const MO_S=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const DAY_S=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-const fmtD=d=>`${DAY_S[d.getDay()]} ${d.getDate()} ${MO_S[d.getMonth()]}`;
-const OFF=(n,base=new Date())=>{const d=new Date(base);d.setDate(d.getDate()+n);return d;};
-const BRANCHES_LIST=['New Cairo','Maadi','Sheikh Zayed'];
+/* ── HELPERS ── */
+var MO_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DAY_S = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function fmtD(d) { return DAY_S[d.getDay()]+' '+d.getDate()+' '+MO_S[d.getMonth()]; }
+function OFF(n) { var d=new Date(); d.setDate(d.getDate()+n); return d; }
 
-/* ── DATA GENERATORS ─────────────────────────────────── */
-const FN_F=['Hania','Sara','Lana','Nour','Dina','Mona','Rania','Aya','Salma','Yasmine','Amira','Farah','Mariam','Nadia','Layla','Sana','Heba','Doaa','Rana','Soha'];
-const FN_M=['Omar','Karim','Youssef','Rami','Ahmed','Mohamed','Ali','Hassan','Tarek','Wael','Sameh','Sherif','Bassem','Khaled','Amr','Tamer','Mostafa','Ibrahim','Adel','Hani'];
-const LN=['Ahmed','Hassan','Karim','Ali','Mahmoud','Ibrahim','Khalil','Nour','Samir','Fahmy','Gaber','Rashid','Badawi','Mansour','Khatib','Saleh','Fawzy','Hamdy','Aziz','Gabr'];
-const GOALS=['Weight Loss','Strength','Body Composition','General Fitness','Mobility','Muscle Gain','Endurance','Competition Prep'];
-const INJURIES=['None','None','None','None','None','Left knee — mild strain','Lower back — chronic','Shoulder impingement','Right ankle — recovering','Hip flexor tension'];
-const JOIN_MO=['Jan','Mar','May','Jul','Sep','Nov'];
-const PKGS_NAMES=['Starter Pack','Performance Pack','Elite Pack','Pro Pack'];
+/* ── STATIC DATA ── */
+var ATHLETES = [
+  {id:1,  name:'Hania Ahmed',   init:'HA', branch:'New Cairo',    pts:147, status:'active',  sess:24, att:91,  joined:'Jan 2024', injury:'Left knee mild strain',  goal:'Weight Loss',    notes:'Prefers mornings. Avoid high-impact knee work.',
+   txns:[{t:'out',d:OFF(-1),l:'Strength session',pts:-10},{t:'purchase',d:OFF(-8),l:'Performance Pack purchase',pts:100},{t:'admin',d:OFF(-15),l:'Challenge winner bonus',pts:20}]},
+  {id:2,  name:'Omar Hassan',   init:'OH', branch:'New Cairo',    pts:250, status:'active',  sess:48, att:96,  joined:'Mar 2023', injury:'None',                    goal:'Strength',       notes:'Competitive athlete. Training for regionals.',
+   txns:[{t:'out',d:OFF(-2),l:'Private Training',pts:-15},{t:'purchase',d:OFF(-9),l:'Elite Pack purchase',pts:200}]},
+  {id:3,  name:'Lana Karim',    init:'LK', branch:'Maadi',        pts:40,  status:'active',  sess:12, att:83,  joined:'Jun 2024', injury:'Lower back chronic',      goal:'Body Composition',notes:'Sensitive lower back. Core stability first.',
+   txns:[{t:'out',d:OFF(-3),l:'Morning Conditioning',pts:-8},{t:'purchase',d:OFF(-20),l:'Starter Pack purchase',pts:50}]},
+  {id:4,  name:'Youssef Ali',   init:'YA', branch:'New Cairo',    pts:80,  status:'active',  sess:8,  att:75,  joined:'Sep 2024', injury:'None',                    goal:'General Fitness', notes:'Beginner. Focus on form over weight.',
+   txns:[{t:'out',d:OFF(-4),l:'Evening HIIT',pts:-8},{t:'purchase',d:OFF(-12),l:'Starter Pack purchase',pts:50}]},
+  {id:5,  name:'Sara Mahmoud',  init:'SM', branch:'Sheikh Zayed', pts:200, status:'active',  sess:31, att:100, joined:'Feb 2024', injury:'Shoulder impingement',    goal:'Mobility',       notes:'Excellent attendance. Modify upper body.',
+   txns:[{t:'purchase',d:OFF(-6),l:'Performance Pack purchase',pts:100},{t:'out',d:OFF(-2),l:'Mobility class',pts:-6}]},
+  {id:6,  name:'Rami Khaled',   init:'RK', branch:'Maadi',        pts:120, status:'active',  sess:19, att:88,  joined:'Apr 2024', injury:'None',                    goal:'Muscle Gain',    notes:'Goal: +5kg muscle by year end.',
+   txns:[{t:'out',d:OFF(-5),l:'Boxing HIIT',pts:-9},{t:'purchase',d:OFF(-14),l:'Performance Pack purchase',pts:100}]},
+  {id:7,  name:'Dina Fawzy',    init:'DF', branch:'New Cairo',    pts:60,  status:'active',  sess:10, att:80,  joined:'Jul 2024', injury:'None',                    goal:'Endurance',      notes:'Training for half marathon.',
+   txns:[{t:'out',d:OFF(-6),l:'Conditioning Blast',pts:-9},{t:'purchase',d:OFF(-18),l:'Starter Pack purchase',pts:50}]},
+  {id:8,  name:'Khaled Samir',  init:'KS', branch:'Sheikh Zayed', pts:30,  status:'active',  sess:6,  att:70,  joined:'Oct 2024', injury:'Right ankle recovering',  goal:'General Fitness', notes:'Recovering from ankle injury. Low impact only.',
+   txns:[{t:'out',d:OFF(-7),l:'Midday Mobility',pts:-6},{t:'purchase',d:OFF(-22),l:'Starter Pack purchase',pts:50}]},
+  {id:9,  name:'Mariam Nour',   init:'MN', branch:'Maadi',        pts:175, status:'active',  sess:27, att:93,  joined:'Dec 2023', injury:'None',                    goal:'Competition Prep',notes:'Preparing for CrossFit competition.',
+   txns:[{t:'out',d:OFF(-1),l:'Strength and Power',pts:-10},{t:'purchase',d:OFF(-7),l:'Elite Pack purchase',pts:200}]},
+  {id:10, name:'Ahmed Rashid',  init:'AR', branch:'New Cairo',    pts:0,   status:'inactive',sess:15, att:80,  joined:'May 2024', injury:'None',                    goal:'Weight Loss',    notes:'Membership paused.',
+   txns:[{t:'purchase',d:OFF(-45),l:'Performance Pack purchase',pts:100}]},
+  {id:11, name:'Nour Mansour',  init:'NM', branch:'New Cairo',    pts:88,  status:'active',  sess:16, att:87,  joined:'Mar 2024', injury:'Hip flexor tension',      goal:'Strength',       notes:'Hip flexor issue. Avoid deep squats for now.',
+   txns:[{t:'out',d:OFF(-3),l:'Strength session',pts:-10},{t:'purchase',d:OFF(-11),l:'Performance Pack purchase',pts:100}]},
+  {id:12, name:'Yasmine Gabr',  init:'YG', branch:'Sheikh Zayed', pts:220, status:'active',  sess:35, att:97,  joined:'Nov 2023', injury:'None',                    goal:'Body Composition',notes:'Very dedicated. Always on time.',
+   txns:[{t:'out',d:OFF(-2),l:'Pilates Core',pts:-6},{t:'purchase',d:OFF(-5),l:'Pro Pack purchase',pts:500}]},
+  {id:13, name:'Tarek Badawi',  init:'TB', branch:'Maadi',        pts:45,  status:'active',  sess:9,  att:78,  joined:'Aug 2024', injury:'None',                    goal:'Muscle Gain',    notes:'Intermediate level. Good attitude.',
+   txns:[{t:'out',d:OFF(-4),l:'Evening HIIT',pts:-8},{t:'purchase',d:OFF(-16),l:'Starter Pack purchase',pts:50}]},
+  {id:14, name:'Salma Ibrahim', init:'SI', branch:'New Cairo',    pts:110, status:'active',  sess:20, att:90,  joined:'Jan 2024', injury:'None',                    goal:'Endurance',      notes:'Running focused. Good base fitness.',
+   txns:[{t:'out',d:OFF(-1),l:'Conditioning Blast',pts:-9},{t:'purchase',d:OFF(-10),l:'Performance Pack purchase',pts:100}]},
+  {id:15, name:'Mohamed Aziz',  init:'MA', branch:'Sheikh Zayed', pts:5,   status:'active',  sess:4,  att:65,  joined:'Nov 2024', injury:'None',                    goal:'General Fitness', notes:'New member. Still finding routine.',
+   txns:[{t:'out',d:OFF(-6),l:'Morning Conditioning',pts:-8},{t:'purchase',d:OFF(-25),l:'Starter Pack purchase',pts:50}]},
+  {id:16, name:'Rana Khalil',   init:'RK', branch:'Maadi',        pts:155, status:'active',  sess:22, att:91,  joined:'Feb 2024', injury:'None',                    goal:'Weight Loss',    notes:'Consistent improvement every month.',
+   txns:[{t:'out',d:OFF(-2),l:'Yoga Flexibility',pts:-6},{t:'purchase',d:OFF(-8),l:'Elite Pack purchase',pts:200}]},
+  {id:17, name:'Amr Saleh',     init:'AS', branch:'New Cairo',    pts:70,  status:'active',  sess:11, att:82,  joined:'Jun 2024', injury:'Left shoulder mild',      goal:'Strength',       notes:'Modify overhead movements for shoulder.',
+   txns:[{t:'out',d:OFF(-5),l:'Strength session',pts:-10},{t:'purchase',d:OFF(-13),l:'Performance Pack purchase',pts:100}]},
+  {id:18, name:'Farah Hamdy',   init:'FH', branch:'Sheikh Zayed', pts:300, status:'active',  sess:40, att:98,  joined:'Oct 2023', injury:'None',                    goal:'Competition Prep',notes:'Top performer. Training for nationals.',
+   txns:[{t:'out',d:OFF(-1),l:'Private Training',pts:-15},{t:'purchase',d:OFF(-4),l:'Pro Pack purchase',pts:500}]},
+  {id:19, name:'Karim Gaber',   init:'KG', branch:'Maadi',        pts:25,  status:'active',  sess:5,  att:72,  joined:'Oct 2024', injury:'None',                    goal:'General Fitness', notes:'Beginner. Needs motivation and encouragement.',
+   txns:[{t:'out',d:OFF(-8),l:'Evening HIIT',pts:-8},{t:'purchase',d:OFF(-28),l:'Starter Pack purchase',pts:50}]},
+  {id:20, name:'Mona Fathy',    init:'MF', branch:'New Cairo',    pts:135, status:'active',  sess:18, att:89,  joined:'Apr 2024', injury:'None',                    goal:'Body Composition',notes:'Focused on aesthetics and toning.',
+   txns:[{t:'out',d:OFF(-3),l:'Pilates Core',pts:-6},{t:'purchase',d:OFF(-9),l:'Performance Pack purchase',pts:100}]}
+];
 
-const genAthletes=()=>Array.from({length:150},(_,i)=>{
-  const female=i%3!==0;
-  const fn=(female?FN_F:FN_M)[i%20];
-  const ln=LN[(i*7+3)%20];
-  const pts=Math.floor((i*37+11)%251);
-  const att=Math.floor((i*13+70)%35)+65;
-  const sess=Math.floor((i*17+5)%60)+1;
-  const branch=BRANCHES_LIST[i%3];
-  const goal=GOALS[i%8];
-  const injury=INJURIES[(i*3+1)%10];
-  const yr=2023+Math.floor(i/75);
-  const mo=JOIN_MO[i%6];
-  const pkgName=PKGS_NAMES[i%4];
-  const pkgPts=pkgName==='Starter Pack'?50:pkgName==='Performance Pack'?100:pkgName==='Elite Pack'?200:500;
-  return{
-    id:i+1,
-    name:`${fn} ${ln}`,init:`${fn[0]}${ln[0]}`,
-    branch,pts,status:i<145?'active':'inactive',
-    sess,att,joined:`${mo} ${yr}`,injury,goal,notes:'',
-    txns:[
-      {t:'purchase',d:OFF(-(i%30+5)),l:`${pkgName} purchase`,pts:pkgPts},
-      ...(sess>3?[{t:'out',d:OFF(-(i%10+1)),l:'Session deduction',pts:-((i%10)+6)}]:[]),
-      ...(i%15===0?[{t:'admin',d:OFF(-(i%20+2)),l:'Admin bonus — challenge winner',pts:20}]:[]),
-    ],
-  };
-});
-
-const genCoaches=()=>[
-  {id:1,name:'Karim Adel',    init:'KA',specialty:'Strength & Power',       rating:4.9,sessions:312,branch:'New Cairo',   status:'active',
-   salary:{type:'per_session',rate:120,base:0,pct:0,bonus_threshold:20,bonus_amount:500},
-   pricing:{p30:200,p45:250,p60:300,p90:400},
-   reviews:[{ath:'Hania A.',r:5,txt:'Pushed me beyond what I thought possible.',date:'May 2025'},{ath:'Omar H.',r:5,txt:'Programming changed my performance.',date:'Apr 2025'},{ath:'Sara M.',r:4,txt:'Great sessions, very motivating.',date:'Apr 2025'}]},
-  {id:2,name:'Sarah Mahmoud', init:'SM',specialty:'Conditioning',           rating:4.8,sessions:245,branch:'Maadi',       status:'active',
-   salary:{type:'monthly',rate:8000,base:0,pct:0,bonus_threshold:15,bonus_amount:1000},
-   pricing:{p30:180,p45:220,p60:270,p90:350},
+var COACHES = [
+  {id:1, name:'Karim Adel',     init:'KA', specialty:'Strength and Power',    rating:4.9, sessions:312, branch:'New Cairo',    status:'active',
+   salary:{type:'per_session', rate:120, base:0, pct:0, per_session:0, bonus_threshold:20, bonus_amount:500},
+   pricing:{p30:200, p45:250, p60:300, p90:400},
+   reviews:[{ath:'Omar H.',r:5,txt:'Pushed me beyond what I thought possible.',date:'May 2025'},{ath:'Sara M.',r:4,txt:'Great sessions, very motivating.',date:'Apr 2025'}]},
+  {id:2, name:'Sarah Mahmoud',  init:'SM', specialty:'Conditioning',          rating:4.8, sessions:245, branch:'Maadi',        status:'active',
+   salary:{type:'monthly',     rate:8000, base:0, pct:0, per_session:0, bonus_threshold:15, bonus_amount:1000},
+   pricing:{p30:180, p45:220, p60:270, p90:350},
    reviews:[{ath:'Lana K.',r:5,txt:'Fixed my form and helped me drop 8kg.',date:'May 2025'},{ath:'Rami K.',r:4,txt:'Good energy, very consistent.',date:'Mar 2025'}]},
-  {id:3,name:'Lina Ramzy',    init:'LR',specialty:'Mobility & Recovery',    rating:5.0,sessions:178,branch:'Sheikh Zayed',status:'active',
-   salary:{type:'hybrid',rate:5000,base:5000,pct:0,per_session:80,bonus_threshold:12,bonus_amount:500},
-   pricing:{p30:160,p45:200,p60:250,p90:320},
+  {id:3, name:'Lina Ramzy',     init:'LR', specialty:'Mobility and Recovery', rating:5.0, sessions:178, branch:'Sheikh Zayed', status:'active',
+   salary:{type:'hybrid',      rate:5000, base:5000, pct:0, per_session:80, bonus_threshold:12, bonus_amount:500},
+   pricing:{p30:160, p45:200, p60:250, p90:320},
    reviews:[{ath:'Youssef A.',r:5,txt:'Fixed a shoulder issue I had for 2 years.',date:'May 2025'}]},
-  {id:4,name:'Omar Tarek',    init:'OT',specialty:'CrossFit & Endurance',   rating:4.7,sessions:198,branch:'New Cairo',   status:'active',
-   salary:{type:'pct_session',rate:0,base:0,pct:25,per_session:0,bonus_threshold:18,bonus_amount:400},
-   pricing:{p30:170,p45:210,p60:260,p90:330},
-   reviews:[{ath:'Hania A.',r:4,txt:'High energy. Really challenges you.',date:'Apr 2025'},{ath:'Omar H.',r:5,txt:'Best CrossFit programming I\'ve seen.',date:'Mar 2025'}]},
-  {id:5,name:'Nada Sherif',   init:'NS',specialty:'Yoga & Flexibility',     rating:4.6,sessions:134,branch:'Maadi',       status:'active',
-   salary:{type:'per_session',rate:90,base:0,pct:0,bonus_threshold:15,bonus_amount:300},
-   pricing:{p30:150,p45:190,p60:230,p90:300},
-   reviews:[{ath:'Sara M.',r:5,txt:'Best yoga classes I\'ve had.',date:'May 2025'},{ath:'Dina H.',r:4,txt:'Very patient and knowledgeable.',date:'Apr 2025'}]},
-  {id:6,name:'Ahmed Fawzy',   init:'AF',specialty:'Boxing & HIIT',          rating:4.8,sessions:167,branch:'New Cairo',   status:'active',
-   salary:{type:'hybrid',rate:4000,base:4000,pct:0,per_session:100,bonus_threshold:20,bonus_amount:600},
-   pricing:{p30:180,p45:225,p60:280,p90:360},
-   reviews:[{ath:'Rami K.',r:5,txt:'Ahmed pushed me to a new level.',date:'May 2025'},{ath:'Ahmed M.',r:5,txt:'Best boxing coach in Cairo.',date:'Mar 2025'}]},
-  {id:7,name:'Mariam Samir',  init:'MS',specialty:'Pilates & Core',         rating:4.9,sessions:156,branch:'Sheikh Zayed',status:'active',
-   salary:{type:'pct_session',rate:0,base:3000,pct:20,per_session:0,bonus_threshold:12,bonus_amount:400},
-   pricing:{p30:160,p45:200,p60:250,p90:320},
-   reviews:[{ath:'Mona I.',r:5,txt:'Mariam is exceptional. Completely transformed my core.',date:'May 2025'}]},
-  {id:8,name:'Tarek Mansour', init:'TM',specialty:'Olympic Weightlifting',  rating:4.7,sessions:143,branch:'New Cairo',   status:'active',
-   salary:{type:'monthly',rate:9000,base:0,pct:0,bonus_threshold:16,bonus_amount:800},
-   pricing:{p30:200,p45:260,p60:320,p90:420},
-   reviews:[{ath:'Omar H.',r:5,txt:'Tarek\'s Olympic technique work is world class.',date:'Apr 2025'}]},
-  {id:9,name:'Rania Khalil',  init:'RK',specialty:'Nutrition & Body Comp',  rating:4.8,sessions:121,branch:'Maadi',       status:'active',
-   salary:{type:'per_session',rate:110,base:0,pct:0,bonus_threshold:14,bonus_amount:350},
-   pricing:{p30:170,p45:215,p60:265,p90:340},
-   reviews:[{ath:'Yasmine F.',r:5,txt:'Rania helped me understand nutrition completely.',date:'May 2025'},{ath:'Salma G.',r:4,txt:'Great coach, very detailed plans.',date:'Apr 2025'}]},
-  {id:10,name:'Bassem Nour',  init:'BN',specialty:'Running & Endurance',    rating:4.6,sessions:98, branch:'Sheikh Zayed',status:'active',
-   salary:{type:'hybrid',rate:3500,base:3500,pct:0,per_session:75,bonus_threshold:10,bonus_amount:300},
-   pricing:{p30:140,p45:180,p60:220,p90:290},
-   reviews:[{ath:'Ahmed R.',r:4,txt:'Bassem got me to finish my first 10k.',date:'Mar 2025'}]},
+  {id:4, name:'Omar Tarek',     init:'OT', specialty:'CrossFit and Endurance',rating:4.7, sessions:198, branch:'New Cairo',    status:'active',
+   salary:{type:'pct_session', rate:0,    base:0, pct:25, per_session:0, bonus_threshold:18, bonus_amount:400},
+   pricing:{p30:170, p45:210, p60:260, p90:330},
+   reviews:[{ath:'Hania A.',r:4,txt:'High energy. Really challenges you.',date:'Apr 2025'},{ath:'Omar H.',r:5,txt:'Best CrossFit programming I have seen.',date:'Mar 2025'}]},
+  {id:5, name:'Nada Sherif',    init:'NS', specialty:'Yoga and Flexibility',  rating:4.6, sessions:134, branch:'Maadi',        status:'active',
+   salary:{type:'per_session', rate:90,   base:0, pct:0, per_session:0, bonus_threshold:15, bonus_amount:300},
+   pricing:{p30:150, p45:190, p60:230, p90:300},
+   reviews:[{ath:'Sara M.',r:5,txt:'Best yoga classes I have attended.',date:'May 2025'},{ath:'Dina H.',r:4,txt:'Very patient and knowledgeable.',date:'Apr 2025'}]},
+  {id:6, name:'Ahmed Fawzy',    init:'AF', specialty:'Boxing and HIIT',       rating:4.8, sessions:167, branch:'New Cairo',    status:'active',
+   salary:{type:'hybrid',      rate:4000, base:4000, pct:0, per_session:100, bonus_threshold:20, bonus_amount:600},
+   pricing:{p30:180, p45:225, p60:280, p90:360},
+   reviews:[{ath:'Rami K.',r:5,txt:'Ahmed pushed me to a new level.',date:'May 2025'},{ath:'Khaled S.',r:5,txt:'Best boxing coach in Cairo.',date:'Mar 2025'}]},
+  {id:7, name:'Mariam Samir',   init:'MS', specialty:'Pilates and Core',      rating:4.9, sessions:156, branch:'Sheikh Zayed', status:'active',
+   salary:{type:'pct_session', rate:0,    base:3000, pct:20, per_session:0, bonus_threshold:12, bonus_amount:400},
+   pricing:{p30:160, p45:200, p60:250, p90:320},
+   reviews:[{ath:'Farah H.',r:5,txt:'Mariam completely transformed my core strength.',date:'May 2025'},{ath:'Yasmine G.',r:5,txt:'Exceptional coach.',date:'Apr 2025'}]}
 ];
 
-const PKG_DEFS=[
-  {id:1,name:'Starter Pack',   pts:50, price:1500, active:true},
-  {id:2,name:'Performance Pack',pts:100,price:2800, active:true},
-  {id:3,name:'Elite Pack',     pts:200,price:5200, active:true},
-  {id:4,name:'Pro Pack',       pts:500,price:11000,active:true},
+var PAYMENTS_INIT = [
+  {id:1,  ath:'Hania Ahmed',   pkg:'Performance Pack', pts:100, price:2800,  status:'pending',  date:OFF(-1),  reason:null},
+  {id:2,  ath:'Omar Hassan',   pkg:'Elite Pack',       pts:200, price:5200,  status:'pending',  date:OFF(-2),  reason:null},
+  {id:3,  ath:'Sara Mahmoud',  pkg:'Starter Pack',     pts:50,  price:1500,  status:'pending',  date:OFF(-3),  reason:null},
+  {id:4,  ath:'Lana Karim',    pkg:'Performance Pack', pts:100, price:2800,  status:'approved', date:OFF(-7),  reason:null},
+  {id:5,  ath:'Youssef Ali',   pkg:'Starter Pack',     pts:50,  price:1500,  status:'approved', date:OFF(-10), reason:null},
+  {id:6,  ath:'Rami Khaled',   pkg:'Pro Pack',         pts:500, price:11000, status:'rejected', date:OFF(-14), reason:'Receipt image was unclear'},
+  {id:7,  ath:'Mariam Nour',   pkg:'Elite Pack',       pts:200, price:5200,  status:'approved', date:OFF(-18), reason:null},
+  {id:8,  ath:'Yasmine Gabr',  pkg:'Pro Pack',         pts:500, price:11000, status:'approved', date:OFF(-21), reason:null},
+  {id:9,  ath:'Salma Ibrahim', pkg:'Performance Pack', pts:100, price:2800,  status:'approved', date:OFF(-25), reason:null},
+  {id:10, ath:'Farah Hamdy',   pkg:'Pro Pack',         pts:500, price:11000, status:'approved', date:OFF(-30), reason:null},
+  {id:11, ath:'Rana Khalil',   pkg:'Elite Pack',       pts:200, price:5200,  status:'approved', date:OFF(-35), reason:null},
+  {id:12, ath:'Nour Mansour',  pkg:'Performance Pack', pts:100, price:2800,  status:'approved', date:OFF(-40), reason:null},
+  {id:13, ath:'Dina Fawzy',    pkg:'Starter Pack',     pts:50,  price:1500,  status:'approved', date:OFF(-44), reason:null},
+  {id:14, ath:'Mona Fathy',    pkg:'Performance Pack', pts:100, price:2800,  status:'approved', date:OFF(-50), reason:null},
+  {id:15, ath:'Amr Saleh',     pkg:'Performance Pack', pts:100, price:2800,  status:'rejected', date:OFF(-55), reason:'Transfer not received'}
 ];
 
-const genPayments=()=>{
-  const athletes=genAthletes();
-  const pkgs=PKG_DEFS;
-  const statuses=['approved','approved','approved','pending','rejected'];
-  const payments=[];
-  let id=1;
-  for(let i=0;i<60;i++){
-    const ath=athletes[i*2%150];
-    const pkg=pkgs[i%4];
-    const daysAgo=i*3+1;
-    const status=i<3?'pending':(i===25?'rejected':statuses[i%5]);
-    payments.push({
-      id,
-      ath:ath.name,athId:ath.id,
-      pkg:pkg.name,pts:pkg.pts,price:pkg.price,
-      status,
-      date:OFF(-daysAgo),
-      receipt:status!=='rejected'||i%10!==0,
-      reason:status==='rejected'?'Receipt image unclear or invalid':null,
-    });
-    id++;
-  }
-  return payments;
-};
-
-const initSessions=()=>[
-  {id:1,date:new Date(),time:'8:00 AM',type:'GROUP',  name:'MORNING CONDITIONING',coach:'Karim Adel',  branch:'New Cairo',   athletes:['Hania A.','Omar H.','Youssef A.','Sara M.'],status:'upcoming',pts:8},
-  {id:2,date:new Date(),time:'11:00 AM',type:'PRIVATE',name:'PRIVATE TRAINING',  coach:'Sarah Mahmoud',branch:'Maadi',       athletes:['Lana K.'],               status:'upcoming',pts:15},
-  {id:3,date:new Date(),time:'6:00 PM', type:'GROUP',  name:'EVENING HIIT',      coach:'Omar Tarek',   branch:'New Cairo',   athletes:['Hania A.','Sara M.','Rami K.'],status:'upcoming',pts:8},
-  {id:4,date:OFF(-1),   time:'8:00 AM', type:'GROUP',  name:'MORNING CONDITIONING',coach:'Karim Adel', branch:'New Cairo',   athletes:['Omar H.','Rami K.','Nour G.'], status:'done',    pts:8},
-  {id:5,date:OFF(-2),   time:'2:00 PM', type:'GROUP',  name:'STRENGTH & POWER',  coach:'Karim Adel',  branch:'New Cairo',   athletes:['Hania A.','Omar H.'],    status:'cancelled',pts:10,cancelledBy:'coach'},
-  {id:6,date:OFF(1),    time:'9:00 AM', type:'GROUP',  name:'STRENGTH & POWER',  coach:'Tarek Mansour',branch:'New Cairo',   athletes:['Sara M.','Youssef A.'],  status:'upcoming',pts:10},
-  {id:7,date:OFF(2),    time:'5:00 PM', type:'PRIVATE',name:'PRIVATE TRAINING',  coach:'Nada Sherif',  branch:'Maadi',       athletes:['Mariam H.'],             status:'upcoming',pts:15},
-  {id:8,date:OFF(-3),   time:'10:00 AM',type:'GROUP',  name:'YOGA & FLEXIBILITY',coach:'Nada Sherif',  branch:'Maadi',       athletes:['Sara M.','Layla F.','Amira K.'],status:'done',pts:6},
-  {id:9,date:OFF(-4),   time:'7:00 PM', type:'GROUP',  name:'BOXING & HIIT',     coach:'Ahmed Fawzy',  branch:'New Cairo',   athletes:['Rami K.','Karim N.'],    status:'done',    pts:9},
+var SESSIONS_INIT = [
+  {id:1, date:new Date(), time:'8:00 AM',  type:'GROUP',   name:'MORNING CONDITIONING', coach:'Karim Adel',    branch:'New Cairo',    athletes:['Hania A.','Omar H.','Youssef A.','Nour M.'], status:'upcoming', pts:8,  adminNote:null},
+  {id:2, date:new Date(), time:'11:00 AM', type:'PRIVATE', name:'PRIVATE TRAINING',     coach:'Sarah Mahmoud', branch:'Maadi',        athletes:['Lana K.'],                                    status:'upcoming', pts:15, adminNote:null},
+  {id:3, date:new Date(), time:'6:00 PM',  type:'GROUP',   name:'EVENING HIIT',         coach:'Omar Tarek',    branch:'New Cairo',    athletes:['Hania A.','Sara M.','Rami K.'],               status:'upcoming', pts:8,  adminNote:null},
+  {id:4, date:OFF(1),    time:'9:00 AM',  type:'GROUP',   name:'STRENGTH AND POWER',   coach:'Karim Adel',    branch:'Sheikh Zayed', athletes:['Sara M.','Farah H.'],                         status:'upcoming', pts:10, adminNote:null},
+  {id:5, date:OFF(2),    time:'5:00 PM',  type:'PRIVATE', name:'PRIVATE TRAINING',     coach:'Nada Sherif',   branch:'Maadi',        athletes:['Mariam N.'],                                  status:'upcoming', pts:15, adminNote:null},
+  {id:6, date:OFF(-1),   time:'8:00 AM',  type:'GROUP',   name:'MORNING CONDITIONING', coach:'Karim Adel',    branch:'New Cairo',    athletes:['Omar H.','Rami K.','Khaled S.'],              status:'done',     pts:8,  adminNote:null},
+  {id:7, date:OFF(-2),   time:'2:00 PM',  type:'GROUP',   name:'STRENGTH AND POWER',   coach:'Karim Adel',    branch:'New Cairo',    athletes:['Hania A.','Omar H.'],                         status:'cancelled',pts:10, adminNote:null, cancelledBy:'coach'},
+  {id:8, date:OFF(-3),   time:'10:00 AM', type:'GROUP',   name:'YOGA AND FLEXIBILITY', coach:'Nada Sherif',   branch:'Maadi',        athletes:['Sara M.','Farah H.','Rana K.'],               status:'done',     pts:6,  adminNote:null},
+  {id:9, date:OFF(-4),   time:'7:00 PM',  type:'GROUP',   name:'BOXING AND HIIT',      coach:'Ahmed Fawzy',   branch:'New Cairo',    athletes:['Rami K.','Karim G.'],                         status:'done',     pts:9,  adminNote:null}
 ];
 
-const initConfig=()=>({
-  group_pts:{30:5,45:6,60:8,90:12,120:15},
-  ath_cancel_free_hrs:24,
-  ath_cancel_penalty_pct:50,
-  coach_cancel_notice_hrs:12,
-  coach_cancel_penalty_pct:0,
-  waitlist_notify_hrs:2,
-  points_per_egp:0.036,
-  max_athletes_group:15,
-  max_athletes_private:1,
-  packages:[...PKG_DEFS],
-  announcements:[
-    {id:1,title:'Strongman Challenge — June 15',body:'Register now and earn 2× bonus points.',audience:'all',active:true,date:OFF(-2)},
-    {id:2,title:'New Branch Opening',body:'Sheikh Zayed branch fully operational.',audience:'all',active:true,date:OFF(-5)},
-    {id:3,title:'Coach Schedule Update',body:'Karim Adel adding Thursday evening slots.',audience:'athletes',active:false,date:OFF(-10)},
-  ],
-  session_types:[
-    {id:1,name:'Strength & Power',    dur:60,pts_group:8, active:true},
-    {id:2,name:'Morning Conditioning',dur:60,pts_group:8, active:true},
-    {id:3,name:'Evening HIIT',        dur:45,pts_group:6, active:true},
-    {id:4,name:'Midday Mobility',     dur:45,pts_group:6, active:true},
-    {id:5,name:'Conditioning Blast',  dur:60,pts_group:9, active:true},
-    {id:6,name:'Weekend Strength',    dur:90,pts_group:12,active:true},
-  ],
-});
-
-/* ── SHARED UI ────────────────────────────────────────── */
-const Tag=({label,c=R,bg=RB})=>(
-  <span style={{display:'inline-flex',background:bg,color:c,borderRadius:6,fontSize:9,fontWeight:700,padding:'2px 6px',fontFamily:FB,letterSpacing:'.2px',whiteSpace:'nowrap'}}>{label}</span>
-);
-const SH=({label,cta,onCta})=>(
-  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7}}>
-    <span style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB}}>{label}</span>
-    {cta&&<span onClick={onCta} style={{fontSize:11,color:R,cursor:'pointer',fontWeight:600,fontFamily:FB}}>{cta}</span>}
-  </div>
-);
-const BackBtn=({onBack,light=false})=>(
-  <button onClick={onBack} style={{background:light?'rgba(255,255,255,.1)':'transparent',border:`1.5px solid ${light?'rgba(255,255,255,.2)':G}`,borderRadius:9,width:32,height:32,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-    <Ic p={I.chL} c={light?W:C} s={15}/>
-  </button>
-);
-const Stars=({r,s=12})=>[1,2,3,4,5].map(i=>(
-  <svg key={i} width={s} height={s} viewBox="0 0 24 24" fill={i<=Math.round(r)?AM:'none'} stroke={AM} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-  </svg>
-));
-const IL=({label,children})=>(
-  <div style={{marginBottom:11}}>
-    <div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:5}}>{label}</div>
-    {children}
-  </div>
-);
-const iS={width:'100%',background:GL,border:`1.5px solid ${G}`,borderRadius:9,padding:'9px 11px',fontSize:12,fontFamily:FB,color:K};
-const STabs=({tabs,active,onChange})=>(
-  <div style={{display:'flex',background:GL,borderRadius:9,padding:3,margin:'0 0 11px 0',border:`1.5px solid ${G}`}}>
-    {tabs.map(([v,l])=>(
-      <div key={v} onClick={()=>onChange(v)} style={{flex:1,textAlign:'center',padding:'7px 0',borderRadius:6,fontSize:11,fontWeight:600,cursor:'pointer',background:active===v?W:'transparent',color:active===v?K:'#bbb',boxShadow:active===v?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,transition:'all .12s'}}>{l}</div>
-    ))}
-  </div>
-);
-const Toggle=({on,onChange})=>(
-  <div onClick={onChange} style={{width:36,height:20,borderRadius:10,background:on?GR:G,cursor:'pointer',position:'relative',transition:'background .2s',flexShrink:0}}>
-    <div style={{width:14,height:14,borderRadius:'50%',background:W,position:'absolute',top:3,left:on?19:3,transition:'left .2s',boxShadow:'0 1px 2px rgba(0,0,0,.2)'}}/>
-  </div>
-);
-
-/* ── MODAL OVERLAY WRAPPER ──────────────────────────────
-   Renders as absolute inside .phone — covers nav, sbar, everything.
-   All modals go through here from App level.                      */
-function ModalWrap({title,onClose,children}){
-  return(
-    <div className="moverlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="msheet su" style={{padding:16}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-          <span style={{fontFamily:FD,fontSize:19,fontWeight:800,color:K}}>{title}</span>
-          <button onClick={onClose} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:8,width:30,height:30,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
-            <Ic p={I.X} c={C} s={13}/>
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/* ── MODAL CONTENT COMPONENTS ─────────────────────────── */
-function ManualPtsContent({athlete,onSave,onClose}){
-  const[type,setType]=useState('add');
-  const[amt,setAmt]=useState('');
-  const[note,setNote]=useState('');
-  const v=parseInt(amt)>0&&note.trim().length>0;
-  return(
-    <ModalWrap title={`POINTS — ${athlete.name.split(' ')[0].toUpperCase()}`} onClose={onClose}>
-      <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:'9px 12px',marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <span style={{fontSize:12,color:C,fontFamily:FB}}>Current balance</span>
-        <span style={{fontFamily:FD,fontSize:22,fontWeight:900,color:R}}>{athlete.pts} <span style={{fontSize:12,color:'#aaa'}}>pts</span></span>
-      </div>
-      <div style={{display:'flex',background:GL,borderRadius:9,padding:3,border:`1.5px solid ${G}`,marginBottom:12}}>
-        {[['add','Add Points'],['deduct','Deduct Points']].map(([val,l])=>(
-          <div key={val} onClick={()=>setType(val)} style={{flex:1,textAlign:'center',padding:'8px 0',borderRadius:6,fontSize:12,fontWeight:600,cursor:'pointer',background:type===val?W:'transparent',color:type===val?K:'#bbb',fontFamily:FB,transition:'all .12s'}}>{l}</div>
-        ))}
-      </div>
-      <IL label="Amount (points)"><input type="number" value={amt} min={1} onChange={e=>setAmt(e.target.value)} placeholder="e.g. 20" style={iS}/></IL>
-      <IL label="Reason / Note (required)"><textarea value={note} onChange={e=>setNote(e.target.value)} rows={2} placeholder="e.g. Bonus for challenge winner…" style={{...iS,resize:'none'}}/></IL>
-      {parseInt(amt)>0&&(
-        <div style={{background:type==='add'?GRB:RB,border:`1.5px solid ${type==='add'?GR+'44':R+'44'}`,borderRadius:10,padding:'10px 12px',marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-          <span style={{fontSize:12,color:C,fontFamily:FB}}>New balance</span>
-          <span style={{fontFamily:FD,fontSize:20,fontWeight:900,color:type==='add'?GR:R}}>
-            {type==='add'?athlete.pts+parseInt(amt):Math.max(0,athlete.pts-parseInt(amt))} pts
-          </span>
-        </div>
-      )}
-      <div style={{display:'flex',gap:8}}>
-        <button onClick={onClose} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>
-        <button onClick={()=>{if(v)onSave(athlete.id,type,parseInt(amt),note);}}
-          style={{flex:1,background:v?(type==='add'?GR:R):G,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:v?W:'#aaa',cursor:v?'pointer':'not-allowed',fontFamily:FB,transition:'all .15s'}}>
-          {type==='add'?'Add Points':'Deduct Points'}
-        </button>
-      </div>
-    </ModalWrap>
-  );
-}
-
-function OverrideContent({session,onSave,onClose}){
-  const[action,setAction]=useState('cancel');
-  const[note,setNote]=useState('');
-  const v=note.trim().length>0;
-  return(
-    <ModalWrap title="OVERRIDE SESSION" onClose={onClose}>
-      <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:'10px 12px',marginBottom:12}}>
-        <div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:2}}>{session.name}</div>
-        <div style={{fontSize:11,color:'#888',fontFamily:FB}}>{fmtD(session.date)} · {session.time} · {session.branch}</div>
-        <div style={{fontSize:11,color:'#aaa',fontFamily:FB,marginTop:2}}>Coach: {session.coach} · {session.athletes.length} enrolled</div>
-      </div>
-      <div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB,marginBottom:7}}>ACTION</div>
-      {[['cancel','Cancel Session','Full refund to all athletes, no penalty timing'],['mark_done','Mark as Done','Override status to completed'],['reopen','Re-open Session','Revert cancellation, restore bookings']].map(([val,l,d])=>(
-        <div key={val} onClick={()=>setAction(val)} style={{display:'flex',alignItems:'flex-start',gap:9,padding:'9px 0',borderBottom:`1px solid ${G}`,cursor:'pointer'}}>
-          <div style={{width:15,height:15,borderRadius:'50%',border:`2px solid ${action===val?R:G}`,background:action===val?R:'transparent',marginTop:2,flexShrink:0,transition:'all .12s'}}/>
-          <div><div style={{fontSize:12,fontWeight:action===val?700:400,color:action===val?K:'#888',fontFamily:FB}}>{l}</div><div style={{fontSize:10,color:'#bbb',fontFamily:FB,marginTop:1}}>{d}</div></div>
-        </div>
-      ))}
-      <div style={{marginTop:12,marginBottom:10}}>
-        <div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:5}}>ADMIN NOTE (REQUIRED)</div>
-        <textarea value={note} onChange={e=>setNote(e.target.value)} rows={2} placeholder="Reason for this override…" style={{...iS,resize:'none'}}/>
-      </div>
-      <div style={{background:AMB,border:`1px solid ${AM}33`,borderRadius:9,padding:'8px 11px',marginBottom:14,display:'flex',gap:7,alignItems:'flex-start'}}>
-        <Ic p={I.inf} c={AM} s={13}/>
-        <span style={{fontSize:11,color:AM,fontFamily:FB,lineHeight:1.5}}>Overrides are logged permanently. All affected users will be notified.</span>
-      </div>
-      <div style={{display:'flex',gap:8}}>
-        <button onClick={onClose} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>
-        <button onClick={()=>{if(v)onSave(session.id,action,note);}}
-          style={{flex:1,background:v?R:G,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:v?W:'#aaa',cursor:v?'pointer':'not-allowed',fontFamily:FB,transition:'all .15s'}}>
-          Apply Override
-        </button>
-      </div>
-    </ModalWrap>
-  );
-}
-
-function SalaryContent({coach,onSave,onClose}){
-  const[salary,setSalary]=useState({...coach.salary});
-  const[pricing,setPricing]=useState({...coach.pricing});
-  const[tab,setTab]=useState('salary');
-  const ss=(k,v)=>setSalary(s=>({...s,[k]:v}));
-  const sp=(k,v)=>setPricing(p=>({...p,[k]:v}));
-  // estimated monthly based on ~22 sessions/month
-  const estimate=()=>{
-    const base=salary.base||0;
-    if(salary.type==='per_session') return (salary.rate||0)*22;
-    if(salary.type==='monthly')    return (salary.rate||0);
-    if(salary.type==='hybrid')     return base+((salary.per_session||0)*22);
-    if(salary.type==='pct_session'){
-      // avg session price ~250 EGP * pct * 22 sessions + optional base
-      const avgPts=Math.round((pricing.p30+pricing.p45+pricing.p60+pricing.p90)/4);
-      return Math.round(base + (salary.pct||0)/100*avgPts*22);
-    }
-    return 0;
+function initConfig() {
+  return {
+    group_pts: {30:5, 45:6, 60:8, 90:12, 120:15},
+    ath_cancel_free_hrs: 24,
+    ath_cancel_penalty_pct: 50,
+    coach_cancel_notice_hrs: 12,
+    coach_cancel_penalty_pct: 0,
+    waitlist_notify_hrs: 2,
+    max_athletes_group: 15,
+    max_athletes_private: 1,
+    packages: [
+      {id:1, name:'Starter Pack',    pts:50,  price:1500,  active:true},
+      {id:2, name:'Performance Pack',pts:100, price:2800,  active:true},
+      {id:3, name:'Elite Pack',      pts:200, price:5200,  active:true},
+      {id:4, name:'Pro Pack',        pts:500, price:11000, active:true}
+    ],
+    session_types: [
+      {id:1, name:'Strength and Power',    dur:60, pts_group:8,  active:true},
+      {id:2, name:'Morning Conditioning',  dur:60, pts_group:8,  active:true},
+      {id:3, name:'Evening HIIT',          dur:45, pts_group:6,  active:true},
+      {id:4, name:'Midday Mobility',       dur:45, pts_group:6,  active:true},
+      {id:5, name:'Conditioning Blast',    dur:60, pts_group:9,  active:true},
+      {id:6, name:'Weekend Strength',      dur:90, pts_group:12, active:true}
+    ],
+    announcements: [
+      {id:1, title:'Strongman Challenge June 15', body:'Register now and earn 2x bonus points this week.', audience:'all',      active:true,  date:OFF(-2)},
+      {id:2, title:'New Branch Opening',           body:'Sheikh Zayed branch is now fully operational.',    audience:'all',      active:true,  date:OFF(-5)},
+      {id:3, title:'Coach Schedule Update',        body:'Karim Adel adding Thursday evening slots.',        audience:'athletes', active:false, date:OFF(-10)}
+    ]
   };
-  return(
-    <div className="moverlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="msheet su">
-        <div style={{padding:'14px 14px 0'}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-            <span style={{fontFamily:FD,fontSize:18,fontWeight:800,color:K}}>PLAN — {coach.name.split(' ')[0].toUpperCase()}</span>
-            <button onClick={onClose} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:8,width:30,height:30,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}><Ic p={I.X} c={C} s={13}/></button>
-          </div>
-          <STabs tabs={[['salary','Salary Plan'],['pricing','Private Rates']]} active={tab} onChange={setTab}/>
-        </div>
-        {tab==='salary'&&(
-          <div style={{padding:'0 14px 6px'}} className="fi">
-            <div style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB,marginBottom:7}}>SALARY TYPE</div>
-            {[
-              ['per_session', 'Per Session (Fixed)', 'Fixed EGP amount per session completed'],
-              ['monthly',     'Monthly Fixed',        'Fixed EGP salary regardless of sessions'],
-              ['hybrid',      'Monthly Base + Per Session', 'Fixed base + additional EGP per session'],
-              ['pct_session', '% of Session Price',   '% of each session\'s price + optional fixed base'],
-            ].map(([val,l,d])=>(
-              <div key={val} onClick={()=>ss('type',val)} style={{display:'flex',alignItems:'flex-start',gap:9,padding:'9px 0',borderBottom:`1px solid ${G}`,cursor:'pointer'}}>
-                <div style={{width:15,height:15,borderRadius:'50%',border:`2px solid ${salary.type===val?R:G}`,background:salary.type===val?R:'transparent',marginTop:2,flexShrink:0,transition:'all .12s'}}/>
-                <div><div style={{fontSize:12,fontWeight:salary.type===val?700:400,color:salary.type===val?K:'#888',fontFamily:FB}}>{l}</div><div style={{fontSize:10,color:'#bbb',fontFamily:FB,marginTop:1}}>{d}</div></div>
-              </div>
-            ))}
-            <div style={{marginTop:12}}>
-              {salary.type==='per_session'&&(
-                <IL label="Rate per session (EGP)"><input type="number" value={salary.rate||0} onChange={e=>ss('rate',parseInt(e.target.value)||0)} style={iS}/></IL>
-              )}
-              {salary.type==='monthly'&&(
-                <IL label="Monthly salary (EGP)"><input type="number" value={salary.rate||0} onChange={e=>ss('rate',parseInt(e.target.value)||0)} style={iS}/></IL>
-              )}
-              {salary.type==='hybrid'&&(
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                  <IL label="Base monthly (EGP)"><input type="number" value={salary.base||0} onChange={e=>ss('base',parseInt(e.target.value)||0)} style={iS}/></IL>
-                  <IL label="Per session (EGP)"><input type="number" value={salary.per_session||0} onChange={e=>ss('per_session',parseInt(e.target.value)||0)} style={iS}/></IL>
-                </div>
-              )}
-              {salary.type==='pct_session'&&(
-                <>
-                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                    <IL label="% of session price">
-                      <div style={{position:'relative'}}>
-                        <input type="number" value={salary.pct||0} min={0} max={100} onChange={e=>ss('pct',parseFloat(e.target.value)||0)} style={{...iS,paddingRight:28}}/>
-                        <span style={{position:'absolute',right:11,top:'50%',transform:'translateY(-50%)',fontSize:13,fontWeight:700,color:AM,fontFamily:FB}}>%</span>
-                      </div>
-                    </IL>
-                    <IL label="Fixed base/month (EGP)"><input type="number" value={salary.base||0} onChange={e=>ss('base',parseInt(e.target.value)||0)} style={iS}/></IL>
-                  </div>
-                  <div style={{background:AMB,border:`1px solid ${AM}33`,borderRadius:9,padding:'8px 11px',marginBottom:10,fontSize:11,color:AM,fontFamily:FB,lineHeight:1.5}}>
-                    Coach earns <strong>{salary.pct||0}%</strong> of each session's price, plus <strong>{(salary.base||0).toLocaleString()} EGP</strong> fixed monthly base.
-                  </div>
-                </>
-              )}
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                <IL label="Bonus after N sessions"><input type="number" value={salary.bonus_threshold||0} onChange={e=>ss('bonus_threshold',parseInt(e.target.value)||0)} style={iS}/></IL>
-                <IL label="Bonus amount (EGP)"><input type="number" value={salary.bonus_amount||0} onChange={e=>ss('bonus_amount',parseInt(e.target.value)||0)} style={iS}/></IL>
-              </div>
-              <div style={{background:K,borderRadius:11,padding:'11px 13px',marginBottom:6}}>
-                <div style={{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.35)',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:5}}>ESTIMATED THIS MONTH</div>
-                <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:R}}>{estimate().toLocaleString()} <span style={{fontSize:13,color:'rgba(255,255,255,.4)'}}>EGP</span></div>
-                <div style={{fontSize:10,color:'rgba(255,255,255,.3)',fontFamily:FB,marginTop:3}}>Based on ~22 sessions/month</div>
-              </div>
-            </div>
-          </div>
-        )}
-        {tab==='pricing'&&(
-          <div style={{padding:'0 14px 6px'}} className="fi">
-            <div style={{background:BLB,border:`1px solid ${BL}33`,borderRadius:9,padding:'8px 11px',marginBottom:12,display:'flex',gap:7}}>
-              <Ic p={I.inf} c={BL} s={13}/>
-              <span style={{fontSize:11,color:BL,fontFamily:FB,lineHeight:1.5}}>Per-coach private rates. Override platform defaults for {coach.name}.</span>
-            </div>
-            {[['p30','30 min private'],['p45','45 min private'],['p60','60 min private'],['p90','90 min private']].map(([k,l])=>(
-              <IL key={k} label={`${l} (EGP)`}><input type="number" value={pricing[k]||0} onChange={e=>sp(k,parseInt(e.target.value)||0)} style={iS}/></IL>
-            ))}
-          </div>
-        )}
-        <div style={{padding:'0 14px 20px'}}>
-          <button onClick={()=>onSave(coach.id,salary,pricing)} style={{width:'100%',background:K,border:'none',borderRadius:11,padding:'12px 0',fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>
-            Save Plan
-          </button>
-        </div>
-      </div>
-    </div>
+}
+
+/* ── SHARED UI ── */
+function Tag(props) {
+  var label=props.label, c=props.c||R, bg=props.bg||RB;
+  return React.createElement('span', {style:{display:'inline-flex',background:bg,color:c,borderRadius:6,fontSize:9,fontWeight:700,padding:'2px 6px',fontFamily:FB,whiteSpace:'nowrap'}}, label);
+}
+function SH(props) {
+  return React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:7}},
+    React.createElement('span', {style:{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB}}, props.label),
+    props.cta && React.createElement('span', {onClick:props.onCta,style:{fontSize:11,color:R,cursor:'pointer',fontWeight:600,fontFamily:FB}}, props.cta)
+  );
+}
+function BackBtn(props) {
+  var light=props.light;
+  return React.createElement('button', {onClick:props.onBack,style:{background:light?'rgba(255,255,255,.1)':'transparent',border:'1.5px solid '+(light?'rgba(255,255,255,.2)':G),borderRadius:9,width:32,height:32,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+    React.createElement(Ic, {p:I.chL, c:light?W:C, s:15})
+  );
+}
+function Toggle(props) {
+  return React.createElement('div', {onClick:props.onChange,style:{width:36,height:20,borderRadius:10,background:props.on?GR:G,cursor:'pointer',position:'relative',transition:'background .2s',flexShrink:0}},
+    React.createElement('div', {style:{width:14,height:14,borderRadius:'50%',background:W,position:'absolute',top:3,left:props.on?19:3,transition:'left .2s',boxShadow:'0 1px 2px rgba(0,0,0,.2)'}})
+  );
+}
+function Stars(props) {
+  var r=props.r, s=props.s||12;
+  return React.createElement('span', {style:{display:'inline-flex',gap:1}},
+    [1,2,3,4,5].map(function(i) {
+      return React.createElement('svg', {key:i,width:s,height:s,viewBox:'0 0 24 24',fill:i<=Math.round(r)?AM:'none',stroke:AM,strokeWidth:'1.8',strokeLinecap:'round',strokeLinejoin:'round'},
+        React.createElement('polygon', {points:'12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'})
+      );
+    })
+  );
+}
+var iS = {width:'100%',background:GL,border:'1.5px solid '+G,borderRadius:9,padding:'9px 11px',fontSize:12,fontFamily:FB,color:K};
+function IL(props) {
+  return React.createElement('div', {style:{marginBottom:11}},
+    React.createElement('div', {style:{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:5}}, props.label),
+    props.children
+  );
+}
+function STabs(props) {
+  return React.createElement('div', {style:{display:'flex',background:GL,borderRadius:9,padding:3,marginBottom:11,border:'1.5px solid '+G}},
+    props.tabs.map(function(t) {
+      return React.createElement('div', {key:t[0],onClick:function(){props.onChange(t[0]);},style:{flex:1,textAlign:'center',padding:'7px 0',borderRadius:6,fontSize:11,fontWeight:600,cursor:'pointer',background:props.active===t[0]?W:'transparent',color:props.active===t[0]?K:'#bbb',boxShadow:props.active===t[0]?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,transition:'all .12s'}}, t[1]);
+    })
   );
 }
 
-function ReceiptContent({payment,onApprove,onReject,onClose}){
-  const[reason,setReason]=useState('');
-  return(
-    <ModalWrap title="PAYMENT REVIEW" onClose={onClose}>
-      <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:'10px 12px',marginBottom:12}}>
-        <div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:6}}>{payment.ath}</div>
-        {[['Package',payment.pkg],['Points',`${payment.pts} pts`],['Amount',`${payment.price.toLocaleString()} EGP`],['Submitted',fmtD(payment.date)]].map(([l,v])=>(
-          <div key={l} style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:`1px solid ${G}`}}>
-            <span style={{fontSize:11,color:'#888',fontFamily:FB}}>{l}</span>
-            <span style={{fontSize:11,fontWeight:700,color:K,fontFamily:FB}}>{v}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{background:GL,border:`2px dashed ${G}`,borderRadius:12,padding:'20px 16px',textAlign:'center',marginBottom:12}}>
-        <div style={{fontSize:22,marginBottom:6}}>🧾</div>
-        <div style={{fontFamily:FD,fontSize:14,fontWeight:700,color:K,marginBottom:3}}>Bank Transfer Receipt</div>
-        <div style={{fontSize:11,color:'#aaa',fontFamily:FB}}>Uploaded by athlete</div>
-      </div>
-      {payment.status==='pending'&&(
-        <>
-          <input value={reason} onChange={e=>setReason(e.target.value)} placeholder="Rejection reason (optional)…" style={{...iS,fontSize:11,marginBottom:10}}/>
-          <div style={{display:'flex',gap:8}}>
-            <button onClick={()=>onReject(payment.id,reason||'Receipt unclear or invalid')} style={{flex:1,background:'transparent',border:`1.5px solid ${R}`,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:R,cursor:'pointer',fontFamily:FB}}>Reject</button>
-            <button onClick={()=>onApprove(payment.id)} style={{flex:1,background:GR,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>✓ Approve</button>
-          </div>
-        </>
-      )}
-      {payment.status!=='pending'&&(
-        <button onClick={onClose} style={{width:'100%',background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Close</button>
-      )}
-    </ModalWrap>
+/* ── MODAL WRAPPER ── */
+function MWrap(props) {
+  return React.createElement('div', {className:'ov', onClick:function(e){if(e.target===e.currentTarget)props.onClose();}},
+    React.createElement('div', {className:'sh su', style:{padding:16}},
+      React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}},
+        React.createElement('span', {style:{fontFamily:FD,fontSize:19,fontWeight:800,color:K}}, props.title),
+        React.createElement('button', {onClick:props.onClose,style:{background:'transparent',border:'1.5px solid '+G,borderRadius:8,width:30,height:30,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}},
+          React.createElement(Ic, {p:I.X, c:C, s:13})
+        )
+      ),
+      props.children
+    )
   );
 }
 
-function AnnContent({ann,onSave,onClose}){
-  const[form,setForm]=useState(ann||{title:'',body:'',audience:'all',active:true});
-  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
-  const v=form.title.trim()&&form.body.trim();
-  return(
-    <ModalWrap title={ann?'EDIT ANNOUNCEMENT':'NEW ANNOUNCEMENT'} onClose={onClose}>
-      <IL label="Title"><input value={form.title} onChange={e=>set('title',e.target.value)} placeholder="Announcement headline…" style={iS}/></IL>
-      <IL label="Body"><textarea value={form.body} onChange={e=>set('body',e.target.value)} rows={3} placeholder="Full announcement text…" style={{...iS,resize:'none'}}/></IL>
-      <IL label="Audience">
-        <select value={form.audience} onChange={e=>set('audience',e.target.value)} style={{...iS,appearance:'none',cursor:'pointer'}}>
-          <option value="all">All Users</option>
-          <option value="athletes">Athletes Only</option>
-          <option value="coaches">Coaches Only</option>
-        </select>
-      </IL>
-      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,padding:'10px 12px',background:GL,borderRadius:10,border:`1.5px solid ${G}`}}>
-        <span style={{fontSize:12,fontWeight:500,color:K,fontFamily:FB}}>Publish immediately</span>
-        <Toggle on={form.active} onChange={()=>set('active',!form.active)}/>
-      </div>
-      <div style={{display:'flex',gap:8}}>
-        <button onClick={onClose} style={{flex:1,background:'transparent',border:`1.5px solid ${G}`,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Cancel</button>
-        <button onClick={()=>{if(v)onSave(form);}} style={{flex:1,background:v?K:G,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:v?W:'#aaa',cursor:v?'pointer':'not-allowed',fontFamily:FB}}>{ann?'Save Changes':'Publish'}</button>
-      </div>
-    </ModalWrap>
+/* ── MODAL: MANUAL POINTS ── */
+function ManualPtsModal(props) {
+  var athlete=props.athlete, onSave=props.onSave, onClose=props.onClose;
+  var st1 = _useState('add'); var type=st1[0]; var setType=st1[1];
+  var st2 = _useState(''); var amt=st2[0]; var setAmt=st2[1];
+  var st3 = _useState(''); var note=st3[0]; var setNote=st3[1];
+  var v = parseInt(amt) > 0 && note.trim().length > 0;
+  var newBal = type==='add' ? athlete.pts+parseInt(amt||0) : Math.max(0, athlete.pts-parseInt(amt||0));
+  return React.createElement(MWrap, {title:'POINTS - '+athlete.name.split(' ')[0].toUpperCase(), onClose:onClose},
+    React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:10,padding:'9px 12px',marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}},
+      React.createElement('span', {style:{fontSize:12,color:C,fontFamily:FB}}, 'Current balance'),
+      React.createElement('span', {style:{fontFamily:FD,fontSize:22,fontWeight:900,color:R}}, athlete.pts+' pts')
+    ),
+    React.createElement('div', {style:{display:'flex',background:GL,borderRadius:9,padding:3,border:'1.5px solid '+G,marginBottom:12}},
+      ['add','deduct'].map(function(v) {
+        return React.createElement('div', {key:v,onClick:function(){setType(v);},style:{flex:1,textAlign:'center',padding:'8px 0',borderRadius:6,fontSize:12,fontWeight:600,cursor:'pointer',background:type===v?W:'transparent',color:type===v?K:'#bbb',fontFamily:FB,transition:'all .12s'}}, v==='add'?'Add Points':'Deduct Points');
+      })
+    ),
+    React.createElement(IL, {label:'Amount (points)'}, React.createElement('input', {type:'number',value:amt,min:1,onChange:function(e){setAmt(e.target.value);},placeholder:'e.g. 20',style:iS})),
+    React.createElement(IL, {label:'Reason / Note (required)'}, React.createElement('textarea', {value:note,onChange:function(e){setNote(e.target.value);},rows:2,placeholder:'e.g. Bonus for challenge winner...',style:Object.assign({},iS,{resize:'none'})})),
+    parseInt(amt)>0 && React.createElement('div', {style:{background:type==='add'?GRB:RB,border:'1.5px solid '+(type==='add'?GR+'44':R+'44'),borderRadius:10,padding:'10px 12px',marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}},
+      React.createElement('span', {style:{fontSize:12,color:C,fontFamily:FB}}, 'New balance'),
+      React.createElement('span', {style:{fontFamily:FD,fontSize:20,fontWeight:900,color:type==='add'?GR:R}}, newBal+' pts')
+    ),
+    React.createElement('div', {style:{display:'flex',gap:8}},
+      React.createElement('button', {onClick:onClose,style:{flex:1,background:'transparent',border:'1.5px solid '+G,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}, 'Cancel'),
+      React.createElement('button', {onClick:function(){if(v)onSave(athlete.id,type,parseInt(amt),note);},style:{flex:1,background:v?(type==='add'?GR:R):G,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:v?W:'#aaa',cursor:v?'pointer':'not-allowed',fontFamily:FB}}, type==='add'?'Add Points':'Deduct Points')
+    )
   );
 }
 
-/* ── SCREEN: DASHBOARD ────────────────────────────────── */
-function DashScreen({athletes,sessions,payments,onNav}){
-  const pending=payments.filter(p=>p.status==='pending');
-  const todaySess=sessions.filter(s=>s.date.toDateString()===new Date().toDateString());
-  const totalPts=athletes.reduce((a,b)=>a+b.pts,0);
-  const approvedRev=payments.filter(p=>p.status==='approved').reduce((a,p)=>a+p.price,0);
-  return(
-    <div style={{paddingBottom:16}}>
-      <div style={{background:K,padding:'14px 14px 16px',position:'relative',overflow:'hidden'}}>
-        <div style={{position:'absolute',right:-30,top:-30,width:130,height:130,borderRadius:'50%',border:'1px solid rgba(199,35,51,.12)',opacity:.4,pointerEvents:'none'}}/>
-        <div style={{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.35)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:1}}>ADMIN PANEL</div>
-        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:W,marginBottom:12}}>INCHES HQ</div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginBottom:12}}>
-          {[[athletes.length,'Athletes'],[10,'Coaches'],[todaySess.length,'Today'],[pending.length,'Pending']].map(([v,l])=>(
-            <div key={l} style={{background:'rgba(255,255,255,.07)',borderRadius:9,padding:'7px 4px',textAlign:'center',border:'1px solid rgba(255,255,255,.07)'}}>
-              <div style={{fontFamily:FD,fontSize:15,fontWeight:900,color:l==='Pending'?AM:W,lineHeight:1}}>{v}</div>
-              <div style={{fontSize:7.5,fontWeight:700,color:'rgba(255,255,255,.3)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:2,fontFamily:FB}}>{l}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{display:'flex',gap:7}}>
-          <button onClick={()=>onNav('payments')} style={{flex:1,background:R,border:'none',borderRadius:9,padding:'8px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
-            <Ic p={I.coin} c={W} s={13}/>Payments ({pending.length})
-          </button>
-          <button onClick={()=>onNav('config')} style={{flex:1,background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)',borderRadius:9,padding:'8px 0',fontSize:12,fontWeight:600,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
-            <Ic p={I.cog} c={W} s={13}/>Config
-          </button>
-        </div>
-      </div>
-      <div style={{padding:'12px 14px 0'}}>
-        {pending.length>0&&(
-          <div style={{background:AMB,border:`1.5px solid ${AM}44`,borderRadius:11,padding:'10px 12px',marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer'}} onClick={()=>onNav('payments')}>
-            <div style={{display:'flex',gap:8,alignItems:'center'}}><Ic p={I.warn} c={AM} s={15}/><div><div style={{fontSize:12,fontWeight:700,color:AM,fontFamily:FB}}>{pending.length} pending payment{pending.length>1?'s':''}</div><div style={{fontSize:10,color:'#888',fontFamily:FB}}>Tap to review</div></div></div>
-            <Ic p={I.chR} c={AM} s={13}/>
-          </div>
-        )}
-        <SH label="Platform Overview"/>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}}>
-          {[[`${totalPts.toLocaleString()} pts`,'Total pts in wallets',BL],[`${approvedRev.toLocaleString()} EGP`,'Total revenue collected',GR],['89%','Avg attendance rate',R],['4.8★','Avg coach rating',AM]].map(([v,l,c])=>(
-            <div key={l} style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'11px 12px'}}>
-              <div style={{fontFamily:FD,fontSize:16,fontWeight:900,color:c,lineHeight:1,marginBottom:4}}>{v}</div>
-              <div style={{fontSize:10,color:'#aaa',fontFamily:FB}}>{l}</div>
-            </div>
-          ))}
-        </div>
-        <SH label={`Today — ${todaySess.length} sessions`} cta="All →" onCta={()=>onNav('sessions')}/>
-        {todaySess.length===0?(
-          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:14,textAlign:'center'}}><div style={{fontSize:12,color:'#aaa',fontFamily:FB}}>No sessions today</div></div>
-        ):todaySess.map(s=>(
-          <div key={s.id} style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'9px 11px',marginBottom:7,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div>
-              <div style={{display:'flex',gap:5,alignItems:'center',marginBottom:3}}><span style={{fontSize:10,fontWeight:700,color:R,fontFamily:FB}}>{s.time}</span><Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/></div>
-              <div style={{fontFamily:FD,fontSize:13,fontWeight:800,color:K,marginBottom:2}}>{s.name}</div>
-              <div style={{fontSize:10,color:'#888',fontFamily:FB}}>{s.coach} · {s.branch} · {s.athletes.length} enrolled</div>
-            </div>
-            <Tag label={s.status==='done'?'✓ Done':'Upcoming'} c={s.status==='done'?GR:C} bg={s.status==='done'?GRB:GL}/>
-          </div>
-        ))}
-      </div>
-    </div>
+/* ── MODAL: OVERRIDE SESSION ── */
+function OverrideModal(props) {
+  var session=props.session, onSave=props.onSave, onClose=props.onClose;
+  var st1=_useState('cancel'); var action=st1[0]; var setAction=st1[1];
+  var st2=_useState(''); var note=st2[0]; var setNote=st2[1];
+  var v=note.trim().length>0;
+  var opts = [['cancel','Cancel Session','Full refund to all athletes'],['mark_done','Mark as Done','Override status to completed'],['reopen','Re-open Session','Revert cancellation']];
+  return React.createElement(MWrap, {title:'OVERRIDE SESSION', onClose:onClose},
+    React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:10,padding:'10px 12px',marginBottom:12}},
+      React.createElement('div', {style:{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:2}}, session.name),
+      React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB}}, fmtD(session.date)+' - '+session.time+' - '+session.branch),
+      React.createElement('div', {style:{fontSize:11,color:'#aaa',fontFamily:FB,marginTop:2}}, 'Coach: '+session.coach+' - '+session.athletes.length+' enrolled')
+    ),
+    React.createElement('div', {style:{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB,marginBottom:7}}, 'ACTION'),
+    opts.map(function(o) {
+      return React.createElement('div', {key:o[0],onClick:function(){setAction(o[0]);},style:{display:'flex',alignItems:'flex-start',gap:9,padding:'9px 0',borderBottom:'1px solid '+G,cursor:'pointer'}},
+        React.createElement('div', {style:{width:15,height:15,borderRadius:'50%',border:'2px solid '+(action===o[0]?R:G),background:action===o[0]?R:'transparent',marginTop:2,flexShrink:0,transition:'all .12s'}}),
+        React.createElement('div', null,
+          React.createElement('div', {style:{fontSize:12,fontWeight:action===o[0]?700:400,color:action===o[0]?K:'#888',fontFamily:FB}}, o[1]),
+          React.createElement('div', {style:{fontSize:10,color:'#bbb',fontFamily:FB,marginTop:1}}, o[2])
+        )
+      );
+    }),
+    React.createElement('div', {style:{marginTop:12,marginBottom:10}},
+      React.createElement('div', {style:{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:5}}, 'ADMIN NOTE (REQUIRED)'),
+      React.createElement('textarea', {value:note,onChange:function(e){setNote(e.target.value);},rows:2,placeholder:'Reason for this override...',style:Object.assign({},iS,{resize:'none'})})
+    ),
+    React.createElement('div', {style:{background:AMB,border:'1px solid '+AM+'33',borderRadius:9,padding:'8px 11px',marginBottom:14,display:'flex',gap:7,alignItems:'flex-start'}},
+      React.createElement(Ic, {p:I.inf, c:AM, s:13}),
+      React.createElement('span', {style:{fontSize:11,color:AM,fontFamily:FB,lineHeight:1.5}}, 'Overrides are logged permanently. All affected users will be notified.')
+    ),
+    React.createElement('div', {style:{display:'flex',gap:8}},
+      React.createElement('button', {onClick:onClose,style:{flex:1,background:'transparent',border:'1.5px solid '+G,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}, 'Cancel'),
+      React.createElement('button', {onClick:function(){if(v)onSave(session.id,action,note);},style:{flex:1,background:v?R:G,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:v?W:'#aaa',cursor:v?'pointer':'not-allowed',fontFamily:FB}}, 'Apply Override')
+    )
   );
 }
 
-/* ── SCREEN: USERS ────────────────────────────────────── */
-function UsersScreen({athletes,setAthletes,coaches,setCoaches,onModal}){
-  const[sub,setSub]=useState('athletes');
-  const[q,setQ]=useState('');
-  const[selAth,setSelAth]=useState(null);
-  const[selCoach,setSelCoach]=useState(null);
-  const[coachTab,setCoachTab]=useState('profile');
-  const[page,setPage]=useState(0);
-  const PER=25;
-
-  const filtAthletes=useMemo(()=>athletes.filter(a=>a.name.toLowerCase().includes(q.toLowerCase())),[athletes,q]);
-  const filtCoaches=useMemo(()=>coaches.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())),[coaches,q]);
-  const paged=filtAthletes.slice(page*PER,(page+1)*PER);
-  const totalPages=Math.ceil(filtAthletes.length/PER);
-
-  /* Athlete detail */
-  if(selAth){
-    const a=athletes.find(x=>x.id===selAth.id)||selAth;
-    const ac=a.att>=95?GR:a.att>=80?AM:R;
-    return(
-      <div style={{paddingBottom:16}}>
-        <div style={{background:K,padding:'13px 14px 16px',position:'relative',overflow:'hidden'}}>
-          <div style={{position:'absolute',right:-25,top:-25,width:110,height:110,borderRadius:'50%',border:'1px solid rgba(199,35,51,.15)',opacity:.4,pointerEvents:'none'}}/>
-          <BackBtn onBack={()=>setSelAth(null)} light/>
-          <div style={{display:'flex',gap:11,alignItems:'flex-start',marginTop:11}}>
-            <div style={{width:52,height:52,borderRadius:16,background:R,border:'2px solid rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-              <span style={{fontFamily:FD,fontSize:19,fontWeight:900,color:W}}>{a.init}</span>
-            </div>
-            <div style={{flex:1}}>
-              <div style={{fontFamily:FD,fontSize:20,fontWeight:900,color:W,lineHeight:1,marginBottom:3}}>{a.name.toUpperCase()}</div>
-              <div style={{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:FB,marginBottom:7}}>{a.goal} · {a.branch} · Joined {a.joined}</div>
-              <div style={{display:'flex',gap:5,flexWrap:'wrap'}}>
-                <Tag label={a.status==='active'?'Active':'Inactive'} c={a.status==='active'?GR:C} bg={a.status==='active'?GRB:GL}/>
-                {a.injury!=='None'&&<Tag label="🩹 Injury" c={AM} bg={AMB}/>}
-              </div>
-            </div>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6,marginTop:12}}>
-            {[[a.pts+'pts','Balance'],[a.sess,'Sessions'],[a.att+'%','Attend.']].map(([v,l])=>(
-              <div key={l} style={{background:'rgba(255,255,255,.07)',borderRadius:9,padding:'7px 4px',textAlign:'center',border:'1px solid rgba(255,255,255,.06)'}}>
-                <div style={{fontFamily:FD,fontSize:14,fontWeight:900,color:W,lineHeight:1}}>{v}</div>
-                <div style={{fontSize:7.5,fontWeight:700,color:'rgba(255,255,255,.28)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:2,fontFamily:FB}}>{l}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,padding:'12px 14px 0'}}>
-          <button onClick={()=>onModal('manualPts',a)} style={{background:GRB,border:`1.5px solid ${GR}33`,borderRadius:10,padding:'9px 0',fontSize:11,fontWeight:700,color:GR,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
-            <Ic p={I.plus} c={GR} s={13}/>Add Points
-          </button>
-          <button onClick={()=>onModal('manualPts',a)} style={{background:RB,border:`1.5px solid ${RBR}`,borderRadius:10,padding:'9px 0',fontSize:11,fontWeight:700,color:R,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>
-            <Ic p={I.minus} c={R} s={13}/>Deduct Points
-          </button>
-        </div>
-        <div style={{padding:'10px 14px 0'}}>
-          {a.injury&&a.injury!=='None'&&(
-            <div style={{background:AMB,border:`1.5px solid ${AM}33`,borderRadius:10,padding:'9px 11px',marginBottom:9}}>
-              <div style={{fontSize:9,fontWeight:700,color:AM,textTransform:'uppercase',letterSpacing:'1px',fontFamily:FB,marginBottom:2}}>Injury on File</div>
-              <div style={{fontSize:12,color:C,fontFamily:FB}}>{a.injury}</div>
-            </div>
-          )}
-          <SH label="Points History"/>
-          {(a.txns||[]).length===0?(
-            <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:14,textAlign:'center'}}><div style={{fontSize:12,color:'#aaa',fontFamily:FB}}>No transactions</div></div>
-          ):(a.txns||[]).slice(0,10).map((t,i)=>(
-            <div key={i} style={{display:'flex',alignItems:'center',gap:9,padding:'8px 0',borderBottom:`1.5px solid ${G}`}}>
-              <div style={{width:30,height:30,borderRadius:8,background:t.pts>0?GRB:RB,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                <span style={{fontSize:12,fontWeight:700,color:t.pts>0?GR:R}}>{t.pts>0?'↑':'↓'}</span>
-              </div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:11,fontWeight:600,color:K,fontFamily:FB}}>{t.l}</div>
-                <div style={{display:'flex',gap:5,alignItems:'center',marginTop:1}}>
-                  <span style={{fontSize:10,color:'#bbb',fontFamily:FB}}>{fmtD(t.d)}</span>
-                  {t.t==='admin'&&<Tag label="Admin" c={PU} bg={PUB}/>}
-                </div>
-              </div>
-              <span style={{fontFamily:FD,fontSize:14,fontWeight:800,color:t.pts>0?GR:R}}>{t.pts>0?'+':''}{t.pts}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  /* Coach detail */
-  if(selCoach){
-    const c=coaches.find(x=>x.id===selCoach.id)||selCoach;
-    const salaryLabel=()=>{
-      if(c.salary.type==='per_session') return `${c.salary.rate} EGP/session`;
-      if(c.salary.type==='monthly')    return `${c.salary.rate.toLocaleString()} EGP/month`;
-      if(c.salary.type==='hybrid')     return `${(c.salary.base||0).toLocaleString()} EGP + ${c.salary.per_session||0} EGP/session`;
-      if(c.salary.type==='pct_session') return `${(c.salary.base||0)>0?(c.salary.base||0).toLocaleString()+' EGP + ':''}${c.salary.pct||0}% per session`;
-      return '-';
-    };
-    return(
-      <div style={{paddingBottom:16}}>
-        <div style={{background:K,padding:'13px 14px 16px',position:'relative',overflow:'hidden'}}>
-          <div style={{position:'absolute',right:-25,top:-25,width:110,height:110,borderRadius:'50%',border:'1px solid rgba(199,35,51,.15)',opacity:.4,pointerEvents:'none'}}/>
-          <BackBtn onBack={()=>setSelCoach(null)} light/>
-          <div style={{display:'flex',gap:11,alignItems:'flex-start',marginTop:11}}>
-            <div style={{width:52,height:52,borderRadius:16,background:R,border:'2px solid rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-              <span style={{fontFamily:FD,fontSize:19,fontWeight:900,color:W}}>{c.init}</span>
-            </div>
-            <div style={{flex:1}}>
-              <div style={{fontFamily:FD,fontSize:20,fontWeight:900,color:W,lineHeight:1,marginBottom:3}}>{c.name.toUpperCase()}</div>
-              <div style={{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:FB,marginBottom:7}}>{c.specialty} · {c.branch}</div>
-              <div style={{display:'flex',alignItems:'center',gap:6}}><div style={{display:'flex',gap:1}}><Stars r={c.rating} s={10}/></div><span style={{fontSize:11,color:'rgba(255,255,255,.6)',fontFamily:FB,fontWeight:600}}>{c.rating} · {c.sessions} sessions</span></div>
-            </div>
-          </div>
-        </div>
-        <div style={{padding:'0 14px'}}>
-          <STabs tabs={[['profile','Profile'],['reviews','Reviews'],['salary','Salary']]} active={coachTab} onChange={setCoachTab}/>
-        </div>
-        {coachTab==='profile'&&(
-          <div style={{padding:'0 14px'}} className="fi">
-            <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'11px 13px',marginBottom:10}}>
-              <div style={{fontSize:9,fontWeight:700,color:'#bbb',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:6}}>CURRENT SALARY PLAN</div>
-              <div style={{fontSize:13,color:K,fontFamily:FB,marginBottom:8}}>{salaryLabel()}</div>
-              <div style={{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}>Bonus: {(c.salary.bonus_amount||0).toLocaleString()} EGP after {c.salary.bonus_threshold||0} sessions/month</div>
-              <button onClick={()=>onModal('salary',c)} style={{width:'100%',background:K,border:'none',borderRadius:9,padding:'9px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Edit Salary Plan & Pricing</button>
-            </div>
-            <SH label="Private Session Pricing"/>
-            <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'4px 0'}}>
-              {[['30 min',c.pricing.p30],['45 min',c.pricing.p45],['60 min',c.pricing.p60],['90 min',c.pricing.p90]].map(([l,v],i,arr)=>(
-                <div key={l} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 13px',borderBottom:i<arr.length-1?`1px solid ${G}`:'none'}}>
-                  <span style={{fontSize:12,color:C,fontFamily:FB}}>Private {l}</span>
-                  <span style={{fontFamily:FD,fontSize:15,fontWeight:800,color:R}}>{v} EGP</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        {coachTab==='reviews'&&(
-          <div style={{padding:'0 14px'}} className="fi">
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12,background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'11px 13px'}}>
-              <div style={{display:'flex',gap:2}}><Stars r={c.rating} s={13}/></div>
-              <div><div style={{fontFamily:FD,fontSize:18,fontWeight:900,color:K}}>{c.rating} / 5.0</div><div style={{fontSize:10,color:'#aaa',fontFamily:FB}}>{c.reviews.length} athlete reviews</div></div>
-            </div>
-            {c.reviews.map((rv,i)=>(
-              <div key={i} style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'11px 13px',marginBottom:8}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                  <div style={{display:'flex',alignItems:'center',gap:7}}>
-                    <div style={{width:26,height:26,borderRadius:7,background:K,display:'flex',alignItems:'center',justifyContent:'center'}}><span style={{fontSize:8,fontWeight:900,color:W,fontFamily:FB}}>{rv.ath.split(' ').map(w=>w[0]).join('')}</span></div>
-                    <span style={{fontSize:12,fontWeight:600,color:K,fontFamily:FB}}>{rv.ath}</span>
-                  </div>
-                  <div style={{display:'flex',alignItems:'center',gap:4}}><div style={{display:'flex',gap:1}}><Stars r={rv.r} s={10}/></div><span style={{fontSize:10,color:'#aaa',fontFamily:FB}}>{rv.date}</span></div>
-                </div>
-                <p style={{fontSize:11,color:'#666',fontFamily:FB,lineHeight:1.5,fontStyle:'italic'}}>"{rv.txt}"</p>
-              </div>
-            ))}
-          </div>
-        )}
-        {coachTab==='salary'&&(
-          <div style={{padding:'0 14px'}} className="fi">
-            <button onClick={()=>onModal('salary',c)} style={{width:'100%',marginBottom:12,background:K,border:'none',borderRadius:10,padding:'11px 0',fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Edit Salary Plan & Private Pricing</button>
-            <SH label="Payout History"/>
-            {[{month:'May 2025',sess:22,amt:2640,status:'paid'},{month:'Apr 2025',sess:20,amt:2400,status:'paid'},{month:'Jun 2025',sess:4,amt:480,status:'pending'}].map((e,i)=>(
-              <div key={i} style={{background:W,border:`1.5px solid ${e.status==='pending'?AM+'44':G}`,borderRadius:12,padding:'10px 12px',marginBottom:8}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
-                  <div><div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:1}}>{e.month}</div><div style={{fontSize:10,color:'#aaa',fontFamily:FB}}>{e.sess} sessions</div></div>
-                  <div style={{textAlign:'right'}}><div style={{fontFamily:FD,fontSize:18,fontWeight:900,color:e.status==='pending'?R:K}}>{e.amt.toLocaleString()}</div><div style={{fontSize:9,color:'#bbb',fontFamily:FB}}>EGP</div></div>
-                </div>
-                <Tag label={e.status==='paid'?'✓ Paid':'Pending Approval'} c={e.status==='paid'?GR:AM} bg={e.status==='paid'?GRB:AMB}/>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return(
-    <div style={{paddingBottom:16}}>
-      <div style={{padding:'10px 14px 11px'}}>
-        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:11}}>USERS</div>
-        <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:10,padding:'0 11px',display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
-          <Ic p={I.srch} c={'#ccc'} s={15}/>
-          <input value={q} onChange={e=>{setQ(e.target.value);setPage(0);}} placeholder="Search…" style={{flex:1,background:'transparent',border:'none',padding:'10px 0',fontSize:12,fontFamily:FB,color:K}}/>
-          {q&&<button onClick={()=>{setQ('');setPage(0);}} style={{background:'transparent',border:'none',cursor:'pointer',display:'flex',padding:2}}><Ic p={I.X} c={'#ccc'} s={13}/></button>}
-        </div>
-        <div style={{padding:'0 0 11px 0'}}>
-          <STabs tabs={[['athletes',`Athletes (${athletes.length})`],['coaches',`Coaches (${coaches.length})`]]} active={sub} onChange={v=>{setSub(v);setQ('');setPage(0);}}/>
-        </div>
-      </div>
-      <div style={{padding:'0 14px'}}>
-        {sub==='athletes'&&(
-          <>
-            <div style={{fontSize:10,color:'#888',fontFamily:FB,marginBottom:8}}>
-              Showing {page*PER+1}–{Math.min((page+1)*PER,filtAthletes.length)} of {filtAthletes.length}
-            </div>
-            {paged.map(a=>{
-              const ac=a.att>=95?GR:a.att>=80?AM:R;
-              return(
-                <div key={a.id} style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'9px 11px',marginBottom:7,opacity:a.status==='inactive'?.6:1}}>
-                  <div style={{display:'flex',alignItems:'center',gap:9,marginBottom:7,cursor:'pointer'}} onClick={()=>setSelAth(a)}>
-                    <div style={{width:36,height:36,borderRadius:10,background:K,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                      <span style={{fontFamily:FD,fontSize:12,fontWeight:900,color:W}}>{a.init}</span>
-                    </div>
-                    <div style={{flex:1}}>
-                      <div style={{fontSize:12,fontWeight:600,color:K,fontFamily:FB,marginBottom:2}}>{a.name}</div>
-                      <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>
-                        <Tag label={a.branch} c={'#777'} bg={GL}/>
-                        <Tag label={a.goal} c={R} bg={RB}/>
-                        {a.injury!=='None'&&<Tag label="🩹" c={AM} bg={AMB}/>}
-                      </div>
-                    </div>
-                    <Ic p={I.chR} c={'#ddd'} s={13}/>
-                  </div>
-                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 32px',gap:5,alignItems:'center'}}>
-                    {[[a.pts+'pts','Bal',R],[a.sess,'Sess','#777'],[a.att+'%','Att',ac]].map(([v,l,c])=>(
-                      <div key={l} style={{background:GL,borderRadius:6,padding:'5px 3px',textAlign:'center'}}>
-                        <div style={{fontFamily:FD,fontSize:12,fontWeight:800,color:c,lineHeight:1}}>{v}</div>
-                        <div style={{fontSize:7,fontWeight:700,color:'#ccc',textTransform:'uppercase',letterSpacing:'.4px',marginTop:1,fontFamily:FB}}>{l}</div>
-                      </div>
-                    ))}
-                    <button onClick={e=>{e.stopPropagation();onModal('manualPts',a);}} style={{background:RB,border:`1.5px solid ${RBR}`,borderRadius:6,height:32,width:32,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                      <Ic p={I.coin} c={R} s={13}/>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-            {totalPages>1&&(
-              <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:10}}>
-                <button onClick={()=>setPage(p=>Math.max(0,p-1))} disabled={page===0} style={{background:page===0?GL:K,border:`1.5px solid ${G}`,borderRadius:8,padding:'7px 14px',fontSize:11,fontWeight:700,color:page===0?'#bbb':W,cursor:page===0?'default':'pointer',fontFamily:FB}}>← Prev</button>
-                <span style={{fontSize:11,color:'#888',fontFamily:FB,display:'flex',alignItems:'center'}}>{page+1} / {totalPages}</span>
-                <button onClick={()=>setPage(p=>Math.min(totalPages-1,p+1))} disabled={page===totalPages-1} style={{background:page===totalPages-1?GL:K,border:`1.5px solid ${G}`,borderRadius:8,padding:'7px 14px',fontSize:11,fontWeight:700,color:page===totalPages-1?'#bbb':W,cursor:page===totalPages-1?'default':'pointer',fontFamily:FB}}>Next →</button>
-              </div>
-            )}
-          </>
-        )}
-        {sub==='coaches'&&filtCoaches.map(c=>(
-          <div key={c.id} onClick={()=>{setSelCoach(c);setCoachTab('profile');}} style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'10px 12px',marginBottom:8,cursor:'pointer'}}>
-            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
-              <div style={{width:40,height:40,borderRadius:12,background:K,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                <span style={{fontFamily:FD,fontSize:14,fontWeight:900,color:W}}>{c.init}</span>
-              </div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:600,color:K,fontFamily:FB,marginBottom:3}}>{c.name}</div>
-                <div style={{display:'flex',gap:4,alignItems:'center',flexWrap:'wrap'}}>
-                  <Tag label={c.branch} c={'#777'} bg={GL}/>
-                  <Tag label={c.specialty} c={R} bg={RB}/>
-                  <span style={{fontSize:10,color:AM,fontWeight:700,fontFamily:FB}}>★ {c.rating}</span>
-                </div>
-              </div>
-              <Ic p={I.chR} c={'#ddd'} s={13}/>
-            </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:6}}>
-              {[[c.sessions,'Sessions','#777'],[c.reviews.length+' rev.','Reviews',BL],[c.rating+'★','Rating',AM]].map(([v,l,col])=>(
-                <div key={l} style={{background:GL,borderRadius:7,padding:'6px 4px',textAlign:'center'}}>
-                  <div style={{fontFamily:FD,fontSize:13,fontWeight:800,color:col,lineHeight:1}}>{v}</div>
-                  <div style={{fontSize:7.5,fontWeight:700,color:'#ccc',textTransform:'uppercase',letterSpacing:'.4px',marginTop:2,fontFamily:FB}}>{l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+/* ── MODAL: SALARY PLAN ── */
+function SalaryModal(props) {
+  var coach=props.coach, onSave=props.onSave, onClose=props.onClose;
+  var st1=_useState(Object.assign({},coach.salary)); var salary=st1[0]; var setSalary=st1[1];
+  var st2=_useState(Object.assign({},coach.pricing)); var pricing=st2[0]; var setPricing=st2[1];
+  var st3=_useState('salary'); var tab=st3[0]; var setTab=st3[1];
+  function ss(k,v){setSalary(function(s){var n=Object.assign({},s);n[k]=v;return n;});}
+  function sp(k,v){setPricing(function(p){var n=Object.assign({},p);n[k]=v;return n;});}
+  var avgPrice = Math.round((pricing.p30+pricing.p45+pricing.p60+pricing.p90)/4);
+  var estimate = salary.type==='per_session' ? (salary.rate||0)*22
+    : salary.type==='monthly'    ? (salary.rate||0)
+    : salary.type==='hybrid'     ? ((salary.base||0)+(salary.per_session||0)*22)
+    : salary.type==='pct_session'? ((salary.base||0)+Math.round((salary.pct||0)/100*avgPrice*22))
+    : 0;
+  var salaryTypes = [['per_session','Per Session Fixed','Fixed EGP per session completed'],['monthly','Monthly Fixed','Fixed EGP salary regardless of sessions'],['hybrid','Hybrid (Base + Per Session)','Fixed monthly + bonus EGP per session'],['pct_session','% of Session Price','Percentage of each session price + optional base']];
+  return React.createElement('div', {className:'ov', onClick:function(e){if(e.target===e.currentTarget)onClose();}},
+    React.createElement('div', {className:'sh su'},
+      React.createElement('div', {style:{padding:'14px 14px 0'}},
+        React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}},
+          React.createElement('span', {style:{fontFamily:FD,fontSize:18,fontWeight:800,color:K}}, 'PLAN - '+coach.name.split(' ')[0].toUpperCase()),
+          React.createElement('button', {onClick:onClose,style:{background:'transparent',border:'1.5px solid '+G,borderRadius:8,width:30,height:30,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}, React.createElement(Ic, {p:I.X,c:C,s:13}))
+        ),
+        React.createElement(STabs, {tabs:[['salary','Salary Plan'],['pricing','Private Rates']], active:tab, onChange:setTab})
+      ),
+      tab==='salary' && React.createElement('div', {style:{padding:'0 14px 6px'}},
+        React.createElement('div', {style:{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB,marginBottom:7}}, 'SALARY TYPE'),
+        salaryTypes.map(function(o) {
+          return React.createElement('div', {key:o[0],onClick:function(){ss('type',o[0]);},style:{display:'flex',alignItems:'flex-start',gap:9,padding:'9px 0',borderBottom:'1px solid '+G,cursor:'pointer'}},
+            React.createElement('div', {style:{width:15,height:15,borderRadius:'50%',border:'2px solid '+(salary.type===o[0]?R:G),background:salary.type===o[0]?R:'transparent',marginTop:2,flexShrink:0,transition:'all .12s'}}),
+            React.createElement('div', null,
+              React.createElement('div', {style:{fontSize:12,fontWeight:salary.type===o[0]?700:400,color:salary.type===o[0]?K:'#888',fontFamily:FB}}, o[1]),
+              React.createElement('div', {style:{fontSize:10,color:'#bbb',fontFamily:FB,marginTop:1}}, o[2])
+            )
+          );
+        }),
+        React.createElement('div', {style:{marginTop:12}},
+          salary.type==='per_session' && React.createElement(IL, {label:'Rate per session (EGP)'}, React.createElement('input', {type:'number',value:salary.rate||0,onChange:function(e){ss('rate',parseInt(e.target.value)||0);},style:iS})),
+          salary.type==='monthly' && React.createElement(IL, {label:'Monthly salary (EGP)'}, React.createElement('input', {type:'number',value:salary.rate||0,onChange:function(e){ss('rate',parseInt(e.target.value)||0);},style:iS})),
+          salary.type==='hybrid' && React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}},
+            React.createElement(IL, {label:'Base monthly (EGP)'}, React.createElement('input', {type:'number',value:salary.base||0,onChange:function(e){ss('base',parseInt(e.target.value)||0);},style:iS})),
+            React.createElement(IL, {label:'Per session (EGP)'}, React.createElement('input', {type:'number',value:salary.per_session||0,onChange:function(e){ss('per_session',parseInt(e.target.value)||0);},style:iS}))
+          ),
+          salary.type==='pct_session' && React.createElement('div', null,
+            React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}},
+              React.createElement(IL, {label:'% of session price'}, React.createElement('input', {type:'number',value:salary.pct||0,min:0,max:100,onChange:function(e){ss('pct',parseFloat(e.target.value)||0);},style:iS})),
+              React.createElement(IL, {label:'Fixed base/month (EGP)'}, React.createElement('input', {type:'number',value:salary.base||0,onChange:function(e){ss('base',parseInt(e.target.value)||0);},style:iS}))
+            ),
+            React.createElement('div', {style:{background:AMB,border:'1px solid '+AM+'33',borderRadius:9,padding:'8px 11px',marginBottom:10,fontSize:11,color:AM,fontFamily:FB,lineHeight:1.5}},
+              'Coach earns '+(salary.pct||0)+'% of each session price plus '+(salary.base||0).toLocaleString()+' EGP fixed monthly base.'
+            )
+          ),
+          React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}},
+            React.createElement(IL, {label:'Bonus after N sessions'}, React.createElement('input', {type:'number',value:salary.bonus_threshold||0,onChange:function(e){ss('bonus_threshold',parseInt(e.target.value)||0);},style:iS})),
+            React.createElement(IL, {label:'Bonus amount (EGP)'}, React.createElement('input', {type:'number',value:salary.bonus_amount||0,onChange:function(e){ss('bonus_amount',parseInt(e.target.value)||0);},style:iS}))
+          ),
+          React.createElement('div', {style:{background:K,borderRadius:11,padding:'11px 13px',marginBottom:6}},
+            React.createElement('div', {style:{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.35)',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:5}}, 'ESTIMATED THIS MONTH'),
+            React.createElement('div', {style:{fontFamily:FD,fontSize:24,fontWeight:900,color:R}}, estimate.toLocaleString()+' EGP'),
+            React.createElement('div', {style:{fontSize:10,color:'rgba(255,255,255,.3)',fontFamily:FB,marginTop:3}}, 'Based on approximately 22 sessions per month')
+          )
+        )
+      ),
+      tab==='pricing' && React.createElement('div', {style:{padding:'0 14px 6px'}},
+        React.createElement('div', {style:{background:BLB,border:'1px solid '+BL+'33',borderRadius:9,padding:'8px 11px',marginBottom:12,display:'flex',gap:7}},
+          React.createElement(Ic, {p:I.inf,c:BL,s:13}),
+          React.createElement('span', {style:{fontSize:11,color:BL,fontFamily:FB,lineHeight:1.5}}, 'Per-coach private session rates. Overrides platform defaults for '+coach.name+'.')
+        ),
+        [['p30','30 min private (EGP)'],['p45','45 min private (EGP)'],['p60','60 min private (EGP)'],['p90','90 min private (EGP)']].map(function(row) {
+          return React.createElement(IL, {key:row[0],label:row[1]}, React.createElement('input', {type:'number',value:pricing[row[0]]||0,onChange:function(e){sp(row[0],parseInt(e.target.value)||0);},style:iS}));
+        })
+      ),
+      React.createElement('div', {style:{padding:'0 14px 20px'}},
+        React.createElement('button', {onClick:function(){onSave(coach.id,salary,pricing);},style:{width:'100%',background:K,border:'none',borderRadius:11,padding:'12px 0',fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}, 'Save Plan')
+      )
+    )
   );
 }
 
-/* ── SCREEN: SESSIONS ─────────────────────────────────── */
-function SessionsScreen({sessions,setSessions,onModal}){
-  const[tab,setTab]=useState('upcoming');
-  const list=sessions.filter(s=>s.status===tab).sort((a,b)=>tab==='upcoming'?a.date-b.date:b.date-a.date);
-  return(
-    <div style={{paddingBottom:16}}>
-      <div style={{padding:'10px 14px 11px'}}>
-        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:4}}>SESSIONS</div>
-        <div style={{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}>Admin view — override any session</div>
-      </div>
-      <div style={{display:'flex',gap:7,padding:'0 14px',marginBottom:10,overflowX:'auto',scrollbarWidth:'none'}}>
-        {[['upcoming','Upcoming',R],['done','Done',GR],['cancelled','Cancelled','#bbb']].map(([v,l,c])=>(
-          <div key={v} onClick={()=>setTab(v)} style={{flexShrink:0,background:tab===v?K:GL,border:`1.5px solid ${tab===v?K:G}`,borderRadius:8,padding:'5px 11px',display:'flex',gap:5,alignItems:'center',cursor:'pointer',transition:'all .12s'}}>
-            <span style={{fontFamily:FD,fontSize:15,fontWeight:900,color:tab===v?W:c,lineHeight:1}}>{sessions.filter(s=>s.status===v).length}</span>
-            <span style={{fontSize:10,fontWeight:600,color:tab===v?'rgba(255,255,255,.5)':'#aaa',fontFamily:FB}}>{l}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{padding:'0 14px'}}>
-        {list.length===0?(
-          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:22,textAlign:'center'}}><div style={{fontSize:12,color:'#bbb',fontFamily:FB}}>No {tab} sessions</div></div>
-        ):list.map(s=>(
-          <div key={s.id} style={{background:W,border:`1.5px solid ${s.status==='done'?GR+'22':s.status==='cancelled'?G:RBR}`,borderRadius:12,padding:'10px 12px',marginBottom:8}}>
-            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4,flexWrap:'wrap'}}>
-              <span style={{fontSize:10,fontWeight:700,color:R,fontFamily:FB}}>{fmtD(s.date)} · {s.time}</span>
-              <Tag label={s.type} c={s.type==='PRIVATE'?AM:BL} bg={s.type==='PRIVATE'?AMB:BLB}/>
-              <Tag label={s.branch} c={'#777'} bg={GL}/>
-            </div>
-            <div style={{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:3}}>{s.name}</div>
-            <div style={{fontSize:11,color:'#888',fontFamily:FB,marginBottom:6}}>Coach {s.coach} · {s.athletes.join(', ')}</div>
-            {s.adminNote&&<div style={{background:PUB,border:`1px solid ${PU}33`,borderRadius:7,padding:'5px 9px',marginBottom:6,fontSize:10,color:PU,fontFamily:FB}}>⚡ Override: {s.adminNote}</div>}
-            {s.cancelledBy==='coach'&&<div style={{background:GRB,border:`1px solid ${GR}22`,borderRadius:7,padding:'5px 9px',marginBottom:6,fontSize:10,color:GR,fontFamily:FB}}>ℹ Coach cancelled — full refund issued</div>}
-            <button onClick={()=>onModal('override',s)} style={{width:'100%',background:GL,border:`1.5px solid ${G}`,borderRadius:8,padding:'7px 0',fontSize:11,fontWeight:700,color:C,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:5}}>
-              <Ic p={I.edit} c={C} s={13}/>Admin Override
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+/* ── MODAL: RECEIPT ── */
+function ReceiptModal(props) {
+  var payment=props.payment, onApprove=props.onApprove, onReject=props.onReject, onClose=props.onClose;
+  var st=_useState(''); var reason=st[0]; var setReason=st[1];
+  return React.createElement(MWrap, {title:'PAYMENT REVIEW', onClose:onClose},
+    React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:10,padding:'10px 12px',marginBottom:12}},
+      React.createElement('div', {style:{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:6}}, payment.ath),
+      [['Package',payment.pkg],['Points',payment.pts+' pts'],['Amount',payment.price.toLocaleString()+' EGP'],['Submitted',fmtD(payment.date)]].map(function(r) {
+        return React.createElement('div', {key:r[0],style:{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid '+G}},
+          React.createElement('span', {style:{fontSize:11,color:'#888',fontFamily:FB}}, r[0]),
+          React.createElement('span', {style:{fontSize:11,fontWeight:700,color:K,fontFamily:FB}}, r[1])
+        );
+      })
+    ),
+    React.createElement('div', {style:{background:GL,border:'2px dashed '+G,borderRadius:12,padding:'20px 16px',textAlign:'center',marginBottom:12}},
+      React.createElement('div', {style:{fontSize:22,marginBottom:6}}, '🧾'),
+      React.createElement('div', {style:{fontFamily:FD,fontSize:14,fontWeight:700,color:K,marginBottom:3}}, 'Bank Transfer Receipt'),
+      React.createElement('div', {style:{fontSize:11,color:'#aaa',fontFamily:FB}}, 'Uploaded by athlete')
+    ),
+    payment.status==='pending' && React.createElement('div', null,
+      React.createElement('input', {value:reason,onChange:function(e){setReason(e.target.value);},placeholder:'Rejection reason (optional)...',style:Object.assign({},iS,{fontSize:11,marginBottom:10})}),
+      React.createElement('div', {style:{display:'flex',gap:8}},
+        React.createElement('button', {onClick:function(){onReject(payment.id,reason||'Receipt unclear or invalid');},style:{flex:1,background:'transparent',border:'1.5px solid '+R,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:R,cursor:'pointer',fontFamily:FB}}, 'Reject'),
+        React.createElement('button', {onClick:function(){onApprove(payment.id);},style:{flex:1,background:GR,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}, 'Approve')
+      )
+    ),
+    payment.status!=='pending' && React.createElement('button', {onClick:onClose,style:{width:'100%',background:GL,border:'1.5px solid '+G,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}, 'Close')
   );
 }
 
-/* ── SCREEN: PAYMENTS ─────────────────────────────────── */
-function PaymentsScreen({payments,setPayments,onModal}){
-  const[tab,setTab]=useState('pending');
-  const pending=payments.filter(p=>p.status==='pending');
-  const approved=payments.filter(p=>p.status==='approved');
-  const rejected=payments.filter(p=>p.status==='rejected');
-  const list=tab==='pending'?pending:tab==='approved'?approved:rejected;
-  return(
-    <div style={{paddingBottom:16}}>
-      <div style={{padding:'10px 14px 0'}}>
-        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:4}}>PAYMENTS</div>
-        <div style={{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}>Review receipts & approve packages</div>
-        {pending.length>0&&(
-          <div style={{background:AMB,border:`1.5px solid ${AM}44`,borderRadius:11,padding:'10px 12px',marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div><div style={{fontSize:12,fontWeight:700,color:AM,fontFamily:FB}}>{pending.length} pending</div><div style={{fontSize:10,color:'#888',fontFamily:FB}}>Total: {pending.reduce((a,p)=>a+p.price,0).toLocaleString()} EGP</div></div>
-            <button onClick={()=>pending[0]&&onModal('receipt',pending[0])} style={{background:AM,border:'none',borderRadius:8,padding:'7px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}>Review First</button>
-          </div>
-        )}
-      </div>
-      <div style={{display:'flex',gap:7,padding:'0 14px',marginBottom:10,overflowX:'auto',scrollbarWidth:'none'}}>
-        {[['pending','Pending',pending.length,AM],['approved','Approved',approved.length,GR],['rejected','Rejected',rejected.length,R]].map(([v,l,n,c])=>(
-          <div key={v} onClick={()=>setTab(v)} style={{flexShrink:0,background:tab===v?K:GL,border:`1.5px solid ${tab===v?K:G}`,borderRadius:8,padding:'5px 11px',display:'flex',gap:5,alignItems:'center',cursor:'pointer',transition:'all .12s'}}>
-            <span style={{fontFamily:FD,fontSize:15,fontWeight:900,color:tab===v?W:c,lineHeight:1}}>{n}</span>
-            <span style={{fontSize:10,fontWeight:600,color:tab===v?'rgba(255,255,255,.5)':'#aaa',fontFamily:FB}}>{l}</span>
-          </div>
-        ))}
-      </div>
-      <div style={{padding:'0 14px'}}>
-        {list.length===0?(
-          <div style={{background:GL,border:`1.5px solid ${G}`,borderRadius:12,padding:22,textAlign:'center'}}><div style={{fontSize:12,color:'#bbb',fontFamily:FB}}>No {tab} payments</div></div>
-        ):list.slice(0,30).map(p=>(
-          <div key={p.id} style={{background:W,border:`1.5px solid ${p.status==='pending'?AM+'44':p.status==='approved'?GR+'22':G}`,borderRadius:12,padding:'10px 12px',marginBottom:8,cursor:'pointer'}} onClick={()=>onModal('receipt',p)}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
-              <div>
-                <div style={{fontFamily:FD,fontSize:14,fontWeight:800,color:K,marginBottom:2}}>{p.ath}</div>
-                <div style={{fontSize:11,color:'#888',fontFamily:FB}}>{p.pkg} · {p.pts} pts</div>
-              </div>
-              <div style={{textAlign:'right'}}>
-                <div style={{fontFamily:FD,fontSize:17,fontWeight:900,color:R,lineHeight:1}}>{p.price.toLocaleString()}</div>
-                <div style={{fontSize:9,color:'#bbb',fontFamily:FB}}>EGP</div>
-              </div>
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:10,color:'#aaa',fontFamily:FB}}>{fmtD(p.date)}</span>
-              <Tag label={p.status==='pending'?'⏳ Pending':p.status==='approved'?'✓ Approved':'✕ Rejected'} c={p.status==='pending'?AM:p.status==='approved'?GR:R} bg={p.status==='pending'?AMB:p.status==='approved'?GRB:RB}/>
-            </div>
-            {p.reason&&<div style={{fontSize:10,color:R,fontFamily:FB,marginTop:4}}>{p.reason}</div>}
-          </div>
-        ))}
-      </div>
-    </div>
+/* ── MODAL: ANNOUNCEMENT ── */
+function AnnModal(props) {
+  var ann=props.ann, onSave=props.onSave, onClose=props.onClose;
+  var st=_useState(ann ? Object.assign({},ann) : {title:'',body:'',audience:'all',active:true});
+  var form=st[0]; var setForm=st[1];
+  function set(k,v){setForm(function(f){var n=Object.assign({},f);n[k]=v;return n;});}
+  var v=form.title.trim()&&form.body.trim();
+  return React.createElement(MWrap, {title:ann?'EDIT ANNOUNCEMENT':'NEW ANNOUNCEMENT', onClose:onClose},
+    React.createElement(IL, {label:'Title'}, React.createElement('input', {value:form.title,onChange:function(e){set('title',e.target.value);},placeholder:'Announcement headline...',style:iS})),
+    React.createElement(IL, {label:'Body'}, React.createElement('textarea', {value:form.body,onChange:function(e){set('body',e.target.value);},rows:3,placeholder:'Full announcement text...',style:Object.assign({},iS,{resize:'none'})})),
+    React.createElement(IL, {label:'Audience'},
+      React.createElement('select', {value:form.audience,onChange:function(e){set('audience',e.target.value);},style:Object.assign({},iS,{appearance:'none',cursor:'pointer'})},
+        React.createElement('option', {value:'all'}, 'All Users'),
+        React.createElement('option', {value:'athletes'}, 'Athletes Only'),
+        React.createElement('option', {value:'coaches'}, 'Coaches Only')
+      )
+    ),
+    React.createElement('div', {style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,padding:'10px 12px',background:GL,borderRadius:10,border:'1.5px solid '+G}},
+      React.createElement('span', {style:{fontSize:12,fontWeight:500,color:K,fontFamily:FB}}, 'Publish immediately'),
+      React.createElement(Toggle, {on:form.active, onChange:function(){set('active',!form.active);}})
+    ),
+    React.createElement('div', {style:{display:'flex',gap:8}},
+      React.createElement('button', {onClick:onClose,style:{flex:1,background:'transparent',border:'1.5px solid '+G,borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}, 'Cancel'),
+      React.createElement('button', {onClick:function(){if(v)onSave(form);},style:{flex:1,background:v?K:G,border:'none',borderRadius:10,padding:'11px 0',fontSize:12,fontWeight:700,color:v?W:'#aaa',cursor:v?'pointer':'not-allowed',fontFamily:FB}}, ann?'Save Changes':'Publish')
+    )
   );
 }
 
-/* ── SCREEN: CONFIG ───────────────────────────────────── */
-function ConfigScreen({config,setConfig,onModal}){
-  const[tab,setTab]=useState('points');
-  const setCfg=(k,v)=>setConfig(c=>({...c,[k]:v}));
-  const setST=(id,field,val)=>setConfig(c=>({...c,session_types:c.session_types.map(s=>s.id===id?{...s,[field]:val}:s)}));
-  const setPkg=(id,field,val)=>setConfig(c=>({...c,packages:c.packages.map(p=>p.id===id?{...p,[field]:val}:p)}));
-  const addST=()=>{const id=Date.now();setConfig(c=>({...c,session_types:[...c.session_types,{id,name:'New Session Type',dur:60,pts_group:8,active:true}];}));};
-  const delST=id=>setConfig(c=>({...c,session_types:c.session_types.filter(s=>s.id!==id)}));
-  const addPkg=()=>{const id=Date.now();setConfig(c=>({...c,packages:[...c.packages,{id,name:'New Package',pts:100,price:3000,active:true}];}));};
-  const delPkg=id=>setConfig(c=>({...c,packages:c.packages.filter(p=>p.id!==id)}));
-  const toggleAnn=id=>setConfig(c=>({...c,announcements:c.announcements.map(a=>a.id===id?{...a,active:!a.active}:a)}));
-  const deleteAnn=id=>setConfig(c=>({...c,announcements:c.announcements.filter(a=>a.id!==id)}));
-  const saveAnn=form=>{
-    if(form.id){setConfig(c=>({...c,announcements:c.announcements.map(a=>a.id===form.id?{...a,...form}:a)}));}
-    else{setConfig(c=>({...c,announcements:[{...form,id:Date.now(),date:new Date()},...c.announcements]}));}
-  };
-  const numStyle={width:56,background:GL,border:`1.5px solid ${G}`,borderRadius:7,padding:'5px 7px',fontSize:12,fontFamily:FB,color:K,textAlign:'center'};
-  return(
-    <div style={{paddingBottom:16}}>
-      <div style={{padding:'10px 14px 0'}}>
-        <div style={{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:4}}>CONFIGURATION</div>
-        <div style={{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}>Platform settings, types & policies</div>
-      </div>
-      <div style={{padding:'0 14px'}}>
-        <div style={{display:'flex',background:GL,borderRadius:9,padding:3,border:`1.5px solid ${G}`,overflowX:'auto',scrollbarWidth:'none',gap:2,marginBottom:12}}>
-          {[['points','Points'],['types','Types & Pkgs'],['policies','Policies'],['announce','Announce']].map(([v,l])=>(
-            <div key={v} onClick={()=>setTab(v)} style={{flex:'1 1 0',textAlign:'center',padding:'7px 4px',borderRadius:6,fontSize:10,fontWeight:600,cursor:'pointer',background:tab===v?W:'transparent',color:tab===v?K:'#bbb',boxShadow:tab===v?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,whiteSpace:'nowrap',transition:'all .12s'}}>{l}</div>
-          ))}
-        </div>
-      </div>
+/* ── SCREEN: DASHBOARD ── */
+function DashScreen(props) {
+  var athletes=props.athletes, sessions=props.sessions, payments=props.payments, onNav=props.onNav;
+  var pending = payments.filter(function(p){return p.status==='pending';});
+  var today = sessions.filter(function(s){return s.date.toDateString()===new Date().toDateString();});
+  var totalPts = athletes.reduce(function(a,b){return a+b.pts;},0);
+  var totalRev = payments.filter(function(p){return p.status==='approved';}).reduce(function(a,p){return a+p.price;},0);
+  return React.createElement('div', {style:{paddingBottom:16}},
+    React.createElement('div', {style:{background:K,padding:'14px 14px 16px',position:'relative',overflow:'hidden'}},
+      React.createElement('div', {style:{position:'absolute',right:-30,top:-30,width:130,height:130,borderRadius:'50%',border:'1px solid rgba(199,35,51,.12)',opacity:.4,pointerEvents:'none'}}),
+      React.createElement('div', {style:{fontSize:9,fontWeight:700,color:'rgba(255,255,255,.35)',letterSpacing:'1.5px',textTransform:'uppercase',fontFamily:FB,marginBottom:1}}, 'ADMIN PANEL'),
+      React.createElement('div', {style:{fontFamily:FD,fontSize:24,fontWeight:900,color:W,marginBottom:12}}, 'INCHES HQ'),
+      React.createElement('div', {style:{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginBottom:12}},
+        [[athletes.length,'Athletes'],[COACHES.length,'Coaches'],[today.length,'Today'],[pending.length,'Pending']].map(function(item) {
+          return React.createElement('div', {key:item[1],style:{background:'rgba(255,255,255,.07)',borderRadius:9,padding:'7px 4px',textAlign:'center',border:'1px solid rgba(255,255,255,.07)'}},
+            React.createElement('div', {style:{fontFamily:FD,fontSize:15,fontWeight:900,color:item[1]==='Pending'?AM:W,lineHeight:1}}, item[0]),
+            React.createElement('div', {style:{fontSize:7.5,fontWeight:700,color:'rgba(255,255,255,.3)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:2,fontFamily:FB}}, item[1])
+          );
+        })
+      ),
+      React.createElement('div', {style:{display:'flex',gap:7}},
+        React.createElement('button', {onClick:function(){onNav('payments');},style:{flex:1,background:R,border:'none',borderRadius:9,padding:'8px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}},
+          React.createElement(Ic,{p:I.coin,c:W,s:13}), 'Payments ('+pending.length+')'
+        ),
+        React.createElement('button', {onClick:function(){onNav('config');},style:{flex:1,background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)',borderRadius:9,padding:'8px 0',fontSize:12,fontWeight:600,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}},
+          React.createElement(Ic,{p:I.cog,c:W,s:13}), 'Config'
+        )
+      )
+    ),
+    React.createElement('div', {style:{padding:'12px 14px 0'}},
+      pending.length>0 && React.createElement('div', {onClick:function(){onNav('payments');},style:{background:AMB,border:'1.5px solid '+AM+'44',borderRadius:11,padding:'10px 12px',marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer'}},
+        React.createElement('div', {style:{display:'flex',gap:8,alignItems:'center'}},
+          React.createElement(Ic,{p:I.warn,c:AM,s:15}),
+          React.createElement('div', null,
+            React.createElement('div', {style:{fontSize:12,fontWeight:700,color:AM,fontFamily:FB}}, pending.length+' pending payment'+(pending.length>1?'s':'')),
+            React.createElement('div', {style:{fontSize:10,color:'#888',fontFamily:FB}}, 'Tap to review receipts')
+          )
+        ),
+        React.createElement(Ic,{p:I.chR,c:AM,s:13})
+      ),
+      React.createElement(SH, {label:'Platform Overview'}),
+      React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:14}},
+        [[totalPts.toLocaleString()+' pts','Total pts in wallets',BL],[totalRev.toLocaleString()+' EGP','Total revenue collected',GR],['89%','Avg attendance rate',R],['4.8 star','Avg coach rating',AM]].map(function(item) {
+          return React.createElement('div', {key:item[1],style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'11px 12px'}},
+            React.createElement('div', {style:{fontFamily:FD,fontSize:16,fontWeight:900,color:item[2],lineHeight:1,marginBottom:4}}, item[0]),
+            React.createElement('div', {style:{fontSize:10,color:'#aaa',fontFamily:FB}}, item[1])
+          );
+        })
+      ),
+      React.createElement(SH, {label:"Today - "+today.length+" sessions", cta:'All sessions', onCta:function(){onNav('sessions');}}),
+      today.length===0
+        ? React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:12,padding:14,textAlign:'center'}}, React.createElement('div', {style:{fontSize:12,color:'#aaa',fontFamily:FB}}, 'No sessions today'))
+        : today.map(function(s) {
+          return React.createElement('div', {key:s.id,style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'9px 11px',marginBottom:7,display:'flex',justifyContent:'space-between',alignItems:'center'}},
+            React.createElement('div', null,
+              React.createElement('div', {style:{display:'flex',gap:5,alignItems:'center',marginBottom:3}},
+                React.createElement('span', {style:{fontSize:10,fontWeight:700,color:R,fontFamily:FB}}, s.time),
+                React.createElement(Tag, {label:s.type, c:s.type==='PRIVATE'?AM:BL, bg:s.type==='PRIVATE'?AMB:BLB})
+              ),
+              React.createElement('div', {style:{fontFamily:FD,fontSize:13,fontWeight:800,color:K,marginBottom:2}}, s.name),
+              React.createElement('div', {style:{fontSize:10,color:'#888',fontFamily:FB}}, s.coach+' - '+s.branch+' - '+s.athletes.length+' enrolled')
+            ),
+            React.createElement(Tag, {label:s.status==='done'?'Done':'Upcoming', c:s.status==='done'?GR:C, bg:s.status==='done'?GRB:GL})
+          );
+        })
+    )
+  );
+}
 
-      {tab==='points'&&(
-        <div style={{padding:'0 14px'}} className="fi">
-          <SH label="Group Points by Duration"/>
-          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'4px 0',marginBottom:12}}>
-            {[[30,'30 min'],[45,'45 min'],[60,'60 min'],[90,'90 min'],[120,'120 min']].map(([dur,l],i,arr)=>(
-              <div key={dur} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 13px',borderBottom:i<arr.length-1?`1px solid ${G}`:'none'}}>
-                <span style={{fontSize:12,color:C,fontFamily:FB}}>{l} group session</span>
-                <div style={{display:'flex',alignItems:'center',gap:7}}>
-                  <input type="number" value={config.group_pts[dur]||0} onChange={e=>setConfig(c=>({...c,group_pts:{...c.group_pts,[dur]:parseInt(e.target.value)||0}}))} style={numStyle}/>
-                  <span style={{fontSize:11,color:'#aaa',fontFamily:FB}}>pts</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <SH label="Platform Settings"/>
-          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'4px 0',marginBottom:12}}>
-            {[['Max athletes per group session','max_athletes_group'],['Max athletes per private session','max_athletes_private']].map(([l,k],i,arr)=>(
-              <div key={k} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 13px',borderBottom:i<arr.length-1?`1px solid ${G}`:'none'}}>
-                <span style={{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}>{l}</span>
-                <input type="number" value={config[k]||0} onChange={e=>setCfg(k,parseInt(e.target.value)||0)} style={numStyle}/>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+/* ── SCREEN: USERS ── */
+function UsersScreen(props) {
+  var athletes=props.athletes, setAthletes=props.setAthletes, coaches=props.coaches, setCoaches=props.setCoaches, onModal=props.onModal;
+  var st1=_useState('athletes'); var sub=st1[0]; var setSub=st1[1];
+  var st2=_useState(''); var q=st2[0]; var setQ=st2[1];
+  var st3=_useState(null); var selAth=st3[0]; var setSelAth=st3[1];
+  var st4=_useState(null); var selCoach=st4[0]; var setSelCoach=st4[1];
+  var st5=_useState('profile'); var coachTab=st5[0]; var setCoachTab=st5[1];
 
-      {tab==='types'&&(
-        <div style={{padding:'0 14px'}} className="fi">
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-            <SH label={`Session Types (${config.session_types.length})`}/>
-            <button onClick={addST} style={{background:K,border:'none',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',gap:4,marginBottom:7}}>
-              <Ic p={I.plus} c={W} s={12}/>New Type
-            </button>
-          </div>
-          {config.session_types.map(s=>(
-            <div key={s.id} style={{background:W,border:`1.5px solid ${s.active?RBR:G}`,borderRadius:12,padding:'10px 13px',marginBottom:8,opacity:s.active?1:.65}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                <input value={s.name} onChange={e=>setST(s.id,'name',e.target.value)} style={{fontFamily:FD,fontSize:14,fontWeight:800,color:K,background:'transparent',border:'none',flex:1,paddingRight:8}}/>
-                <div style={{display:'flex',alignItems:'center',gap:6}}>
-                  <button onClick={()=>delST(s.id)} style={{background:'transparent',border:`1.5px solid ${R}33`,borderRadius:6,padding:'3px 7px',fontSize:10,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}>Del</button>
-                  <Toggle on={s.active} onChange={()=>setST(s.id,'active',!s.active)}/>
-                </div>
-              </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-                <div><div style={{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}>Duration (min)</div><input type="number" value={s.dur} onChange={e=>setST(s.id,'dur',parseInt(e.target.value)||0)} style={{...iS,padding:'7px 9px',fontSize:12}}/></div>
-                <div><div style={{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}>Group pts</div><input type="number" value={s.pts_group} onChange={e=>setST(s.id,'pts_group',parseInt(e.target.value)||0)} style={{...iS,padding:'7px 9px',fontSize:12,color:R,fontFamily:FD,fontWeight:800}}/></div>
-              </div>
-            </div>
-          ))}
+  var filtAth = athletes.filter(function(a){return a.name.toLowerCase().includes(q.toLowerCase());});
+  var filtCoa = coaches.filter(function(c){return c.name.toLowerCase().includes(q.toLowerCase());});
 
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:14,marginBottom:10}}>
-            <SH label={`Packages (${config.packages.length})`}/>
-            <button onClick={addPkg} style={{background:K,border:'none',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',gap:4,marginBottom:7}}>
-              <Ic p={I.plus} c={W} s={12}/>New Package
-            </button>
-          </div>
-          {config.packages.map(p=>{
-            const ppt=p.pts>0?(p.price/p.pts).toFixed(1):'—';
-            return(
-              <div key={p.id} style={{background:W,border:`1.5px solid ${p.active?RBR:G}`,borderRadius:12,padding:'10px 13px',marginBottom:8,opacity:p.active?1:.65}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                  <input value={p.name} onChange={e=>setPkg(p.id,'name',e.target.value)} style={{fontFamily:FD,fontSize:14,fontWeight:800,color:K,background:'transparent',border:'none',flex:1,paddingRight:8}}/>
-                  <div style={{display:'flex',alignItems:'center',gap:6}}>
-                    <button onClick={()=>delPkg(p.id)} style={{background:'transparent',border:`1.5px solid ${R}33`,borderRadius:6,padding:'3px 7px',fontSize:10,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}>Del</button>
-                    <Toggle on={p.active} onChange={()=>setPkg(p.id,'active',!p.active)}/>
-                  </div>
-                </div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
-                  <div><div style={{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}>Points</div><input type="number" value={p.pts} onChange={e=>setPkg(p.id,'pts',parseInt(e.target.value)||0)} style={{...iS,padding:'7px 9px',fontSize:12,color:R,fontFamily:FD,fontWeight:800}}/></div>
-                  <div><div style={{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}>Price (EGP)</div><input type="number" value={p.price} onChange={e=>setPkg(p.id,'price',parseInt(e.target.value)||0)} style={{...iS,padding:'7px 9px',fontSize:12}}/></div>
-                  <div><div style={{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}>EGP/pt</div><div style={{...iS,padding:'7px 9px',fontSize:12,fontFamily:FD,fontWeight:800,color:GR,border:`1.5px solid ${GR}33`,background:GRB,borderRadius:9}}>{ppt}</div></div>
-                </div>
-              </div>
+  if(selAth) {
+    var a = athletes.find(function(x){return x.id===selAth.id;}) || selAth;
+    var ac = a.att>=95?GR:a.att>=80?AM:R;
+    return React.createElement('div', {style:{paddingBottom:16}},
+      React.createElement('div', {style:{background:K,padding:'13px 14px 16px',position:'relative',overflow:'hidden'}},
+        React.createElement('div', {style:{position:'absolute',right:-25,top:-25,width:110,height:110,borderRadius:'50%',border:'1px solid rgba(199,35,51,.15)',opacity:.4,pointerEvents:'none'}}),
+        React.createElement(BackBtn, {onBack:function(){setSelAth(null);},light:true}),
+        React.createElement('div', {style:{display:'flex',gap:11,alignItems:'flex-start',marginTop:11}},
+          React.createElement('div', {style:{width:52,height:52,borderRadius:16,background:R,border:'2px solid rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+            React.createElement('span', {style:{fontFamily:FD,fontSize:19,fontWeight:900,color:W}}, a.init)
+          ),
+          React.createElement('div', {style:{flex:1}},
+            React.createElement('div', {style:{fontFamily:FD,fontSize:20,fontWeight:900,color:W,lineHeight:1,marginBottom:3}}, a.name.toUpperCase()),
+            React.createElement('div', {style:{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:FB,marginBottom:7}}, a.goal+' - '+a.branch+' - Joined '+a.joined),
+            React.createElement('div', {style:{display:'flex',gap:5,flexWrap:'wrap'}},
+              React.createElement(Tag, {label:a.status==='active'?'Active':'Inactive', c:a.status==='active'?GR:C, bg:a.status==='active'?GRB:GL}),
+              a.injury!=='None' && React.createElement(Tag, {label:'Injury', c:AM, bg:AMB})
+            )
+          )
+        ),
+        React.createElement('div', {style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:6,marginTop:12}},
+          [[a.pts+'pts','Balance'],[a.sess+'','Sessions'],[a.att+'%','Attend.']].map(function(item) {
+            return React.createElement('div', {key:item[1],style:{background:'rgba(255,255,255,.07)',borderRadius:9,padding:'7px 4px',textAlign:'center',border:'1px solid rgba(255,255,255,.06)'}},
+              React.createElement('div', {style:{fontFamily:FD,fontSize:14,fontWeight:900,color:W,lineHeight:1}}, item[0]),
+              React.createElement('div', {style:{fontSize:7.5,fontWeight:700,color:'rgba(255,255,255,.28)',textTransform:'uppercase',letterSpacing:'.5px',marginTop:2,fontFamily:FB}}, item[1])
             );
-          })}
-        </div>
-      )}
+          })
+        )
+      ),
+      React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,padding:'12px 14px 0'}},
+        React.createElement('button', {onClick:function(){onModal('manualPts',a);},style:{background:GRB,border:'1.5px solid '+GR+'33',borderRadius:10,padding:'9px 0',fontSize:11,fontWeight:700,color:GR,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}},
+          React.createElement(Ic,{p:I.plus,c:GR,s:13}), 'Add Points'
+        ),
+        React.createElement('button', {onClick:function(){onModal('manualPts',a);},style:{background:RB,border:'1.5px solid '+RBR,borderRadius:10,padding:'9px 0',fontSize:11,fontWeight:700,color:R,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:4}},
+          React.createElement(Ic,{p:I.minus,c:R,s:13}), 'Deduct Points'
+        )
+      ),
+      React.createElement('div', {style:{padding:'10px 14px 0'}},
+        a.injury && a.injury!=='None' && React.createElement('div', {style:{background:AMB,border:'1.5px solid '+AM+'33',borderRadius:10,padding:'9px 11px',marginBottom:9}},
+          React.createElement('div', {style:{fontSize:9,fontWeight:700,color:AM,textTransform:'uppercase',letterSpacing:'1px',fontFamily:FB,marginBottom:2}}, 'INJURY ON FILE'),
+          React.createElement('div', {style:{fontSize:12,color:C,fontFamily:FB}}, a.injury)
+        ),
+        React.createElement(SH, {label:'Points History'}),
+        (a.txns||[]).length===0
+          ? React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:10,padding:14,textAlign:'center'}}, React.createElement('div', {style:{fontSize:12,color:'#aaa',fontFamily:FB}}, 'No transactions'))
+          : (a.txns||[]).map(function(t,i) {
+            return React.createElement('div', {key:i,style:{display:'flex',alignItems:'center',gap:9,padding:'8px 0',borderBottom:'1.5px solid '+G}},
+              React.createElement('div', {style:{width:30,height:30,borderRadius:8,background:t.pts>0?GRB:RB,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+                React.createElement('span', {style:{fontSize:12,fontWeight:700,color:t.pts>0?GR:R}}, t.pts>0?'up':'dn')
+              ),
+              React.createElement('div', {style:{flex:1}},
+                React.createElement('div', {style:{fontSize:11,fontWeight:600,color:K,fontFamily:FB}}, t.l),
+                React.createElement('div', {style:{display:'flex',gap:5,alignItems:'center',marginTop:1}},
+                  React.createElement('span', {style:{fontSize:10,color:'#bbb',fontFamily:FB}}, fmtD(t.d)),
+                  t.t==='admin' && React.createElement(Tag, {label:'Admin', c:PU, bg:PUB})
+                )
+              ),
+              React.createElement('span', {style:{fontFamily:FD,fontSize:14,fontWeight:800,color:t.pts>0?GR:R}}, (t.pts>0?'+':'')+t.pts)
+            );
+          })
+      )
+    );
+  }
 
-      {tab==='policies'&&(
-        <div style={{padding:'0 14px'}} className="fi">
-          <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:8}}>
-            <div style={{width:8,height:8,borderRadius:'50%',background:R,flexShrink:0}}/>
-            <span style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB}}>ATHLETE CANCELLATION</span>
-          </div>
-          <div style={{background:W,border:`1.5px solid ${RBR}`,borderRadius:12,padding:'4px 0',marginBottom:8}}>
-            {[['Free cancel window (hrs before session)','ath_cancel_free_hrs'],['Late cancel penalty (% of pts deducted)','ath_cancel_penalty_pct']].map(([l,k],i,arr)=>(
-              <div key={k} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px',borderBottom:i<arr.length-1?`1px solid ${G}`:'none'}}>
-                <span style={{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}>{l}</span>
-                <div style={{display:'flex',alignItems:'center',gap:4}}>
-                  <input type="number" value={config[k]||0} onChange={e=>setCfg(k,parseInt(e.target.value)||0)} style={numStyle}/>
-                  <span style={{fontSize:10,color:'#bbb',fontFamily:FB}}>{k.includes('pct')?'%':'hrs'}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{background:RB,border:`1px solid ${RBR}`,borderRadius:9,padding:'8px 11px',marginBottom:14,fontSize:11,color:C,fontFamily:FB,lineHeight:1.5}}>
-            Athletes cancelling within <strong>{config.ath_cancel_free_hrs||0} hrs</strong> lose <strong>{config.ath_cancel_penalty_pct||0}%</strong> of session points.
-          </div>
+  if(selCoach) {
+    var c = coaches.find(function(x){return x.id===selCoach.id;}) || selCoach;
+    var salLbl = c.salary.type==='per_session' ? c.salary.rate+' EGP per session'
+      : c.salary.type==='monthly'    ? c.salary.rate.toLocaleString()+' EGP per month'
+      : c.salary.type==='hybrid'     ? (c.salary.base||0).toLocaleString()+' EGP base + '+(c.salary.per_session||0)+' EGP per session'
+      : (c.salary.base||0)>0        ? (c.salary.base||0).toLocaleString()+' EGP + '+(c.salary.pct||0)+'% per session'
+      : (c.salary.pct||0)+'% of session price';
+    return React.createElement('div', {style:{paddingBottom:16}},
+      React.createElement('div', {style:{background:K,padding:'13px 14px 16px',position:'relative',overflow:'hidden'}},
+        React.createElement('div', {style:{position:'absolute',right:-25,top:-25,width:110,height:110,borderRadius:'50%',border:'1px solid rgba(199,35,51,.15)',opacity:.4,pointerEvents:'none'}}),
+        React.createElement(BackBtn, {onBack:function(){setSelCoach(null);},light:true}),
+        React.createElement('div', {style:{display:'flex',gap:11,alignItems:'flex-start',marginTop:11}},
+          React.createElement('div', {style:{width:52,height:52,borderRadius:16,background:R,border:'2px solid rgba(255,255,255,.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+            React.createElement('span', {style:{fontFamily:FD,fontSize:19,fontWeight:900,color:W}}, c.init)
+          ),
+          React.createElement('div', {style:{flex:1}},
+            React.createElement('div', {style:{fontFamily:FD,fontSize:20,fontWeight:900,color:W,lineHeight:1,marginBottom:3}}, c.name.toUpperCase()),
+            React.createElement('div', {style:{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:FB,marginBottom:7}}, c.specialty+' - '+c.branch),
+            React.createElement('div', {style:{display:'flex',alignItems:'center',gap:6}},
+              React.createElement(Stars,{r:c.rating,s:10}),
+              React.createElement('span', {style:{fontSize:11,color:'rgba(255,255,255,.6)',fontFamily:FB,fontWeight:600}}, c.rating+' - '+c.sessions+' sessions')
+            )
+          )
+        )
+      ),
+      React.createElement('div', {style:{padding:'0 14px'}},
+        React.createElement(STabs, {tabs:[['profile','Profile'],['reviews','Reviews'],['salary','Salary']], active:coachTab, onChange:setCoachTab})
+      ),
+      coachTab==='profile' && React.createElement('div', {style:{padding:'0 14px'},className:'fi'},
+        React.createElement('div', {style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'11px 13px',marginBottom:10}},
+          React.createElement('div', {style:{fontSize:9,fontWeight:700,color:'#bbb',letterSpacing:'1.3px',textTransform:'uppercase',fontFamily:FB,marginBottom:6}}, 'CURRENT SALARY PLAN'),
+          React.createElement('div', {style:{fontSize:13,color:K,fontFamily:FB,marginBottom:8}}, salLbl),
+          React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}, 'Bonus: '+(c.salary.bonus_amount||0).toLocaleString()+' EGP after '+(c.salary.bonus_threshold||0)+' sessions per month'),
+          React.createElement('button', {onClick:function(){onModal('salary',c);},style:{width:'100%',background:K,border:'none',borderRadius:9,padding:'9px 0',fontSize:12,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}, 'Edit Salary Plan and Pricing')
+        ),
+        React.createElement(SH, {label:'Private Session Pricing'}),
+        React.createElement('div', {style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'4px 0'}},
+          [['30 min',c.pricing.p30],['45 min',c.pricing.p45],['60 min',c.pricing.p60],['90 min',c.pricing.p90]].map(function(row,i,arr) {
+            return React.createElement('div', {key:row[0],style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 13px',borderBottom:i<arr.length-1?'1px solid '+G:'none'}},
+              React.createElement('span', {style:{fontSize:12,color:C,fontFamily:FB}}, 'Private '+row[0]),
+              React.createElement('span', {style:{fontFamily:FD,fontSize:15,fontWeight:800,color:R}}, row[1]+' EGP')
+            );
+          })
+        )
+      ),
+      coachTab==='reviews' && React.createElement('div', {style:{padding:'0 14px'},className:'fi'},
+        React.createElement('div', {style:{display:'flex',alignItems:'center',gap:10,marginBottom:12,background:W,border:'1.5px solid '+G,borderRadius:12,padding:'11px 13px'}},
+          React.createElement('div', {style:{display:'flex',gap:2}}, React.createElement(Stars,{r:c.rating,s:13})),
+          React.createElement('div', null,
+            React.createElement('div', {style:{fontFamily:FD,fontSize:18,fontWeight:900,color:K}}, c.rating+' / 5.0'),
+            React.createElement('div', {style:{fontSize:10,color:'#aaa',fontFamily:FB}}, c.reviews.length+' athlete reviews')
+          )
+        ),
+        c.reviews.map(function(rv,i) {
+          return React.createElement('div', {key:i,style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'11px 13px',marginBottom:8}},
+            React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}},
+              React.createElement('div', {style:{display:'flex',alignItems:'center',gap:7}},
+                React.createElement('div', {style:{width:26,height:26,borderRadius:7,background:K,display:'flex',alignItems:'center',justifyContent:'center'}},
+                  React.createElement('span', {style:{fontSize:8,fontWeight:900,color:W,fontFamily:FB}}, rv.ath.split(' ').map(function(w){return w[0];}).join(''))
+                ),
+                React.createElement('span', {style:{fontSize:12,fontWeight:600,color:K,fontFamily:FB}}, rv.ath)
+              ),
+              React.createElement('div', {style:{display:'flex',alignItems:'center',gap:4}},
+                React.createElement(Stars,{r:rv.r,s:10}),
+                React.createElement('span', {style:{fontSize:10,color:'#aaa',fontFamily:FB}}, rv.date)
+              )
+            ),
+            React.createElement('p', {style:{fontSize:11,color:'#666',fontFamily:FB,lineHeight:1.5,fontStyle:'italic'}}, '"'+rv.txt+'"')
+          );
+        })
+      ),
+      coachTab==='salary' && React.createElement('div', {style:{padding:'0 14px'},className:'fi'},
+        React.createElement('button', {onClick:function(){onModal('salary',c);},style:{width:'100%',marginBottom:12,background:K,border:'none',borderRadius:10,padding:'11px 0',fontSize:13,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}, 'Edit Salary Plan and Private Pricing'),
+        React.createElement(SH, {label:'Payout History'}),
+        [{month:'May 2025',sess:22,amt:2640,status:'paid'},{month:'Apr 2025',sess:20,amt:2400,status:'paid'},{month:'Jun 2025',sess:4,amt:480,status:'pending'}].map(function(e,i) {
+          return React.createElement('div', {key:i,style:{background:W,border:'1.5px solid '+(e.status==='pending'?AM+'44':G),borderRadius:12,padding:'10px 12px',marginBottom:8}},
+            React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}},
+              React.createElement('div', null,
+                React.createElement('div', {style:{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:1}}, e.month),
+                React.createElement('div', {style:{fontSize:10,color:'#aaa',fontFamily:FB}}, e.sess+' sessions')
+              ),
+              React.createElement('div', {style:{textAlign:'right'}},
+                React.createElement('div', {style:{fontFamily:FD,fontSize:18,fontWeight:900,color:e.status==='pending'?R:K}}, e.amt.toLocaleString()),
+                React.createElement('div', {style:{fontSize:9,color:'#bbb',fontFamily:FB}}, 'EGP')
+              )
+            ),
+            React.createElement(Tag, {label:e.status==='paid'?'Paid':'Pending Approval', c:e.status==='paid'?GR:AM, bg:e.status==='paid'?GRB:AMB})
+          );
+        })
+      )
+    );
+  }
 
-          <div style={{display:'flex',alignItems:'center',gap:7,marginBottom:8}}>
-            <div style={{width:8,height:8,borderRadius:'50%',background:BL,flexShrink:0}}/>
-            <span style={{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB}}>COACH CANCELLATION</span>
-          </div>
-          <div style={{background:W,border:`1.5px solid ${BL}33`,borderRadius:12,padding:'4px 0',marginBottom:8}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px',borderBottom:`1px solid ${G}`}}>
-              <span style={{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}>Minimum notice required (hrs)</span>
-              <div style={{display:'flex',alignItems:'center',gap:4}}>
-                <input type="number" value={config.coach_cancel_notice_hrs||0} onChange={e=>setCfg('coach_cancel_notice_hrs',parseInt(e.target.value)||0)} style={numStyle}/>
-                <span style={{fontSize:10,color:'#bbb',fontFamily:FB}}>hrs</span>
-              </div>
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px',borderBottom:`1px solid ${G}`}}>
-              <span style={{fontSize:11,color:C,fontFamily:FB}}>Athlete refund (always)</span>
-              <Tag label="100% Always" c={GR} bg={GRB}/>
-            </div>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px'}}>
-              <span style={{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}>Coach pay penalty for late cancel (%)</span>
-              <div style={{display:'flex',alignItems:'center',gap:4}}>
-                <input type="number" value={config.coach_cancel_penalty_pct||0} onChange={e=>setCfg('coach_cancel_penalty_pct',parseInt(e.target.value)||0)} style={numStyle}/>
-                <span style={{fontSize:10,color:'#bbb',fontFamily:FB}}>%</span>
-              </div>
-            </div>
-          </div>
-          <div style={{background:BLB,border:`1px solid ${BL}33`,borderRadius:9,padding:'8px 11px',marginBottom:14,fontSize:11,color:C,fontFamily:FB,lineHeight:1.5}}>
-            Athletes always get 100% refund. Coach may lose <strong>{config.coach_cancel_penalty_pct||0}%</strong> of session pay if under <strong>{config.coach_cancel_notice_hrs||0} hrs</strong> notice.
-          </div>
-
-          <SH label="Waitlist"/>
-          <div style={{background:W,border:`1.5px solid ${G}`,borderRadius:12,padding:'4px 0'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px'}}>
-              <span style={{fontSize:11,color:C,fontFamily:FB}}>Notify waitlist when spot opens (hrs ahead)</span>
-              <div style={{display:'flex',alignItems:'center',gap:4}}>
-                <input type="number" value={config.waitlist_notify_hrs||0} onChange={e=>setCfg('waitlist_notify_hrs',parseInt(e.target.value)||0)} style={numStyle}/>
-                <span style={{fontSize:10,color:'#bbb',fontFamily:FB}}>hrs</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {tab==='announce'&&(
-        <div style={{padding:'0 14px'}} className="fi">
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-            <SH label={`Announcements (${config.announcements.length})`}/>
-            <button onClick={()=>onModal('announcement',null)} style={{background:K,border:'none',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',gap:4,marginBottom:7}}>
-              <Ic p={I.plus} c={W} s={12}/>New
-            </button>
-          </div>
-          {config.announcements.map(a=>(
-            <div key={a.id} style={{background:W,border:`1.5px solid ${a.active?RBR:G}`,borderRadius:12,padding:'10px 13px',marginBottom:8}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:5}}>
-                <div style={{flex:1,paddingRight:10}}>
-                  <div style={{fontFamily:FD,fontSize:13,fontWeight:800,color:K,marginBottom:3}}>{a.title}</div>
-                  <div style={{fontSize:11,color:'#888',fontFamily:FB,lineHeight:1.4}}>{a.body}</div>
-                </div>
-                <Toggle on={a.active} onChange={()=>toggleAnn(a.id)}/>
-              </div>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:7}}>
-                <div style={{display:'flex',gap:5}}>
-                  <Tag label={a.audience==='all'?'All Users':a.audience==='athletes'?'Athletes':'Coaches'} c={BL} bg={BLB}/>
-                  <Tag label={a.active?'Live':'Draft'} c={a.active?GR:'#999'} bg={a.active?GRB:GL}/>
-                </div>
-                <div style={{display:'flex',gap:6}}>
-                  <button onClick={()=>onModal('announcement',a)} style={{background:'transparent',border:`1.5px solid ${G}`,borderRadius:7,padding:'4px 9px',fontSize:10,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}>Edit</button>
-                  <button onClick={()=>deleteAnn(a.id)} style={{background:'transparent',border:`1.5px solid ${R}33`,borderRadius:7,padding:'4px 9px',fontSize:10,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}>Delete</button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+  return React.createElement('div', {style:{paddingBottom:16}},
+    React.createElement('div', {style:{padding:'10px 14px 11px'}},
+      React.createElement('div', {style:{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:11}}, 'USERS'),
+      React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:10,padding:'0 11px',display:'flex',alignItems:'center',gap:8,marginBottom:10}},
+        React.createElement(Ic,{p:I.srch,c:'#ccc',s:15}),
+        React.createElement('input', {value:q,onChange:function(e){setQ(e.target.value);},placeholder:'Search...',style:{flex:1,background:'transparent',border:'none',padding:'10px 0',fontSize:12,fontFamily:FB,color:K}}),
+        q && React.createElement('button', {onClick:function(){setQ('');},style:{background:'transparent',border:'none',cursor:'pointer',display:'flex',padding:2}}, React.createElement(Ic,{p:I.X,c:'#ccc',s:13}))
+      ),
+      React.createElement(STabs, {tabs:[['athletes','Athletes ('+athletes.length+')'],['coaches','Coaches ('+coaches.length+')']], active:sub, onChange:function(v){setSub(v);setQ('');}}),
+    ),
+    React.createElement('div', {style:{padding:'0 14px'}},
+      sub==='athletes' && filtAth.map(function(a) {
+        var ac2 = a.att>=95?GR:a.att>=80?AM:R;
+        return React.createElement('div', {key:a.id,style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'9px 11px',marginBottom:7,opacity:a.status==='inactive'?.6:1}},
+          React.createElement('div', {style:{display:'flex',alignItems:'center',gap:9,marginBottom:7,cursor:'pointer'},onClick:function(){setSelAth(a);}},
+            React.createElement('div', {style:{width:36,height:36,borderRadius:10,background:K,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+              React.createElement('span', {style:{fontFamily:FD,fontSize:12,fontWeight:900,color:W}}, a.init)
+            ),
+            React.createElement('div', {style:{flex:1}},
+              React.createElement('div', {style:{fontSize:12,fontWeight:600,color:K,fontFamily:FB,marginBottom:2}}, a.name),
+              React.createElement('div', {style:{display:'flex',gap:4,flexWrap:'wrap'}},
+                React.createElement(Tag,{label:a.branch,c:'#777',bg:GL}),
+                React.createElement(Tag,{label:a.goal,c:R,bg:RB}),
+                a.injury!=='None' && React.createElement(Tag,{label:'Injury',c:AM,bg:AMB})
+              )
+            ),
+            React.createElement(Ic,{p:I.chR,c:'#ddd',s:13})
+          ),
+          React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 32px',gap:5,alignItems:'center'}},
+            [[a.pts+'pts','Bal',R],[a.sess+'','Sess','#777'],[a.att+'%','Att',ac2]].map(function(item) {
+              return React.createElement('div', {key:item[1],style:{background:GL,borderRadius:6,padding:'5px 3px',textAlign:'center'}},
+                React.createElement('div', {style:{fontFamily:FD,fontSize:12,fontWeight:800,color:item[2],lineHeight:1}}, item[0]),
+                React.createElement('div', {style:{fontSize:7,fontWeight:700,color:'#ccc',textTransform:'uppercase',letterSpacing:'.4px',marginTop:1,fontFamily:FB}}, item[1])
+              );
+            }),
+            React.createElement('button', {onClick:function(e){e.stopPropagation();onModal('manualPts',a);},style:{background:RB,border:'1.5px solid '+RBR,borderRadius:6,height:32,width:32,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}},
+              React.createElement(Ic,{p:I.coin,c:R,s:13})
+            )
+          )
+        );
+      }),
+      sub==='coaches' && filtCoa.map(function(c) {
+        return React.createElement('div', {key:c.id,onClick:function(){setSelCoach(c);setCoachTab('profile');},style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'10px 12px',marginBottom:8,cursor:'pointer'}},
+          React.createElement('div', {style:{display:'flex',alignItems:'center',gap:10,marginBottom:8}},
+            React.createElement('div', {style:{width:40,height:40,borderRadius:12,background:K,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},
+              React.createElement('span', {style:{fontFamily:FD,fontSize:14,fontWeight:900,color:W}}, c.init)
+            ),
+            React.createElement('div', {style:{flex:1}},
+              React.createElement('div', {style:{fontSize:13,fontWeight:600,color:K,fontFamily:FB,marginBottom:3}}, c.name),
+              React.createElement('div', {style:{display:'flex',gap:4,alignItems:'center',flexWrap:'wrap'}},
+                React.createElement(Tag,{label:c.branch,c:'#777',bg:GL}),
+                React.createElement(Tag,{label:c.specialty,c:R,bg:RB}),
+                React.createElement('span', {style:{fontSize:10,color:AM,fontWeight:700,fontFamily:FB}}, c.rating+' star')
+              )
+            ),
+            React.createElement(Ic,{p:I.chR,c:'#ddd',s:13})
+          ),
+          React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:6}},
+            [[c.sessions+'','Sessions','#777'],[c.reviews.length+' reviews','Reviews',BL],[c.rating+' star','Rating',AM]].map(function(item) {
+              return React.createElement('div', {key:item[1],style:{background:GL,borderRadius:7,padding:'6px 4px',textAlign:'center'}},
+                React.createElement('div', {style:{fontFamily:FD,fontSize:12,fontWeight:800,color:item[2],lineHeight:1}}, item[0]),
+                React.createElement('div', {style:{fontSize:7.5,fontWeight:700,color:'#ccc',textTransform:'uppercase',letterSpacing:'.4px',marginTop:2,fontFamily:FB}}, item[1])
+              );
+            })
+          )
+        );
+      })
+    )
   );
 }
 
-/* ── ROOT APP ──────────────────────────────────────────── */
-function App(){
-  const[tab,setTab]=useState('dashboard');
-  const[athletes,setAthletes]=useState(()=>genAthletes());
-  const[coaches,setCoaches]=useState(()=>genCoaches());
-  const[payments,setPayments]=useState(()=>genPayments());
-  const[sessions,setSessions]=useState(()=>initSessions());
-  const[config,setConfig]=useState(()=>initConfig());
-  // Single modal state — type + data, rendered inside .phone outside .scr
-  const[modal,setModal]=useState(null); // {type, data}
-  const openModal=(type,data)=>setModal({type,data});
-  const closeModal=()=>setModal(null);
+/* ── SCREEN: SESSIONS ── */
+function SessionsScreen(props) {
+  var sessions=props.sessions, setSessions=props.setSessions, onModal=props.onModal;
+  var st=_useState('upcoming'); var tab=st[0]; var setTab=st[1];
+  var list = sessions.filter(function(s){return s.status===tab;}).sort(function(a,b){return tab==='upcoming'?a.date-b.date:b.date-a.date;});
+  var counts = {upcoming:sessions.filter(function(s){return s.status==='upcoming';}).length, done:sessions.filter(function(s){return s.status==='done';}).length, cancelled:sessions.filter(function(s){return s.status==='cancelled';}).length};
+  return React.createElement('div', {style:{paddingBottom:16}},
+    React.createElement('div', {style:{padding:'10px 14px 11px'}},
+      React.createElement('div', {style:{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:4}}, 'SESSIONS'),
+      React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}, 'Admin view - override any session')
+    ),
+    React.createElement('div', {style:{display:'flex',gap:7,padding:'0 14px',marginBottom:10,overflowX:'auto',scrollbarWidth:'none'}},
+      [['upcoming','Upcoming',R],['done','Done',GR],['cancelled','Cancelled','#bbb']].map(function(item) {
+        return React.createElement('div', {key:item[0],onClick:function(){setTab(item[0]);},style:{flexShrink:0,background:tab===item[0]?K:GL,border:'1.5px solid '+(tab===item[0]?K:G),borderRadius:8,padding:'5px 11px',display:'flex',gap:5,alignItems:'center',cursor:'pointer',transition:'all .12s'}},
+          React.createElement('span', {style:{fontFamily:FD,fontSize:15,fontWeight:900,color:tab===item[0]?W:item[2],lineHeight:1}}, counts[item[0]]),
+          React.createElement('span', {style:{fontSize:10,fontWeight:600,color:tab===item[0]?'rgba(255,255,255,.5)':'#aaa',fontFamily:FB}}, item[1])
+        );
+      })
+    ),
+    React.createElement('div', {style:{padding:'0 14px'}},
+      list.length===0
+        ? React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:12,padding:22,textAlign:'center'}}, React.createElement('div', {style:{fontSize:12,color:'#bbb',fontFamily:FB}}, 'No '+tab+' sessions'))
+        : list.map(function(s) {
+          return React.createElement('div', {key:s.id,style:{background:W,border:'1.5px solid '+(s.status==='done'?GR+'22':s.status==='cancelled'?G:RBR),borderRadius:12,padding:'10px 12px',marginBottom:8}},
+            React.createElement('div', {style:{display:'flex',alignItems:'center',gap:6,marginBottom:4,flexWrap:'wrap'}},
+              React.createElement('span', {style:{fontSize:10,fontWeight:700,color:R,fontFamily:FB}}, fmtD(s.date)+' - '+s.time),
+              React.createElement(Tag,{label:s.type,c:s.type==='PRIVATE'?AM:BL,bg:s.type==='PRIVATE'?AMB:BLB}),
+              React.createElement(Tag,{label:s.branch,c:'#777',bg:GL})
+            ),
+            React.createElement('div', {style:{fontFamily:FD,fontSize:15,fontWeight:800,color:K,marginBottom:3}}, s.name),
+            React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB,marginBottom:6}}, 'Coach '+s.coach+' - '+s.athletes.join(', ')),
+            s.adminNote && React.createElement('div', {style:{background:PUB,border:'1px solid '+PU+'33',borderRadius:7,padding:'5px 9px',marginBottom:6,fontSize:10,color:PU,fontFamily:FB}}, 'Override: '+s.adminNote),
+            s.cancelledBy==='coach' && React.createElement('div', {style:{background:GRB,border:'1px solid '+GR+'22',borderRadius:7,padding:'5px 9px',marginBottom:6,fontSize:10,color:GR,fontFamily:FB}}, 'Coach cancelled - full refund issued to athletes'),
+            React.createElement('button', {onClick:function(){onModal('override',s);},style:{width:'100%',background:GL,border:'1.5px solid '+G,borderRadius:8,padding:'7px 0',fontSize:11,fontWeight:700,color:C,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',justifyContent:'center',gap:5}},
+              React.createElement(Ic,{p:I.edit,c:C,s:13}), 'Admin Override'
+            )
+          );
+        })
+    )
+  );
+}
 
-  /* Modal handlers */
-  const handleManualPts=(id,type,amt,note)=>{
-    setAthletes(prev=>prev.map(a=>{
+/* ── SCREEN: PAYMENTS ── */
+function PaymentsScreen(props) {
+  var payments=props.payments, setPayments=props.setPayments, onModal=props.onModal;
+  var st=_useState('pending'); var tab=st[0]; var setTab=st[1];
+  var pending = payments.filter(function(p){return p.status==='pending';});
+  var approved = payments.filter(function(p){return p.status==='approved';});
+  var rejected = payments.filter(function(p){return p.status==='rejected';});
+  var list = tab==='pending'?pending:tab==='approved'?approved:rejected;
+  return React.createElement('div', {style:{paddingBottom:16}},
+    React.createElement('div', {style:{padding:'10px 14px 0'}},
+      React.createElement('div', {style:{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:4}}, 'PAYMENTS'),
+      React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}, 'Review receipts and approve packages'),
+      pending.length>0 && React.createElement('div', {style:{background:AMB,border:'1.5px solid '+AM+'44',borderRadius:11,padding:'10px 12px',marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center'}},
+        React.createElement('div', null,
+          React.createElement('div', {style:{fontSize:12,fontWeight:700,color:AM,fontFamily:FB}}, pending.length+' pending - need review'),
+          React.createElement('div', {style:{fontSize:10,color:'#888',fontFamily:FB}}, 'Total: '+pending.reduce(function(a,p){return a+p.price;},0).toLocaleString()+' EGP')
+        ),
+        React.createElement('button', {onClick:function(){if(pending[0])onModal('receipt',pending[0]);},style:{background:AM,border:'none',borderRadius:8,padding:'7px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB}}, 'Review First')
+      )
+    ),
+    React.createElement('div', {style:{display:'flex',gap:7,padding:'0 14px',marginBottom:10,overflowX:'auto',scrollbarWidth:'none'}},
+      [['pending','Pending',pending.length,AM],['approved','Approved',approved.length,GR],['rejected','Rejected',rejected.length,R]].map(function(item) {
+        return React.createElement('div', {key:item[0],onClick:function(){setTab(item[0]);},style:{flexShrink:0,background:tab===item[0]?K:GL,border:'1.5px solid '+(tab===item[0]?K:G),borderRadius:8,padding:'5px 11px',display:'flex',gap:5,alignItems:'center',cursor:'pointer',transition:'all .12s'}},
+          React.createElement('span', {style:{fontFamily:FD,fontSize:15,fontWeight:900,color:tab===item[0]?W:item[3],lineHeight:1}}, item[2]),
+          React.createElement('span', {style:{fontSize:10,fontWeight:600,color:tab===item[0]?'rgba(255,255,255,.5)':'#aaa',fontFamily:FB}}, item[1])
+        );
+      })
+    ),
+    React.createElement('div', {style:{padding:'0 14px'}},
+      list.length===0
+        ? React.createElement('div', {style:{background:GL,border:'1.5px solid '+G,borderRadius:12,padding:22,textAlign:'center'}}, React.createElement('div', {style:{fontSize:12,color:'#bbb',fontFamily:FB}}, 'No '+tab+' payments'))
+        : list.map(function(p) {
+          var borderCol = p.status==='pending'?AM+'44':p.status==='approved'?GR+'22':G;
+          var statusLabel = p.status==='pending'?'Pending':p.status==='approved'?'Approved':'Rejected';
+          var statusC = p.status==='pending'?AM:p.status==='approved'?GR:R;
+          var statusBg = p.status==='pending'?AMB:p.status==='approved'?GRB:RB;
+          return React.createElement('div', {key:p.id,onClick:function(){onModal('receipt',p);},style:{background:W,border:'1.5px solid '+borderCol,borderRadius:12,padding:'10px 12px',marginBottom:8,cursor:'pointer'}},
+            React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}},
+              React.createElement('div', null,
+                React.createElement('div', {style:{fontFamily:FD,fontSize:14,fontWeight:800,color:K,marginBottom:2}}, p.ath),
+                React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB}}, p.pkg+' - '+p.pts+' pts')
+              ),
+              React.createElement('div', {style:{textAlign:'right'}},
+                React.createElement('div', {style:{fontFamily:FD,fontSize:17,fontWeight:900,color:R,lineHeight:1}}, p.price.toLocaleString()),
+                React.createElement('div', {style:{fontSize:9,color:'#bbb',fontFamily:FB}}, 'EGP')
+              )
+            ),
+            React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center'}},
+              React.createElement('span', {style:{fontSize:10,color:'#aaa',fontFamily:FB}}, fmtD(p.date)),
+              React.createElement(Tag,{label:statusLabel,c:statusC,bg:statusBg})
+            ),
+            p.reason && React.createElement('div', {style:{fontSize:10,color:R,fontFamily:FB,marginTop:4}}, p.reason)
+          );
+        })
+    )
+  );
+}
+
+/* ── SCREEN: CONFIG ── */
+function ConfigScreen(props) {
+  var config=props.config, setConfig=props.setConfig, onModal=props.onModal;
+  var st=_useState('points'); var tab=st[0]; var setTab=st[1];
+  function setCfg(k,v){setConfig(function(c){var n=Object.assign({},c);n[k]=v;return n;});}
+  function setST(id,field,val){setConfig(function(c){return Object.assign({},c,{session_types:c.session_types.map(function(s){return s.id===id?Object.assign({},s,{[field]:val}):s;})});});}
+  function setPkg(id,field,val){setConfig(function(c){return Object.assign({},c,{packages:c.packages.map(function(p){return p.id===id?Object.assign({},p,{[field]:val}):p;})});});}
+  function addST(){var id=Date.now();setConfig(function(c){return Object.assign({},c,{session_types:[...c.session_types,{id:id,name:'New Session Type',dur:60,pts_group:8,active:true}]});});}
+  function delST(id){setConfig(function(c){return Object.assign({},c,{session_types:c.session_types.filter(function(s){return s.id!==id;})});});}
+  function addPkg(){var id=Date.now();setConfig(function(c){return Object.assign({},c,{packages:[...c.packages,{id:id,name:'New Package',pts:100,price:3000,active:true}]});});}
+  function delPkg(id){setConfig(function(c){return Object.assign({},c,{packages:c.packages.filter(function(p){return p.id!==id;})});});}
+  function toggleAnn(id){setConfig(function(c){return Object.assign({},c,{announcements:c.announcements.map(function(a){return a.id===id?Object.assign({},a,{active:!a.active}):a;})});});}
+  function delAnn(id){setConfig(function(c){return Object.assign({},c,{announcements:c.announcements.filter(function(a){return a.id!==id;})});});}
+  function saveAnn(form){
+    setConfig(function(c){
+      var existing = c.announcements.find(function(a){return a.id===form.id;});
+      if(existing){return Object.assign({},c,{announcements:c.announcements.map(function(a){return a.id===form.id?Object.assign({},a,form):a;})});}
+      var newAnn = Object.assign({},form,{id:Date.now(),date:new Date()});
+      return Object.assign({},c,{announcements:[newAnn,...c.announcements]});
+    });
+  }
+  var numSt = {width:56,background:GL,border:'1.5px solid '+G,borderRadius:7,padding:'5px 7px',fontSize:12,fontFamily:FB,color:K,textAlign:'center'};
+  return React.createElement('div', {style:{paddingBottom:16}},
+    React.createElement('div', {style:{padding:'10px 14px 0'}},
+      React.createElement('div', {style:{fontFamily:FD,fontSize:24,fontWeight:900,color:K,marginBottom:4}}, 'CONFIGURATION'),
+      React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB,marginBottom:10}}, 'Platform settings, types and policies')
+    ),
+    React.createElement('div', {style:{padding:'0 14px'}},
+      React.createElement('div', {style:{display:'flex',background:GL,borderRadius:9,padding:3,border:'1.5px solid '+G,overflowX:'auto',scrollbarWidth:'none',gap:2,marginBottom:12}},
+        [['points','Points'],['types','Types and Pkgs'],['policies','Policies'],['announce','Announce']].map(function(t) {
+          return React.createElement('div', {key:t[0],onClick:function(){setTab(t[0]);},style:{flex:'1 1 0',textAlign:'center',padding:'7px 4px',borderRadius:6,fontSize:10,fontWeight:600,cursor:'pointer',background:tab===t[0]?W:'transparent',color:tab===t[0]?K:'#bbb',boxShadow:tab===t[0]?'0 1px 3px rgba(0,0,0,.1)':'none',fontFamily:FB,whiteSpace:'nowrap',transition:'all .12s'}}, t[1]);
+        })
+      )
+    ),
+
+    tab==='points' && React.createElement('div', {style:{padding:'0 14px'},className:'fi'},
+      React.createElement(SH,{label:'Group Points by Duration'}),
+      React.createElement('div', {style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'4px 0',marginBottom:12}},
+        [[30,'30 min'],[45,'45 min'],[60,'60 min'],[90,'90 min'],[120,'120 min']].map(function(row,i,arr) {
+          return React.createElement('div', {key:row[0],style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 13px',borderBottom:i<arr.length-1?'1px solid '+G:'none'}},
+            React.createElement('span', {style:{fontSize:12,color:C,fontFamily:FB}}, row[1]+' group session'),
+            React.createElement('div', {style:{display:'flex',alignItems:'center',gap:7}},
+              React.createElement('input', {type:'number',value:config.group_pts[row[0]]||0,onChange:function(e){setConfig(function(c){var gp=Object.assign({},c.group_pts);gp[row[0]]=parseInt(e.target.value)||0;return Object.assign({},c,{group_pts:gp});});},style:numSt}),
+              React.createElement('span', {style:{fontSize:11,color:'#aaa',fontFamily:FB}}, 'pts')
+            )
+          );
+        })
+      ),
+      React.createElement(SH,{label:'Platform Settings'}),
+      React.createElement('div', {style:{background:W,border:'1.5px solid '+G,borderRadius:12,padding:'4px 0'}},
+        [['Max athletes per group session','max_athletes_group'],['Max athletes per private session','max_athletes_private']].map(function(row,i,arr) {
+          return React.createElement('div', {key:row[1],style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'9px 13px',borderBottom:i<arr.length-1?'1px solid '+G:'none'}},
+            React.createElement('span', {style:{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}, row[0]),
+            React.createElement('input', {type:'number',value:config[row[1]]||0,onChange:function(e){setCfg(row[1],parseInt(e.target.value)||0);},style:numSt})
+          );
+        })
+      )
+    ),
+
+    tab==='types' && React.createElement('div', {style:{padding:'0 14px'},className:'fi'},
+      React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
+        React.createElement(SH,{label:'Session Types ('+config.session_types.length+')'}),
+        React.createElement('button', {onClick:addST,style:{background:K,border:'none',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',gap:4,flexShrink:0}},
+          React.createElement(Ic,{p:I.plus,c:W,s:12}), 'New Type'
+        )
+      ),
+      config.session_types.map(function(s) {
+        return React.createElement('div', {key:s.id,style:{background:W,border:'1.5px solid '+(s.active?RBR:G),borderRadius:12,padding:'10px 13px',marginBottom:8,opacity:s.active?1:.65}},
+          React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}},
+            React.createElement('input', {value:s.name,onChange:function(e){setST(s.id,'name',e.target.value);},style:{fontFamily:FD,fontSize:14,fontWeight:800,color:K,background:'transparent',border:'none',flex:1,paddingRight:8}}),
+            React.createElement('div', {style:{display:'flex',alignItems:'center',gap:6}},
+              React.createElement('button', {onClick:function(){delST(s.id);},style:{background:'transparent',border:'1.5px solid '+R+'33',borderRadius:6,padding:'3px 7px',fontSize:10,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}, 'Del'),
+              React.createElement(Toggle,{on:s.active,onChange:function(){setST(s.id,'active',!s.active);}})
+            )
+          ),
+          React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}},
+            React.createElement('div', null,
+              React.createElement('div', {style:{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}, 'Duration (min)'),
+              React.createElement('input', {type:'number',value:s.dur,onChange:function(e){setST(s.id,'dur',parseInt(e.target.value)||0);},style:Object.assign({},iS,{padding:'7px 9px',fontSize:12})})
+            ),
+            React.createElement('div', null,
+              React.createElement('div', {style:{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}, 'Group pts'),
+              React.createElement('input', {type:'number',value:s.pts_group,onChange:function(e){setST(s.id,'pts_group',parseInt(e.target.value)||0);},style:Object.assign({},iS,{padding:'7px 9px',fontSize:12,color:R,fontFamily:FD,fontWeight:800})})
+            )
+          )
+        );
+      }),
+      React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:14,marginBottom:10}},
+        React.createElement(SH,{label:'Packages ('+config.packages.length+')'}),
+        React.createElement('button', {onClick:addPkg,style:{background:K,border:'none',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',gap:4,flexShrink:0}},
+          React.createElement(Ic,{p:I.plus,c:W,s:12}), 'New Package'
+        )
+      ),
+      config.packages.map(function(p) {
+        var ppt = p.pts>0 ? (p.price/p.pts).toFixed(1) : '--';
+        return React.createElement('div', {key:p.id,style:{background:W,border:'1.5px solid '+(p.active?RBR:G),borderRadius:12,padding:'10px 13px',marginBottom:8,opacity:p.active?1:.65}},
+          React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}},
+            React.createElement('input', {value:p.name,onChange:function(e){setPkg(p.id,'name',e.target.value);},style:{fontFamily:FD,fontSize:14,fontWeight:800,color:K,background:'transparent',border:'none',flex:1,paddingRight:8}}),
+            React.createElement('div', {style:{display:'flex',alignItems:'center',gap:6}},
+              React.createElement('button', {onClick:function(){delPkg(p.id);},style:{background:'transparent',border:'1.5px solid '+R+'33',borderRadius:6,padding:'3px 7px',fontSize:10,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}, 'Del'),
+              React.createElement(Toggle,{on:p.active,onChange:function(){setPkg(p.id,'active',!p.active);}})
+            )
+          ),
+          React.createElement('div', {style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}},
+            React.createElement('div', null, React.createElement('div', {style:{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}, 'Points'), React.createElement('input', {type:'number',value:p.pts,onChange:function(e){setPkg(p.id,'pts',parseInt(e.target.value)||0);},style:Object.assign({},iS,{padding:'7px 9px',fontSize:12,color:R,fontFamily:FD,fontWeight:800})})),
+            React.createElement('div', null, React.createElement('div', {style:{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}, 'Price EGP'), React.createElement('input', {type:'number',value:p.price,onChange:function(e){setPkg(p.id,'price',parseInt(e.target.value)||0);},style:Object.assign({},iS,{padding:'7px 9px',fontSize:12})})),
+            React.createElement('div', null, React.createElement('div', {style:{fontSize:8,fontWeight:700,color:'#bbb',textTransform:'uppercase',fontFamily:FB,marginBottom:4}}, 'EGP per pt'), React.createElement('div', {style:Object.assign({},iS,{padding:'7px 9px',fontSize:12,fontFamily:FD,fontWeight:800,color:GR,border:'1.5px solid '+GR+'33',background:GRB,borderRadius:9})}, ppt))
+          )
+        );
+      })
+    ),
+
+    tab==='policies' && React.createElement('div', {style:{padding:'0 14px'},className:'fi'},
+      React.createElement('div', {style:{display:'flex',alignItems:'center',gap:7,marginBottom:8}},
+        React.createElement('div', {style:{width:8,height:8,borderRadius:'50%',background:R,flexShrink:0}}),
+        React.createElement('span', {style:{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB}}, 'ATHLETE CANCELLATION')
+      ),
+      React.createElement('div', {style:{background:W,border:'1.5px solid '+RBR,borderRadius:12,padding:'4px 0',marginBottom:8}},
+        [['Free cancel window (hrs before session)','ath_cancel_free_hrs'],['Late cancel penalty (% of pts deducted)','ath_cancel_penalty_pct']].map(function(row,i,arr) {
+          return React.createElement('div', {key:row[1],style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px',borderBottom:i<arr.length-1?'1px solid '+G:'none'}},
+            React.createElement('span', {style:{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}, row[0]),
+            React.createElement('div', {style:{display:'flex',alignItems:'center',gap:4}},
+              React.createElement('input', {type:'number',value:config[row[1]]||0,onChange:function(e){setCfg(row[1],parseInt(e.target.value)||0);},style:numSt}),
+              React.createElement('span', {style:{fontSize:10,color:'#bbb',fontFamily:FB}}, row[1].includes('pct')?'%':'hrs')
+            )
+          );
+        })
+      ),
+      React.createElement('div', {style:{background:RB,border:'1px solid '+RBR,borderRadius:9,padding:'8px 11px',marginBottom:14,fontSize:11,color:C,fontFamily:FB,lineHeight:1.5}},
+        'Athletes cancelling within '+(config.ath_cancel_free_hrs||0)+' hrs lose '+(config.ath_cancel_penalty_pct||0)+'% of session points.'
+      ),
+      React.createElement('div', {style:{display:'flex',alignItems:'center',gap:7,marginBottom:8}},
+        React.createElement('div', {style:{width:8,height:8,borderRadius:'50%',background:BL,flexShrink:0}}),
+        React.createElement('span', {style:{fontSize:9,fontWeight:700,color:'#999',letterSpacing:'1.4px',textTransform:'uppercase',fontFamily:FB}}, 'COACH CANCELLATION')
+      ),
+      React.createElement('div', {style:{background:W,border:'1.5px solid '+BL+'33',borderRadius:12,padding:'4px 0',marginBottom:8}},
+        React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px',borderBottom:'1px solid '+G}},
+          React.createElement('span', {style:{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}, 'Minimum notice required (hrs)'),
+          React.createElement('div', {style:{display:'flex',alignItems:'center',gap:4}},
+            React.createElement('input', {type:'number',value:config.coach_cancel_notice_hrs||0,onChange:function(e){setCfg('coach_cancel_notice_hrs',parseInt(e.target.value)||0);},style:numSt}),
+            React.createElement('span', {style:{fontSize:10,color:'#bbb',fontFamily:FB}}, 'hrs')
+          )
+        ),
+        React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px',borderBottom:'1px solid '+G}},
+          React.createElement('span', {style:{fontSize:11,color:C,fontFamily:FB}}, 'Athlete refund when coach cancels'),
+          React.createElement(Tag,{label:'100% Always',c:GR,bg:GRB})
+        ),
+        React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 13px'}},
+          React.createElement('span', {style:{fontSize:11,color:C,fontFamily:FB,flex:1,paddingRight:10}}, 'Coach pay penalty for late cancel (%)'),
+          React.createElement('div', {style:{display:'flex',alignItems:'center',gap:4}},
+            React.createElement('input', {type:'number',value:config.coach_cancel_penalty_pct||0,onChange:function(e){setCfg('coach_cancel_penalty_pct',parseInt(e.target.value)||0);},style:numSt}),
+            React.createElement('span', {style:{fontSize:10,color:'#bbb',fontFamily:FB}}, '%')
+          )
+        )
+      ),
+      React.createElement('div', {style:{background:BLB,border:'1px solid '+BL+'33',borderRadius:9,padding:'8px 11px',marginBottom:14,fontSize:11,color:C,fontFamily:FB,lineHeight:1.5}},
+        'Athletes always get 100% refund. Coach may lose '+(config.coach_cancel_penalty_pct||0)+'% of session pay if under '+(config.coach_cancel_notice_hrs||0)+' hrs notice.'
+      )
+    ),
+
+    tab==='announce' && React.createElement('div', {style:{padding:'0 14px'},className:'fi'},
+      React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
+        React.createElement(SH,{label:'Announcements ('+config.announcements.length+')'}),
+        React.createElement('button', {onClick:function(){onModal('announcement',null);},style:{background:K,border:'none',borderRadius:8,padding:'6px 11px',fontSize:11,fontWeight:700,color:W,cursor:'pointer',fontFamily:FB,display:'flex',alignItems:'center',gap:4,flexShrink:0}},
+          React.createElement(Ic,{p:I.plus,c:W,s:12}), 'New'
+        )
+      ),
+      config.announcements.map(function(a) {
+        return React.createElement('div', {key:a.id,style:{background:W,border:'1.5px solid '+(a.active?RBR:G),borderRadius:12,padding:'10px 13px',marginBottom:8}},
+          React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:5}},
+            React.createElement('div', {style:{flex:1,paddingRight:10}},
+              React.createElement('div', {style:{fontFamily:FD,fontSize:13,fontWeight:800,color:K,marginBottom:3}}, a.title),
+              React.createElement('div', {style:{fontSize:11,color:'#888',fontFamily:FB,lineHeight:1.4}}, a.body)
+            ),
+            React.createElement(Toggle,{on:a.active,onChange:function(){toggleAnn(a.id);}})
+          ),
+          React.createElement('div', {style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:7}},
+            React.createElement('div', {style:{display:'flex',gap:5}},
+              React.createElement(Tag,{label:a.audience==='all'?'All Users':a.audience==='athletes'?'Athletes':'Coaches',c:BL,bg:BLB}),
+              React.createElement(Tag,{label:a.active?'Live':'Draft',c:a.active?GR:'#999',bg:a.active?GRB:GL})
+            ),
+            React.createElement('div', {style:{display:'flex',gap:6}},
+              React.createElement('button', {onClick:function(){onModal('announcement',a);},style:{background:'transparent',border:'1.5px solid '+G,borderRadius:7,padding:'4px 9px',fontSize:10,fontWeight:600,color:C,cursor:'pointer',fontFamily:FB}}, 'Edit'),
+              React.createElement('button', {onClick:function(){delAnn(a.id);},style:{background:'transparent',border:'1.5px solid '+R+'33',borderRadius:7,padding:'4px 9px',fontSize:10,fontWeight:600,color:R,cursor:'pointer',fontFamily:FB}}, 'Delete')
+            )
+          )
+        );
+      })
+    )
+  );
+}
+
+/* ── ROOT APP ── */
+function App() {
+  var st1=_useState('dashboard'); var tab=st1[0]; var setTab=st1[1];
+  var st2=_useState(ATHLETES.map(function(a){return Object.assign({},a);})); var athletes=st2[0]; var setAthletes=st2[1];
+  var st3=_useState(COACHES.map(function(c){return Object.assign({},c);})); var coaches=st3[0]; var setCoaches=st3[1];
+  var st4=_useState(PAYMENTS_INIT.map(function(p){return Object.assign({},p);})); var payments=st4[0]; var setPayments=st4[1];
+  var st5=_useState(SESSIONS_INIT.map(function(s){return Object.assign({},s);})); var sessions=st5[0]; var setSessions=st5[1];
+  var st6=_useState(initConfig()); var config=st6[0]; var setConfig=st6[1];
+  var st7=_useState(null); var modal=st7[0]; var setModal=st7[1];
+
+  function openModal(type,data){setModal({type:type,data:data});}
+  function closeModal(){setModal(null);}
+
+  function handleManualPts(id,type,amt,note){
+    setAthletes(function(prev){return prev.map(function(a){
       if(a.id!==id) return a;
-      const newPts=type==='add'?a.pts+amt:Math.max(0,a.pts-amt);
-      return{...a,pts:newPts,txns:[{t:'admin',d:new Date(),l:note,pts:type==='add'?amt:-amt},...(a.txns||[])]};
-    }));
+      var newPts=type==='add'?a.pts+amt:Math.max(0,a.pts-amt);
+      var newTxn={t:'admin',d:new Date(),l:note,pts:type==='add'?amt:-amt};
+      return Object.assign({},a,{pts:newPts,txns:[newTxn,...(a.txns||[])]});
+    });});
     closeModal();
-  };
-  const handleOverride=(id,action,note)=>{
-    const newStatus=action==='cancel'?'cancelled':action==='mark_done'?'done':'upcoming';
-    setSessions(prev=>prev.map(s=>s.id===id?{...s,status:newStatus,adminNote:note}:s));
+  }
+  function handleOverride(id,action,note){
+    var statusMap={cancel:'cancelled',mark_done:'done',reopen:'upcoming'};
+    setSessions(function(prev){return prev.map(function(s){return s.id===id?Object.assign({},s,{status:statusMap[action],adminNote:note}):s;});});
     closeModal();
-  };
-  const handleSalary=(id,salary,pricing)=>{
-    setCoaches(prev=>prev.map(c=>c.id===id?{...c,salary,pricing}:c));
+  }
+  function handleSalary(id,salary,pricing){
+    setCoaches(function(prev){return prev.map(function(c){return c.id===id?Object.assign({},c,{salary:salary,pricing:pricing}):c;});});
     closeModal();
-  };
-  const handleApprove=id=>{setPayments(prev=>prev.map(p=>p.id===id?{...p,status:'approved'}:p));closeModal();};
-  const handleReject=(id,reason)=>{setPayments(prev=>prev.map(p=>p.id===id?{...p,status:'rejected',reason}:p));closeModal();};
-  const handleAnn=form=>{
-    if(form.id){setConfig(c=>({...c,announcements:c.announcements.map(a=>a.id===form.id?{...a,...form}:a)}));}
-    else{setConfig(c=>({...c,announcements:[{...form,id:Date.now(),date:new Date()},...c.announcements]}));}
+  }
+  function handleApprove(id){setPayments(function(prev){return prev.map(function(p){return p.id===id?Object.assign({},p,{status:'approved'}):p;});});closeModal();}
+  function handleReject(id,reason){setPayments(function(prev){return prev.map(function(p){return p.id===id?Object.assign({},p,{status:'rejected',reason:reason}):p;});});closeModal();}
+  function handleAnn(form){
+    setConfig(function(c){
+      var exists=c.announcements.find(function(a){return a.id===form.id;});
+      if(exists){return Object.assign({},c,{announcements:c.announcements.map(function(a){return a.id===form.id?Object.assign({},a,form):a;})});}
+      return Object.assign({},c,{announcements:[Object.assign({},form,{id:Date.now(),date:new Date()}),...c.announcements]});
+    });
     closeModal();
-  };
+  }
 
-  const nav=[
-    {id:'dashboard',l:'Dash',   ic:I.dash},
-    {id:'users',    l:'Users',  ic:I.usrs},
-    {id:'sessions', l:'Sessions',ic:I.cal},
-    {id:'payments', l:'Pay',    ic:I.coin},
-    {id:'config',   l:'Config', ic:I.cog},
-  ];
+  var nav=[['dashboard','Dash',I.dash],['users','Users',I.usrs],['sessions','Sessions',I.cal],['payments','Pay',I.coin],['config','Config',I.cog]];
 
-  return(
-    <div className="shell">
-      <div className="brand"><div className="brand-name">INCHES</div><div className="brand-sub">Admin Panel</div></div>
-      <div className="phone">
-        <div className="notch"/>
-        {/* Status bar */}
-        <div className="sbar">
-          <span style={{fontSize:12,fontWeight:600,color:K,fontFamily:FB}}>9:41</span>
-          <div style={{display:'flex',alignItems:'center',gap:4}}>
-            <svg width="13" height="9" viewBox="0 0 16 11" fill={K}><rect x="0" y="3" width="3" height="8" rx="1"/><rect x="4.5" y="2" width="3" height="9" rx="1"/><rect x="9" y="0" width="3" height="11" rx="1"/><rect x="13.5" y="1" width="2.5" height="10" rx=".5" opacity=".3"/></svg>
-            <svg width="12" height="9" viewBox="0 0 15 11" fill="none"><path d="M7.5 2.5C9.5 2.5 11.3 3.3 12.6 4.6L14 3.2C12.3 1.5 10 .5 7.5.5 5 .5 2.7 1.5 1 3.2L2.4 4.6C3.7 3.3 5.5 2.5 7.5 2.5Z" fill={K}/><path d="M7.5 5.5C8.7 5.5 9.8 6 10.6 6.8L12 5.4C10.8 4.2 9.2 3.5 7.5 3.5 5.8 3.5 4.2 4.2 3 5.4L4.4 6.8C5.2 6 6.3 5.5 7.5 5.5Z" fill={K}/><circle cx="7.5" cy="9.5" r="1.5" fill={K}/></svg>
-            <svg width="20" height="10" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke={K} strokeOpacity=".35"/><rect x="1.5" y="1.5" width="18" height="9" rx="2.5" fill={K}/><path d="M23 4.5V7.5c.8-.3 1.5-1.1 1.5-1.5S23.8 4.8 23 4.5Z" fill={K} fillOpacity=".4"/></svg>
-          </div>
-        </div>
-
-        {/* Screen content */}
-        <div className="scr">
-          {tab==='dashboard'&&<DashScreen athletes={athletes} sessions={sessions} payments={payments} onNav={setTab}/>}
-          {tab==='users'    &&<UsersScreen athletes={athletes} setAthletes={setAthletes} coaches={coaches} setCoaches={setCoaches} onModal={openModal}/>}
-          {tab==='sessions' &&<SessionsScreen sessions={sessions} setSessions={setSessions} onModal={openModal}/>}
-          {tab==='payments' &&<PaymentsScreen payments={payments} setPayments={setPayments} onModal={openModal}/>}
-          {tab==='config'   &&<ConfigScreen config={config} setConfig={setConfig} onModal={openModal}/>}
-        </div>
-
-        {/* Bottom nav */}
-        <div className="bnav">
-          {nav.map(item=>(
-            <div key={item.id} onClick={()=>setTab(item.id)} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,cursor:'pointer',padding:'2px 0'}}>
-              <Ic p={item.ic} c={tab===item.id?R:C} s={19}/>
-              <span style={{fontSize:8.5,fontWeight:700,letterSpacing:'.3px',textTransform:'uppercase',fontFamily:FB,color:tab===item.id?R:'#bbb'}}>{item.l}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* ── ALL MODALS RENDERED HERE — inside .phone, outside .scr ──
-            position:absolute on .moverlay clips to .phone (position:relative+overflow:hidden)
-            This guarantees the modal covers the full phone including nav */}
-        {modal?.type==='manualPts'  && <ManualPtsContent  athlete={modal.data}  onSave={handleManualPts} onClose={closeModal}/>}
-        {modal?.type==='override'   && <OverrideContent   session={modal.data}  onSave={handleOverride}  onClose={closeModal}/>}
-        {modal?.type==='salary'     && <SalaryContent     coach={modal.data}    onSave={handleSalary}    onClose={closeModal}/>}
-        {modal?.type==='receipt'    && <ReceiptContent    payment={modal.data}  onApprove={handleApprove} onReject={handleReject} onClose={closeModal}/>}
-        {modal?.type==='announcement'&& <AnnContent       ann={modal.data}      onSave={handleAnn}       onClose={closeModal}/>}
-      </div>
-    </div>
+  return React.createElement('div', {className:'shell'},
+    React.createElement('div', null,
+      React.createElement('div', {className:'brand-name'}, 'INCHES'),
+      React.createElement('div', {className:'brand-sub'}, 'Admin Panel')
+    ),
+    React.createElement('div', {className:'phone'},
+      React.createElement('div', {className:'notch'}),
+      React.createElement('div', {className:'sbar'},
+        React.createElement('span', {style:{fontSize:12,fontWeight:600,color:K,fontFamily:FB}}, '9:41'),
+        React.createElement('div', {style:{display:'flex',alignItems:'center',gap:4}},
+          React.createElement('svg', {width:13,height:9,viewBox:'0 0 16 11',fill:K}, React.createElement('rect',{x:0,y:3,width:3,height:8,rx:1}),React.createElement('rect',{x:4.5,y:2,width:3,height:9,rx:1}),React.createElement('rect',{x:9,y:0,width:3,height:11,rx:1}),React.createElement('rect',{x:13.5,y:1,width:2.5,height:10,rx:.5,opacity:.3}))
+        )
+      ),
+      React.createElement('div', {className:'scr'},
+        tab==='dashboard' && React.createElement(DashScreen,{athletes:athletes,sessions:sessions,payments:payments,onNav:setTab}),
+        tab==='users'     && React.createElement(UsersScreen,{athletes:athletes,setAthletes:setAthletes,coaches:coaches,setCoaches:setCoaches,onModal:openModal}),
+        tab==='sessions'  && React.createElement(SessionsScreen,{sessions:sessions,setSessions:setSessions,onModal:openModal}),
+        tab==='payments'  && React.createElement(PaymentsScreen,{payments:payments,setPayments:setPayments,onModal:openModal}),
+        tab==='config'    && React.createElement(ConfigScreen,{config:config,setConfig:setConfig,onModal:openModal})
+      ),
+      React.createElement('div', {className:'bnav'},
+        nav.map(function(item) {
+          return React.createElement('div', {key:item[0],onClick:function(){setTab(item[0]);},style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2,cursor:'pointer',padding:'2px 0'}},
+            React.createElement(Ic,{p:item[2],c:tab===item[0]?R:C,s:19}),
+            React.createElement('span', {style:{fontSize:8.5,fontWeight:700,letterSpacing:'.3px',textTransform:'uppercase',fontFamily:FB,color:tab===item[0]?R:'#bbb'}}, item[1])
+          );
+        })
+      ),
+      modal && modal.type==='manualPts'   && React.createElement(ManualPtsModal,{athlete:modal.data,onSave:handleManualPts,onClose:closeModal}),
+      modal && modal.type==='override'    && React.createElement(OverrideModal,{session:modal.data,onSave:handleOverride,onClose:closeModal}),
+      modal && modal.type==='salary'      && React.createElement(SalaryModal,{coach:modal.data,onSave:handleSalary,onClose:closeModal}),
+      modal && modal.type==='receipt'     && React.createElement(ReceiptModal,{payment:modal.data,onApprove:handleApprove,onReject:handleReject,onClose:closeModal}),
+      modal && modal.type==='announcement'&& React.createElement(AnnModal,{ann:modal.data,onSave:handleAnn,onClose:closeModal})
+    )
   );
 }
 
 document.getElementById('loading').style.display='none';
 document.getElementById('root').style.display='block';
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
 </body>
 </html>
